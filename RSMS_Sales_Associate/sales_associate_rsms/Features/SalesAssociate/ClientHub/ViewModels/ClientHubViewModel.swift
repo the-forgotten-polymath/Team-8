@@ -13,6 +13,9 @@ class ClientHubViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
 
+    /// Set by the parent view from AuthViewModel.currentUser?.id
+    var associateId: UUID? = nil
+
     private var searchTask: Task<Void, Never>?
 
     func searchClients() {
@@ -21,12 +24,15 @@ class ClientHubViewModel: ObservableObject {
             do {
                 isLoading = true
                 errorMessage = nil
-                
-                // Add a small debounce if typing
+
+                // Debounce if the user is typing
                 try await Task.sleep(nanoseconds: 300_000_000)
-                
-                let results = try await ClientDigitalTwinService.shared.searchClients(query: searchQuery)
-                
+
+                let results = try await ClientDigitalTwinService.shared.searchClients(
+                    query: searchQuery,
+                    associateId: associateId
+                )
+
                 if !Task.isCancelled {
                     if let tier = self.selectedTier {
                         self.clients = results.filter { $0.tier == tier }
@@ -44,4 +50,3 @@ class ClientHubViewModel: ObservableObject {
         }
     }
 }
-

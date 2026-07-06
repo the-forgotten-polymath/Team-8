@@ -5,12 +5,12 @@ import SwiftUI
 
 struct CatalogBrowserView: View {
     @EnvironmentObject var checkoutEnv: CheckoutEnvironment
+    @EnvironmentObject private var authVM: AuthViewModel
     @StateObject private var viewModel = CatalogViewModel()
     
-    // Strict 2-column layout with 12pt grid spacing
+    // Responsive grid layout that adapts to iPhone and iPad
     let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
+        GridItem(.adaptive(minimum: 160), spacing: 12)
     ]
     
     var body: some View {
@@ -155,6 +155,7 @@ struct CatalogBrowserView: View {
             }
             .toolbar(.hidden, for: .navigationBar) // Hide native nav bar on root Catalog tab
             .onAppear {
+                viewModel.storeId = authVM.userStoreID
                 viewModel.searchQuery = ""
                 viewModel.selectedCategory = nil
                 Task {

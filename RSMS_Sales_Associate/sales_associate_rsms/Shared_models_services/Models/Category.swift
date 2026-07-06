@@ -10,7 +10,7 @@ import Foundation
 struct Category: Identifiable, Codable {
     let id: UUID
     let categoryName: String
-    let createdAt: Date
+    let createdAt: Date?
 
     enum CodingKeys: String, CodingKey {
         case id

@@ -9,18 +9,54 @@ struct CatalogProductCardView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Product Image Container (1:1 Ratio)
-            ZStack(alignment: .topTrailing) {
-                // Category Specific Digital Gradient
-                LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .aspectRatio(1, contentMode: .fit)
-                    .overlay(
-                        Image(systemName: product.sfSymbolName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 44)
-                            .foregroundColor(.white)
-                    )
+            // Product Image Container (Strict 1:1 Ratio)
+            Color.clear
+                .aspectRatio(1, contentMode: .fit)
+                .overlay(
+                    ZStack(alignment: .topTrailing) {
+                        // Category Specific Digital Gradient or Image
+                if let firstImageURL = product.imageURLs?.first {
+                    AsyncImage(url: firstImageURL) { phase in
+                        switch phase {
+                        case .empty:
+                            ZStack {
+                                LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                                    .overlay(
+                                        Image(systemName: product.sfSymbolName)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 44)
+                                            .foregroundColor(.white.opacity(0.5))
+                                    )
+                                ProgressView()
+                            }
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        case .failure:
+                            LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                                .overlay(
+                                    Image(systemName: product.sfSymbolName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 44)
+                                        .foregroundColor(.white)
+                                )
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .overlay(
+                            Image(systemName: product.sfSymbolName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 44)
+                                .foregroundColor(.white)
+                        )
+                }
                 
                 // Wishlist overlay icon
                 Button(action: {
@@ -34,9 +70,11 @@ struct CatalogProductCardView: View {
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1.5)
                 }
-                .padding(10)
-            }
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
+                .padding(8)
+                    }
+                )
+                .clipped()
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
             
             // Card Info Content
             VStack(alignment: .leading, spacing: 6) {

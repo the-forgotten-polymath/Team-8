@@ -82,10 +82,16 @@ struct DashboardView: View {
                     .environmentObject(checkoutEnv)
             }
             .task {
-                await viewModel.loadDashboardData()
+                await viewModel.loadDashboardData(
+                    userId: authVM.currentUser?.id,
+                    storeId: authVM.userStoreID
+                )
             }
             .refreshable {
-                await viewModel.loadDashboardData()
+                await viewModel.loadDashboardData(
+                    userId: authVM.currentUser?.id,
+                    storeId: authVM.userStoreID
+                )
             }
         }
     }

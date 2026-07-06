@@ -6,6 +6,7 @@ import SwiftUI
 struct ProductDetailView: View {
     let product: ProductDigitalTwin
     
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject var checkoutEnv: CheckoutEnvironment
     @State private var showingAvailability = false
     @State private var recommendedProducts: [ProductDigitalTwin] = []
@@ -13,19 +14,103 @@ struct ProductDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            if horizontalSizeClass == .regular {
+                HStack(alignment: .top, spacing: 32) {
+                    headerImage
+                        .frame(maxWidth: 500)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    productDetails
+                }
+                .padding(32)
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    headerImage
+                    productDetails
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: CartReviewView(isEmbedded: true)) {
+                    ZStack {
+                        Image(systemName: "cart")
+                            .font(.body)
+                        
+                        if let cart = checkoutEnv.activeCart, !cart.items.isEmpty {
+                            let totalCount = cart.items.reduce(0) { $0 + $1.quantity }
+                            Text("\(totalCount)")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(3)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .offset(x: 9, y: -9)
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingAvailability) {
+            InventoryAvailabilityView(product: product)
+        }
+        .onAppear {
+            loadRecommendations()
+        }
+    }
+    
+    @ViewBuilder
+    private var headerImage: some View {
                 // Header Image with Category Gradient
-                LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .frame(height: 350)
-                    .overlay(
-                        Image(systemName: product.sfSymbolName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 80)
-                            .foregroundColor(.white)
-                    )
-                
-                VStack(alignment: .leading, spacing: 24) {
+                if let firstImageURL = product.imageURLs?.first {
+                    AsyncImage(url: firstImageURL) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 350)
+                                .background(Color(.systemGray6))
+                        case .success(let image):
+                            Color.clear
+                                .frame(height: horizontalSizeClass == .regular ? 500 : 350)
+                                .overlay(
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                )
+                                .clipped()
+                        case .failure:
+                            LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                                .frame(height: 350)
+                                .overlay(
+                                    Image(systemName: product.sfSymbolName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 80)
+                                        .foregroundColor(.white)
+                                )
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    LinearGradient(colors: product.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .frame(height: 350)
+                        .overlay(
+                            Image(systemName: product.sfSymbolName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 80)
+                                .foregroundColor(.white)
+                        )
+                }
+    }
+    
+    @ViewBuilder
+    private var productDetails: some View {
+        VStack(alignment: .leading, spacing: 24) {
                     // Title and Price Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text(product.brand)
@@ -83,11 +168,10 @@ struct ProductDetailView: View {
                                     Text("Add to Cart")
                                         .fontWeight(.bold)
                                         .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .background(product.isAvailable ? Color.blue : Color.gray)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(12)
                                 }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.large)
+                                .tint(product.isAvailable ? Color.blue : Color.gray)
                                 .disabled(!product.isAvailable)
                             }
                             
@@ -107,11 +191,10 @@ struct ProductDetailView: View {
                             Text("Buy Now")
                                 .fontWeight(.bold)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(product.isAvailable ? Color.green : Color.gray)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
                         }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .tint(product.isAvailable ? Color.green : Color.gray)
                         .disabled(!product.isAvailable)
                     }
                     
@@ -215,41 +298,13 @@ struct ProductDetailView: View {
                 }
                 .padding()
             }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: CartReviewView(isEmbedded: true)) {
-                    ZStack {
-                        Image(systemName: "cart")
-                            .font(.body)
-                        
-                        if let cart = checkoutEnv.activeCart, !cart.items.isEmpty {
-                            let totalCount = cart.items.reduce(0) { $0 + $1.quantity }
-                            Text("\(totalCount)")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(3)
-                                .background(Color.red)
-                                .clipShape(Circle())
-                                .offset(x: 9, y: -9)
-                        }
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $showingAvailability) {
-            InventoryAvailabilityView(product: product)
-        }
-        .onAppear {
-            checkoutEnv.visitProduct(product)
-            if recommendedProducts.isEmpty {
-                Task {
-                    isLoadingRecommendations = true
-                    recommendedProducts = await RecommendationEngine.shared.recommendComplementary(for: product)
-                    isLoadingRecommendations = false
-                }
+    private func loadRecommendations() {
+        checkoutEnv.visitProduct(product)
+        if recommendedProducts.isEmpty {
+            Task {
+                isLoadingRecommendations = true
+                recommendedProducts = await RecommendationEngine.shared.recommendComplementary(for: product)
+                isLoadingRecommendations = false
             }
         }
     }

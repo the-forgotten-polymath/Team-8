@@ -20,24 +20,10 @@ class CheckoutEnvironment: ObservableObject {
     @Published var paymentStatus: PaymentStatus = .pending
     
     func startCheckout(for client: ClientDigitalTwin) {
-        // In a real flow, this would pull from a server or active session
-        // Here we mock an active cart with some items
-        
-        let mockItem1 = CartItem(
-            id: UUID(),
-            product: MockData.products[0],
-            quantity: 1
-        )
-        
-        let mockItem2 = CartItem(
-            id: UUID(),
-            product: MockData.products[1],
-            quantity: 2
-        )
-        
+        // Start with an empty cart for the given client
         self.activeCart = ActiveCart(
             clientId: client.id,
-            items: [mockItem1, mockItem2]
+            items: []
         )
         self.paymentStatus = .pending
         self.managerApproved = false
@@ -76,20 +62,17 @@ class CheckoutEnvironment: ObservableObject {
         }
     }
     
-    func finalizeTransaction() {
+    func finalizeTransaction(userId: UUID? = nil, storeId: UUID? = nil) async {
         // Appends events to Client and Product Passports
         guard let cart = activeCart else { return }
         
-        CheckoutService.shared.finalizeTransaction(cart: cart)
+        await CheckoutService.shared.finalizeTransaction(cart: cart, userId: userId, storeId: storeId)
     }
     
     func addProductToCart(_ product: ProductDigitalTwin) {
         if activeCart == nil {
-            if let client = MockData.clients.first {
-                self.activeCart = ActiveCart(clientId: client.id, items: [])
-            } else {
-                self.activeCart = ActiveCart(clientId: UUID(), items: [])
-            }
+            // Create a guest cart when no active cart exists
+            self.activeCart = ActiveCart(clientId: UUID(), items: [])
         }
         
         guard var cart = activeCart else { return }
@@ -145,7 +128,8 @@ class CheckoutEnvironment: ObservableObject {
     }
     
     func instantCheckout(for product: ProductDigitalTwin) {
-        let client = MockData.clients.first ?? ClientDigitalTwin(
+        // Create a guest client for instant checkout
+        let client = ClientDigitalTwin(
             id: UUID(),
             customerID: nil,
             firstName: "Guest",

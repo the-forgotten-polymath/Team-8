@@ -5,6 +5,7 @@ import StoreManagerModule
 import SalesAssociateModule
 import Supabase
 import Combine
+import Foundation
 
 private enum GatewayConstants {
     static let supabaseURL = "https://yldspqgtzyrbdnoromgv.supabase.co"

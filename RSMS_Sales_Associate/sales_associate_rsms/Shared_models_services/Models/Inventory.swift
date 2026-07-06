@@ -12,11 +12,11 @@ struct InventoryItem: Codable, Identifiable {
     let productId: UUID
     let storeId: UUID?
     let warehouseId: UUID?
-    let locationType: String
+    let locationType: String?
     let quantity: Int
-    let reorderLevel: Int
+    let reorderLevel: Int?
     let lastVerifiedAt: Date?
-    let createdAt: Date
+    let createdAt: Date?
     let zone: String?
 
     enum CodingKeys: String, CodingKey {

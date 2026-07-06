@@ -5,8 +5,9 @@ import SwiftUI
 
 struct AppointmentsView: View {
     var isEmbedded: Bool = false
+    @EnvironmentObject private var authVM: AuthViewModel
+    @StateObject private var viewModel = AppointmentsViewModel()
     @State private var showingCreateAppointment = false
-    @State private var appointments = MockData.appointments
     
     var body: some View {
         if isEmbedded {
@@ -20,9 +21,16 @@ struct AppointmentsView: View {
     
     private var mainContent: some View {
         List {
-            ForEach(appointments) { appointment in
-                NavigationLink(destination: AppointmentDetailView(appointment: appointment)) {
-                    AppointmentRowView(appointment: appointment)
+            if viewModel.isLoading {
+                ProgressView("Loading...")
+            } else if viewModel.appointments.isEmpty {
+                Text("No appointments found.")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(viewModel.appointments) { appointment in
+                    NavigationLink(destination: AppointmentDetailView(appointment: appointment)) {
+                        AppointmentRowView(appointment: appointment)
+                    }
                 }
             }
         }
@@ -38,7 +46,14 @@ struct AppointmentsView: View {
             }
         }
         .sheet(isPresented: $showingCreateAppointment) {
-            CreateAppointmentView(appointments: $appointments)
+            // Need to pass viewModel.appointments as binding, but better to fetch after
+            CreateAppointmentView(appointments: $viewModel.appointments)
+        }
+        .task {
+            await viewModel.fetchAppointments(userId: authVM.currentUser?.id)
+        }
+        .refreshable {
+            await viewModel.fetchAppointments(userId: authVM.currentUser?.id)
         }
     }
 }
@@ -54,13 +69,13 @@ struct AppointmentRowView: View {
                 Circle()
                     .fill(Color.blue.opacity(0.1))
                     .frame(width: 44, height: 44)
-                Text(clientInitials(for: appointment.clientId))
+                Text(clientInitials(for: appointment))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.blue)
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(clientName(for: appointment.clientId))
+                Text(clientName(for: appointment))
                     .font(.headline)
                     .foregroundColor(.primary)
                 
@@ -92,13 +107,17 @@ struct AppointmentRowView: View {
         .padding(.vertical, 6)
     }
     
-    private func clientInitials(for id: UUID) -> String {
-        guard let client = MockData.clients.first(where: { $0.id == id }) else { return "??" }
-        return "\(client.firstName.prefix(1))\(client.lastName.prefix(1))"
+    private func clientInitials(for appointment: Appointment) -> String {
+        let name = appointment.clientName ?? "Unknown Client"
+        let parts = name.split(separator: " ")
+        if parts.count >= 2 {
+            return "\(parts[0].prefix(1))\(parts[1].prefix(1))"
+        }
+        return "\(name.prefix(2))"
     }
     
-    private func clientName(for id: UUID) -> String {
-        return MockData.clients.first(where: { $0.id == id })?.fullName ?? "Unknown Client"
+    private func clientName(for appointment: Appointment) -> String {
+        return appointment.clientName ?? "Unknown Client"
     }
     
     private func statusColor(_ status: AppointmentStatus) -> Color {

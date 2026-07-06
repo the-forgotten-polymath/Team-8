@@ -12,8 +12,11 @@ final class ClientDigitalTwinService: Sendable {
 
     // MARK: - Search & List
 
-    func searchClients(query: String, limit: Int? = nil) async throws -> [ClientDigitalTwin] {
+    /// Searches customers assigned to the currently authenticated associate.
+    /// Falls back to MockData when `AppConstants.useMockData` is true.
+    func searchClients(query: String, associateId: UUID? = nil, limit: Int? = nil) async throws -> [ClientDigitalTwin] {
         let actualLimit = limit ?? AppConstants.App.pageSize
+
         if AppConstants.useMockData {
             if query.isEmpty {
                 return MockData.clients
@@ -21,86 +24,133 @@ final class ClientDigitalTwinService: Sendable {
                 return MockData.clients.filter { $0.fullName.localizedCaseInsensitiveContains(query) }
             }
         }
-        
-        var request = supabase.from("clients").select()
-        
-        if !query.isEmpty {
-            // Assuming pg_trgm and a generated column or searching across multiple fields
-            // For simplicity, we use ilike on first_name, last_name, email, phone
-            request = request.or("first_name.ilike.%\(query)%,last_name.ilike.%\(query)%,email.ilike.%\(query)%,phone.ilike.%\(query)%")
+
+        // Fetch from `customers` table (the actual table in the DB schema)
+        var customers: [Customer]
+        if let associateId = associateId {
+            customers = try await SalesAssociateService.shared.fetchCustomers(
+                associateId: associateId,
+                searchQuery: query
+            )
+        } else {
+            // Fallback: search all active customers when no associate scoping
+            var dbQuery = supabase
+                .from("customers")
+                .select()
+                .eq("is_active", value: "true")
+
+            if !query.isEmpty {
+                dbQuery = dbQuery.or("name.ilike.%\(query)%,email.ilike.%\(query)%,phone.ilike.%\(query)%")
+            }
+
+            customers = try await dbQuery
+                .order("name")
+                .limit(actualLimit)
+                .execute()
+                .value
         }
-        
-        return try await request
-            .order("last_name", ascending: true)
-            .limit(actualLimit)
-            .execute()
-            .value
+
+        return customers.map { mapCustomerToTwin($0) }
     }
 
     // MARK: - Fetch Full Passport
 
+    /// Fetches a full ClientDigitalTwin for a given customer UUID.
+    /// Enriches the base record with their sales history as events.
     func fetchFullTwin(clientID: UUID) async throws -> ClientDigitalTwin {
         if AppConstants.useMockData {
             guard let client = MockData.clients.first(where: { $0.id == clientID }) else {
-                throw URLError(.badURL) // arbitrary error for mock failure
+                throw AppError.notFound("Client")
             }
             return client
         }
-        
-        // Fetch base client
-        var client: ClientDigitalTwin = try await supabase
-            .from("clients")
+
+        // Fetch base customer record from `customers` table
+        let customer = try await SalesAssociateService.shared.fetchCustomer(id: clientID)
+        var twin = mapCustomerToTwin(customer)
+
+        // Concurrently enrich with sales history as events
+        async let salesReq: [Sale] = (try? supabase
+            .from("sales")
             .select()
-            .eq("id", value: clientID.uuidString)
-            .single()
+            .eq("customer_id", value: clientID.uuidString)
+            .order("sale_date", ascending: false)
+            .limit(20)
             .execute()
-            .value
+            .value) ?? []
 
-        // Fetch relationships concurrently
-        async let prefReq: ClientPreferences? = try? supabase.from("client_preferences").select().eq("client_id", value: clientID.uuidString).single().execute().value
-        async let sizesReq: SizeProfile? = try? supabase.from("client_sizes").select().eq("client_id", value: clientID.uuidString).single().execute().value
-        async let eventsReq: [ClientDigitalTwinEvent] = (try? supabase.from("client_events").select().eq("client_id", value: clientID.uuidString).order("date", ascending: false).execute().value) ?? []
-        async let wishlistReq: [WishlistItem] = (try? supabase.from("wishlist_items").select().eq("client_id", value: clientID.uuidString).order("added_date", ascending: false).execute().value) ?? []
-        async let consentReq: ConsentRecord? = try? supabase.from("consent_records").select().eq("client_id", value: clientID.uuidString).single().execute().value
-        async let gdprReq: GDPRFlags? = try? supabase.from("gdpr_flags").select().eq("client_id", value: clientID.uuidString).single().execute().value
-        async let ownedReq: [OwnedProduct] = (try? supabase.from("owned_products").select().eq("client_id", value: clientID.uuidString).order("purchase_date", ascending: false).execute().value) ?? []
+        let sales = await salesReq
 
-        client.preferences = await prefReq
-        client.preferences?.sizes = await sizesReq
-        client.events = await eventsReq
-        client.wishlistItems = await wishlistReq
-        client.consentStatus = await consentReq
-        client.gdprFlags = await gdprReq
-        client.ownedProducts = await ownedReq
+        // Map past sales to ClientDigitalTwinEvent objects
+        let purchaseEvents: [ClientDigitalTwinEvent] = sales.map { sale in
+            ClientDigitalTwinEvent(
+                id: sale.id,
+                clientID: clientID,
+                date: sale.saleDate,
+                type: .purchase,
+                title: "Purchase — \(sale.invoiceNumber ?? sale.id.uuidString.prefix(8).description)",
+                description: "Total: \(AppConstants.App.currencySymbol)\(String(format: "%.2f", sale.totalAmount)) via \(sale.paymentMethod)",
+                location: nil,
+                performedBy: sale.userId,
+                linkedProductDigitalTwinID: nil,
+                metadata: [
+                    "total_amount": "\(sale.totalAmount)",
+                    "payment_method": sale.paymentMethod,
+                    "sale_status": sale.saleStatus
+                ]
+            )
+        }
+        twin.events = purchaseEvents.isEmpty ? nil : purchaseEvents
 
-        return client
+        // Build wishlist items from the `wishlist` text field (comma-separated entries)
+        if let wishlistText = customer.wishlist, !wishlistText.isEmpty {
+            let wishlistEntries = wishlistText
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+
+            twin.wishlistItems = wishlistEntries.enumerated().map { idx, entry in
+                WishlistItem(
+                    id: UUID(),
+                    clientID: clientID,
+                    sku: "WISH-\(idx + 1)",
+                    productName: entry,
+                    addedDate: customer.createdAt ?? Date(),
+                    addedBy: customer.assignedSalesAssociateId ?? UUID(),
+                    isAvailable: false,
+                    availableStores: [],
+                    notifyOnRestock: true,
+                    notes: nil
+                )
+            }
+        }
+
+        return twin
     }
 
     // MARK: - Create
 
-    func createClient(_ client: ClientDigitalTwin, preferences: ClientPreferences?, sizes: SizeProfile?) async throws -> ClientDigitalTwin {
+    func createClient(
+        _ client: ClientDigitalTwin,
+        preferences: ClientPreferences?,
+        sizes: SizeProfile?
+    ) async throws -> ClientDigitalTwin {
         if AppConstants.useMockData {
-            // For now, in mock mode, just return the passed client.
-            // In a more complex mock, we could append this to MockData.clients.
             return client
         }
-        
-        // Create base client
-        let created: ClientDigitalTwin = try await supabase
-            .from("clients")
-            .insert(client, returning: .representation)
+
+        // Insert into `customers` table using a mapped payload
+        let payload = CustomerInsertPayload(from: client)
+        let created: Customer = try await supabase
+            .from("customers")
+            .insert(payload, returning: .representation)
             .single()
             .execute()
             .value
 
-        if let pref = preferences {
-            _ = try? await supabase.from("client_preferences").insert(pref).execute()
-        }
-        if let sz = sizes {
-            _ = try? await supabase.from("client_sizes").insert(sz).execute()
-        }
-        
-        // Add initial event
+        var twin = mapCustomerToTwin(created)
+
+        // Add initial boutique visit event
         let initialEvent = ClientDigitalTwinEvent(
             id: UUID(),
             clientID: created.id,
@@ -109,48 +159,208 @@ final class ClientDigitalTwinService: Sendable {
             title: "First Boutique Visit",
             description: "Client profile created.",
             location: nil,
-            performedBy: nil, // Will be set by RLS or auth context if available
+            performedBy: nil,
             linkedProductDigitalTwinID: nil,
             metadata: nil
         )
-        _ = try? await addEvent(initialEvent)
+        twin.events = [initialEvent]
 
-        return created
+        return twin
     }
 
     // MARK: - Update
 
     func updateClient(clientID: UUID, updates: [String: AnyJSON]) async throws {
         try await supabase
-            .from("clients")
+            .from("customers")
             .update(updates)
             .eq("id", value: clientID.uuidString)
             .execute()
     }
 
-    // MARK: - Add Event
+    // MARK: - Add Event (stored locally on the twin; no DB table for events)
 
     func addEvent(_ event: ClientDigitalTwinEvent) async throws {
-        try await supabase
-            .from("client_events")
-            .insert(event)
-            .execute()
+        // Events are derived from the `sales` table; no separate events table in the schema.
+        // This is a no-op for now — future: insert into a client_events table if added.
+        print("[ClientDigitalTwinService] Event logged locally: \(event.title)")
     }
 
-    // MARK: - Wishlist
+    // MARK: - Wishlist (stored as text in customers.wishlist column)
 
     func addToWishlist(_ item: WishlistItem) async throws {
+        // Fetch current wishlist, append entry, and update the text column
+        let customer: Customer = try await supabase
+            .from("customers")
+            .select()
+            .eq("id", value: item.clientID.uuidString)
+            .single()
+            .execute()
+            .value
+
+        let existingWishlist = customer.wishlist ?? ""
+        let newEntry = item.productName
+        let updated = existingWishlist.isEmpty ? newEntry : "\(existingWishlist), \(newEntry)"
+
         try await supabase
-            .from("wishlist_items")
-            .insert(item)
+            .from("customers")
+            .update(["wishlist": updated])
+            .eq("id", value: item.clientID.uuidString)
             .execute()
     }
-    
+
     func removeFromWishlist(itemID: UUID) async throws {
-        try await supabase
-            .from("wishlist_items")
-            .delete()
-            .eq("id", value: itemID.uuidString)
-            .execute()
+        // Without a dedicated wishlist table, we can't remove by UUID.
+        // This method is a no-op until a wishlist table is added.
+        print("[ClientDigitalTwinService] removeFromWishlist: requires dedicated wishlist table.")
+    }
+
+    // MARK: - DB → Domain Mapping
+
+    /// Maps a `Customer` DB model to a `ClientDigitalTwin` domain model.
+    func mapCustomerToTwin(_ customer: Customer) -> ClientDigitalTwin {
+        // Split full name into first/last
+        let parts = customer.name.split(separator: " ", maxSplits: 1)
+        let firstName = parts.first.map(String.init) ?? customer.name
+        let lastName  = parts.count > 1 ? String(parts[1]) : ""
+
+        // Map customer_tier string to CustomerTier enum
+        let tier = mapTier(customer.customerTier)
+
+        // Derive lifetimeSpend from loyaltyPoints (1 point ≈ ₹500 spend)
+        let loyaltyPts = customer.loyaltyPoints ?? 0
+        let lifetimeSpend = Decimal(loyaltyPts) * 500
+
+        // Build preferences from available fields
+        let prefs: ClientPreferences? = (customer.preferredBrand != nil || customer.notes != nil) ?
+            ClientPreferences(
+                clientID: customer.id,
+                preferredBrands: customer.preferredBrand.map { [$0] } ?? [],
+                preferredCategories: [],
+                preferredColors: [],
+                preferredMaterials: [],
+                communicationChannel: mapContactMethod(customer.preferredContactMethod),
+                languagePreference: "en",
+                shoppingOccasions: [],
+                anniversaryDate: customer.anniversaryDate,
+                birthdayDate: customer.dateOfBirth,
+                notes: customer.notes,
+                sizes: nil
+            ) : nil
+
+        // Build consent from privacy_consent flag
+        let hasConsent = customer.privacyConsent ?? false
+        let consent = ConsentRecord(
+            clientID: customer.id,
+            marketingEmail: hasConsent,
+            marketingSMS: hasConsent,
+            marketingWhatsApp: false,
+            marketingPush: hasConsent,
+            dataProcessing: hasConsent,
+            profilingForRecommendations: hasConsent,
+            consentDate: customer.createdAt ?? Date(),
+            consentVersion: "v1.0",
+            withdrawnDate: nil
+        )
+
+        let gdpr = GDPRFlags(
+            clientID: customer.id,
+            canStore: hasConsent,
+            canProcess: hasConsent,
+            canProfile: hasConsent,
+            rightToErasureRequested: false,
+            exportRequested: false
+        )
+
+        return ClientDigitalTwin(
+            id: customer.id,
+            customerID: customer.id,
+            firstName: firstName,
+            lastName: lastName,
+            email: customer.email,
+            phone: customer.phone,
+            dateOfBirth: customer.dateOfBirth,
+            tier: tier,
+            lifetimeSpend: lifetimeSpend,
+            preferredStore: customer.assignedStoreId,
+            preferredAdvisor: customer.assignedSalesAssociateId,
+            createdAt: customer.createdAt ?? Date(),
+            updatedAt: customer.createdAt ?? Date(),
+            preferences: prefs,
+            events: nil,
+            ownedProducts: nil,
+            wishlistItems: nil,
+            consentStatus: consent,
+            gdprFlags: gdpr
+        )
+    }
+
+    // MARK: - Helpers
+
+    private func mapTier(_ tier: String?) -> CustomerTier {
+        switch tier?.lowercased() {
+        case "vip":    return .vip
+        case "vvip":   return .vvip
+        default:       return .standard
+        }
+    }
+
+    private func mapContactMethod(_ method: String?) -> CommunicationChannel {
+        switch method?.lowercased() {
+        case "sms":       return .sms
+        case "email":     return .email
+        case "whatsapp":  return .whatsapp
+        case "push":      return .push
+        default:          return .email
+        }
+    }
+}
+
+// MARK: - CustomerInsertPayload
+
+/// Encodable payload for inserting into the `customers` table.
+struct CustomerInsertPayload: Encodable {
+    let name: String
+    let email: String?
+    let phone: String?
+    let gender: String?
+    let dateOfBirth: String?
+    let customerTier: String
+    let customerStatus: String
+    let isVip: Bool
+    let isActive: Bool
+    let privacyConsent: Bool
+    let loyaltyPoints: Int
+
+    enum CodingKeys: String, CodingKey {
+        case name, email, phone, gender
+        case dateOfBirth        = "date_of_birth"
+        case customerTier       = "customer_tier"
+        case customerStatus     = "customer_status"
+        case isVip              = "is_vip"
+        case isActive           = "is_active"
+        case privacyConsent     = "privacy_consent"
+        case loyaltyPoints      = "loyalty_points"
+    }
+
+    init(from twin: ClientDigitalTwin) {
+        self.name          = twin.fullName
+        self.email         = twin.email
+        self.phone         = twin.phone
+        self.gender        = nil
+        // Format date as YYYY-MM-DD string for PostgreSQL DATE type
+        if let dob = twin.dateOfBirth {
+            let fmt = DateFormatter()
+            fmt.dateFormat = "yyyy-MM-dd"
+            self.dateOfBirth = fmt.string(from: dob)
+        } else {
+            self.dateOfBirth = nil
+        }
+        self.customerTier   = twin.tier.rawValue.capitalized
+        self.customerStatus = "Active"
+        self.isVip          = twin.tier == .vvip
+        self.isActive       = true
+        self.privacyConsent = twin.consentStatus?.dataProcessing ?? true
+        self.loyaltyPoints  = 0
     }
 }

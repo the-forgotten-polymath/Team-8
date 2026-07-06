@@ -12,7 +12,7 @@ struct ProductImage: Identifiable, Codable {
     let productId: UUID
     let imageURL: String
     let isPrimary: Bool
-    let createdAt: Date
+    let createdAt: Date?
     
     enum CodingKeys: String, CodingKey {
         case id

@@ -7,45 +7,36 @@ struct AppointmentDetailView: View {
     let appointment: Appointment
     @State private var showingCuratedCartBuilder = false
     
-    var client: ClientDigitalTwin? {
-        MockData.clients.first(where: { $0.id == appointment.clientId })
-    }
+    // client property removed since we're using appointment.clientName
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 // Client Briefing Card
-                if let client = client {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Pre-Appointment Briefing")
-                            .font(.headline)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Pre-Appointment Briefing")
+                        .font(.headline)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(appointment.clientName ?? "Unknown Client")
+                            .font(.title3.bold())
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(client.fullName)
-                                .font(.title3.bold())
-                            
-                            if let phone = client.phone {
-                                Text(phone)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Divider()
-                            
-                            Text("Preferences")
-                                .font(.subheadline.bold())
-                            
-                            HStack {
-                                Text("Language: \(client.preferences?.languagePreference ?? "English")")
-                                Spacer()
-                                Text("Contact: \(client.preferences?.communicationChannel.rawValue.capitalized ?? "Email")")
-                            }
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        Divider()
+                        
+                        Text("Preferences")
+                            .font(.subheadline.bold())
+                        
+                        HStack {
+                            Text("Language: English")
+                            Spacer()
+                            Text("Contact: Email")
                         }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
                 }
                 
                 // Appointment Context

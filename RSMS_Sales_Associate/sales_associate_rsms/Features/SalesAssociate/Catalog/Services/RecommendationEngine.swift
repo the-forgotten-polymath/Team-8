@@ -10,11 +10,8 @@ final class RecommendationEngine: Sendable {
     private init() {}
     
     /// Recommends complementary products based on an anchor product (Rule-Based Heuristic)
-    func recommendComplementary(for anchor: ProductDigitalTwin) async -> [ProductDigitalTwin] {
-        // Simulate network or ML inference delay
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        
-        let allProducts = MockData.products
+    func recommendComplementary(for anchor: ProductDigitalTwin, storeId: UUID? = nil) async -> [ProductDigitalTwin] {
+        let allProducts = (try? await ProductDigitalTwinService.shared.fetchCatalog(storeId: storeId)) ?? []
         var recommendations: [ProductDigitalTwin] = []
         
         switch anchor.category {
@@ -37,10 +34,8 @@ final class RecommendationEngine: Sendable {
     }
     
     /// Recommends a full "Look" based on an occasion and optionally a client profile
-    func recommendLook(forOccasion occasion: String, client: ClientDigitalTwin? = nil) async -> [ProductDigitalTwin] {
-        try? await Task.sleep(nanoseconds: 700_000_000)
-        
-        let allProducts = MockData.products
+    func recommendLook(forOccasion occasion: String, client: ClientDigitalTwin? = nil, storeId: UUID? = nil) async -> [ProductDigitalTwin] {
+        let allProducts = (try? await ProductDigitalTwinService.shared.fetchCatalog(storeId: storeId)) ?? []
         var look: [ProductDigitalTwin] = []
         
         if occasion.lowercased().contains("wedding") || occasion.lowercased().contains("gala") {

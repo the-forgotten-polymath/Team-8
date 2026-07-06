@@ -6,14 +6,12 @@ import Foundation
 enum AppConstants: Sendable {
     
     // MARK: - App Config
-    static let useMockData: Bool = true
+    static let useMockData: Bool = false
 
     // MARK: - Supabase
     enum Supabase {
-        /// Replace with your Supabase project URL
-        static let projectURL = "https://YOUR_PROJECT_ID.supabase.co"
-        /// Replace with your Supabase anon (public) key
-        static let anonKey    = "YOUR_SUPABASE_ANON_KEY"
+        static let projectURL = "https://yldspqgtzyrbdnoromgv.supabase.co"
+        static let anonKey    = "sb_publishable_6hcPNWOppBItrHk7_F7LoQ_0eGNXAL5"
     }
 
     // MARK: - Gemini AI

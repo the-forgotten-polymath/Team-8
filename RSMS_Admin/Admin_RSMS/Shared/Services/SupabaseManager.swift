@@ -33,22 +33,7 @@ final class SupabaseManager {
         )
     }
 
-    /// Postgres/PostgREST is inconsistent about what a timestamp string
-    /// looks like depending on the column type and driver defaults:
-    ///   - `date`                      → "2026-01-30"
-    ///   - `timestamp` (no tz)         → "2026-07-03T07:21:21.586"        (no Z, 3 fractional digits)
-    ///                                   "2026-07-02T10:36:26.963922"     (no Z, 6 fractional digits)
-    ///                                   "2026-07-02T10:00:00"            (no Z, no fractional digits)
-    ///   - `timestamptz`               → "2026-07-03T18:55:05.514729Z"   (Z, 6 fractional digits)
-    ///                                   "2026-07-03T10:23:10.335+05:30" (offset, 3 fractional digits)
-    /// `ISO8601DateFormatter` only accepts one exact shape at a time (it
-    /// requires a timezone designator, and only understands 3-digit
-    /// fractional seconds), so previously any column without a trailing
-    /// `Z`/offset — or with 6-digit microsecond precision — failed to
-    /// decode. This normalizes the string into a shape `ISO8601DateFormatter`
-    /// can always parse: pad/truncate fractional seconds to 3 digits, and
-    /// assume UTC when no timezone designator is present (Postgres always
-    /// stores/returns `timestamp without time zone` in UTC in this project).
+
     private static func makeDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
 

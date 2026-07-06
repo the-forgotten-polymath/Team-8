@@ -147,8 +147,10 @@ struct ReceiptView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
             if !finalized {
-                checkoutEnv.finalizeTransaction()
-                finalized = true
+                Task {
+                    await checkoutEnv.finalizeTransaction()
+                    finalized = true
+                }
             }
         }
     }

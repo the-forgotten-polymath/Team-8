@@ -1,5 +1,5 @@
 require 'xcodeproj'
-project_path = '/Users/sehgal18505/Documents/infy/sales_associate_rsms/sales_associate_rsms.xcodeproj'
+project_path = '/Users/sherlock/Documents/Team-8/RSMS_Sales_Associate/sales_associate_rsms.xcodeproj'
 project = Xcodeproj::Project.open(project_path)
 target = project.targets.first
 

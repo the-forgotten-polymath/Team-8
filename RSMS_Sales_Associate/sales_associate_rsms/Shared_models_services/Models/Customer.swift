@@ -38,15 +38,15 @@ struct Customer: Codable, Identifiable {
     let customerStatus: String?
 
     // Privacy & Loyalty
-    let privacyConsent: Bool
-    let loyaltyPoints: Int
+    let privacyConsent: Bool?
+    let loyaltyPoints: Int?
 
     // Status Flags
-    let isVip: Bool
-    let isActive: Bool
+    let isVip: Bool?
+    let isActive: Bool?
 
     // Audit
-    let createdAt: Date
+    let createdAt: Date?
 
     enum CodingKeys: String, CodingKey {
         case id

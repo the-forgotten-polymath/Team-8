@@ -93,13 +93,35 @@ public class AuthViewModel: ObservableObject {
 
     private func loadProfile(for userID: UUID) async {
         do {
-            let profile: StaffProfile = try await supabase
-                .from("profiles")
+            // Fetch from users table (profiles table doesn't exist in schema)
+            let user: User = try await supabase
+                .from("users")
                 .select()
                 .eq("id", value: userID.uuidString)
                 .single()
                 .execute()
                 .value
+            
+            // Split full_name into first/last
+            let nameParts = user.fullName.split(separator: " ", maxSplits: 1)
+            let firstName = nameParts.first.map(String.init) ?? user.fullName
+            let lastName = nameParts.count > 1 ? String(nameParts[1]) : ""
+            
+            // Map role_id to StaffRole (simplified mapping)
+            let staffRole: StaffRole = .salesAssociate // Default, could be enhanced with roles table lookup
+            
+            let profile = StaffProfile(
+                id: user.id,
+                firstName: firstName,
+                lastName: lastName,
+                email: user.email ?? "",
+                role: staffRole,
+                storeID: user.storeId,
+                avatarURL: user.profileImageURL,
+                isActive: user.employeeStatus?.lowercased() == "active",
+                createdAt: user.createdAt
+            )
+            
             currentUser = profile
             isAuthenticated = true
         } catch {

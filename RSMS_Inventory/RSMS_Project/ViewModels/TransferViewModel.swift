@@ -26,7 +26,8 @@ final class TransferViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            self.transfers = try await warehouseService.fetchTransfers()
+            let fetchedTransfers = try await warehouseService.fetchTransfers()
+            self.transfers = fetchedTransfers.sorted(by: { $0.transferDate > $1.transferDate })
             self.products = try await productService.fetchProducts()
             self.stores = try await DatabaseService.shared.fetch(from: "stores", as: Store.self)
             self.stockRequests = try await warehouseService.fetchStockRequests()

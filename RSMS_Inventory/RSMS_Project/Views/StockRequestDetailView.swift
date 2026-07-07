@@ -147,24 +147,22 @@ struct StockRequestDetailView: View {
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.appleBorder, lineWidth: 1))
                     }
                     
-                    // Spacer at the bottom to avoid overlapping with bottom swipe button
+                    // Spacer at the bottom to avoid overlapping with bottom buttons
                     if hasPendingItems {
-                        Spacer().frame(height: 100)
+                        Spacer().frame(height: 150)
                     }
                 }
                 .padding()
             }
             
-            // Bottom Action: Single swipe-to-fulfill button for entire order
+            // Bottom Action: Fulfill and Reject buttons for entire order
             if hasPendingItems {
                 VStack {
                     Divider()
                         .padding(.bottom, 8)
                     
-                    SwipeToFulfillButton(
-                        isEnabled: allPendingStockAvailable,
-                        onSwipeSuccess: {
-                            // Find current GroupedStockRequest reference to fulfill
+                    VStack(spacing: 12) {
+                        Button(action: {
                             if let refreshedGroup = viewModel.groupedStockRequests.first(where: { $0.orderId == groupedRequest.orderId }) {
                                 Swift.Task {
                                     await viewModel.fulfillGroupedRequest(
@@ -174,8 +172,42 @@ struct StockRequestDetailView: View {
                                     )
                                 }
                             }
+                        }) {
+                            Text(allPendingStockAvailable ? "Fulfill Order" : "Stock Shortage — Cannot Fulfill")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(allPendingStockAvailable ? Color.blue : Color.gray)
+                                .cornerRadius(12)
                         }
-                    )
+                        .disabled(!allPendingStockAvailable)
+                        
+                        Button(action: {
+                            if let refreshedGroup = viewModel.groupedStockRequests.first(where: { $0.orderId == groupedRequest.orderId }) {
+                                Swift.Task {
+                                    await viewModel.rejectGroupedRequest(
+                                        groupedRequest: refreshedGroup,
+                                        warehouseId: warehouseId,
+                                        userId: userId
+                                    )
+                                }
+                            }
+                        }) {
+                            Text("Reject Request")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.red)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(Color.red.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.red, lineWidth: 1.5)
+                                )
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal, 16)
                     .padding(.bottom, 24)
                 }
                 .background(Color(UIColor.systemBackground).ignoresSafeArea(edges: .bottom))

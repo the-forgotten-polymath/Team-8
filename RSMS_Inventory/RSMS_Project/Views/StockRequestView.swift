@@ -17,14 +17,13 @@ struct StockRequestView: View {
     
 
     enum RequestFilter {
-        case all, pending, active, completed, rejected
+        case all, pending, delivered, rejected
 
         var displayName: String {
             switch self {
             case .all:       return "All"
             case .pending:   return "Pending"
-            case .active:    return "Active"
-            case .completed: return "Completed"
+            case .delivered: return "Delivered"
             case .rejected:  return "Rejected"
             }
         }
@@ -38,24 +37,18 @@ struct StockRequestView: View {
             list = viewModel.groupedStockRequests
         case .pending:
             list = viewModel.groupedStockRequests.filter { $0.status.lowercased() == "pending" }
-        case .active:
-            list = viewModel.groupedStockRequests.filter {
-                let status = $0.status.lowercased()
-                return status == "approved" || status == "active" || status == "in transit" || status == "preparing shipment"
-            }
-        case .completed:
-            list = viewModel.groupedStockRequests.filter {
-                let status = $0.status.lowercased()
-                return status == "fulfilled" || status == "completed" || status == "delivered"
-            }
+        case .delivered:
+            list = viewModel.groupedStockRequests.filter { $0.status.lowercased() == "delivered" }
         case .rejected:
             list = viewModel.groupedStockRequests.filter { $0.status.lowercased() == "rejected" }
         }
         
+        let sortedList = list.sorted(by: { $0.createdAt > $1.createdAt })
+        
         if searchText.isEmpty {
-            return list
+            return sortedList
         } else {
-            return list.filter { group in
+            return sortedList.filter { group in
                 group.items.contains { item in
                     guard let product = viewModel.getProduct(for: item.productId) else { return false }
                     return product.productName.localizedCaseInsensitiveContains(searchText) ||
@@ -76,7 +69,7 @@ struct StockRequestView: View {
                         .foregroundColor(.secondary)
                         .font(.system(size: 15))
 
-                    TextField("Search by product or SKU...", text: $searchText)
+                    TextField("Search by OrderId", text: $searchText)
                         .font(.body)
                         .autocorrectionDisabled()
                         .autocapitalization(.none)
@@ -104,11 +97,8 @@ struct StockRequestView: View {
                     Button(action: { filterOption = .pending }) {
                         Label("Pending", systemImage: filterOption == .pending ? "checkmark" : "")
                     }
-                    Button(action: { filterOption = .active }) {
-                        Label("Active", systemImage: filterOption == .active ? "checkmark" : "")
-                    }
-                    Button(action: { filterOption = .completed }) {
-                        Label("Completed", systemImage: filterOption == .completed ? "checkmark" : "")
+                    Button(action: { filterOption = .delivered }) {
+                        Label("Delivered", systemImage: filterOption == .delivered ? "checkmark" : "")
                     }
                     Button(action: { filterOption = .rejected }) {
                         Label("Rejected", systemImage: filterOption == .rejected ? "checkmark" : "")

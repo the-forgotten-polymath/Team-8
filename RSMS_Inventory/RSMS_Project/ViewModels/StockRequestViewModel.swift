@@ -49,7 +49,8 @@ final class StockRequestViewModel: ObservableObject {
             // Group raw requests by order_id, fallback to raw request id
             let groupedDict = Dictionary(grouping: rawRequests) { $0.orderId ?? $0.id.uuidString }
             self.groupedStockRequests = groupedDict.map { (orderId, items) in
-                let firstItem = items.first!
+                let sortedItems = items.sorted(by: { $0.createdAt < $1.createdAt })
+                let firstItem = sortedItems.first!
                 
                 // Determine order status:
                 // - if all items are fulfilled or delivered, order is delivered
@@ -90,7 +91,7 @@ final class StockRequestViewModel: ObservableObject {
                     status: orderStatus,
                     remarks: firstItem.remarks,
                     createdAt: firstItem.createdAt,
-                    items: items.sorted(by: { $0.createdAt < $1.createdAt })
+                    items: sortedItems
                 )
             }.sorted(by: { $0.createdAt > $1.createdAt })
             
@@ -326,6 +327,34 @@ final class StockRequestViewModel: ObservableObject {
                         userId: userId,
                         module: "Stock Requests",
                         action: "Fulfilled stock request \(item.id.uuidString) for Store: \(destinationName)"
+                    )
+                }
+            }
+
+            // Reload grouped request list
+            await loadData(warehouseId: warehouseId)
+        } catch {
+            guard !Swift.Task.isCancelled else { return }
+            self.errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    func rejectGroupedRequest(groupedRequest: GroupedStockRequest, warehouseId: UUID, userId: UUID) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            for item in groupedRequest.items {
+                if item.status.lowercased() == "pending" {
+                    // Update Request Status to "rejected"
+                    try await warehouseService.updateStockRequestStatus(requestId: item.id, status: "rejected")
+
+                    // Log audit action
+                    let destinationName = getStore(for: item.storeId)?.storeName ?? "Store"
+                    try await warehouseService.logAction(
+                        userId: userId,
+                        module: "Stock Requests",
+                        action: "Rejected stock request \(item.id.uuidString) for Store: \(destinationName)"
                     )
                 }
             }

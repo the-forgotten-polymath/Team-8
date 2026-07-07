@@ -35,7 +35,8 @@ final class ShipmentVerificationViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            self.shipments = try await warehouseService.fetchShipments()
+            let fetchedShipments = try await warehouseService.fetchShipments()
+            self.shipments = fetchedShipments.sorted(by: { $0.createdAt > $1.createdAt })
             self.products = try await productService.fetchProducts()
         } catch {
             self.errorMessage = error.localizedDescription

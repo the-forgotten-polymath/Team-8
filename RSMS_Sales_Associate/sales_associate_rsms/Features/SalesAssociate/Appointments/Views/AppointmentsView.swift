@@ -20,20 +20,29 @@ struct AppointmentsView: View {
     }
     
     private var mainContent: some View {
-        List {
-            if viewModel.isLoading {
-                ProgressView("Loading...")
-            } else if viewModel.appointments.isEmpty {
-                Text("No appointments found.")
-                    .foregroundColor(.secondary)
-            } else {
-                ForEach(viewModel.appointments) { appointment in
-                    NavigationLink(destination: AppointmentDetailView(appointment: appointment)) {
-                        AppointmentRowView(appointment: appointment)
+        ScrollView {
+            VStack(spacing: 16) {
+                if viewModel.isLoading {
+                    ProgressView("Loading...")
+                        .padding()
+                } else if viewModel.appointments.isEmpty {
+                    Text("No appointments found.")
+                        .foregroundColor(.secondary)
+                        .padding()
+                } else {
+                    ForEach(viewModel.appointments) { appointment in
+                        NavigationLink(destination: AppointmentDetailView(appointment: appointment)) {
+                            AppointmentRowView(appointment: appointment)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding()
+                        .liquidGlass()
                     }
                 }
             }
+            .padding()
         }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Appointments")
         .toolbar(.hidden, for: .tabBar)
         .toolbar {

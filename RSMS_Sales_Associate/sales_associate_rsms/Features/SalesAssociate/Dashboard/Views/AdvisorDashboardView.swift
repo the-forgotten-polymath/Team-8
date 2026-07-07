@@ -7,67 +7,107 @@ struct AdvisorDashboardView: View {
     @EnvironmentObject var viewModel: DashboardViewModel
     
     var body: some View {
-        List {
-            Section(header: Text("Performance Tracker")) {
-                if let metrics = viewModel.advisorMetrics {
-                    SalesGoalGaugeView(metrics: metrics)
-                        .padding(.vertical)
-                }
-            }
-            
-            Section(header: Text("Today's Agenda")) {
-                if viewModel.todayAppointments.isEmpty {
-                    Text("No appointments scheduled for today.")
-                        .foregroundColor(.secondary)
-                } else {
-                    ForEach(viewModel.todayAppointments) { appointment in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(appointment.type.rawValue)
-                                    .font(.headline)
-                                Text(appointment.date, style: .time)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                        }
+        ScrollView {
+            VStack(spacing: 24) {
+                // Performance Tracker
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Performance Tracker")
+                        .font(.headline)
+                        .padding(.horizontal, 4)
+                    
+                    if let metrics = viewModel.advisorMetrics {
+                        SalesGoalGaugeView(metrics: metrics)
+                            .padding()
+                            .liquidGlass()
                     }
                 }
-            }
-            
-            Section(header: HStack {
-                Text("Active Opportunities")
-                Spacer()
-                NavigationLink(destination: ActiveOpportunitiesView().environmentObject(viewModel)) {
-                    Text("See All")
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                }
-            }) {
-                if viewModel.activeOpportunities.isEmpty {
-                    Text("No active opportunities.")
-                        .foregroundColor(.secondary)
-                } else {
-                    ForEach(viewModel.activeOpportunities.prefix(3)) { opp in
-                        HStack {
-                            Image(systemName: iconForOpportunity(opp.type))
-                                .foregroundColor(colorForOpportunity(opp.type))
-                                .frame(width: 30)
-                            VStack(alignment: .leading) {
-                                Text(opp.title)
-                                    .font(.body)
-                                Text(opp.clientName ?? "Unknown Client")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                
+                // Today's Agenda
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Today's Agenda")
+                        .font(.headline)
+                        .padding(.horizontal, 4)
+                    
+                    VStack(spacing: 12) {
+                        if viewModel.todayAppointments.isEmpty {
+                            Text("No appointments scheduled for today.")
+                                .foregroundColor(.secondary)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            ForEach(viewModel.todayAppointments) { appointment in
+                                HStack(spacing: 16) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(appointment.type.rawValue)
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                        Text(appointment.date, style: .time)
+                                            .font(.subheadline)
+                                            .foregroundColor(.blue)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(Color(.systemGray4))
+                                }
+                                .padding()
+                                .liquidGlass()
                             }
                         }
                     }
                 }
+                
+                // Active Opportunities
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Active Opportunities")
+                            .font(.headline)
+                        Spacer()
+                        NavigationLink(destination: ActiveOpportunitiesView().environmentObject(viewModel)) {
+                            Text("See All")
+                                .font(.subheadline)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    
+                    VStack(spacing: 12) {
+                        if viewModel.activeOpportunities.isEmpty {
+                            Text("No active opportunities.")
+                                .foregroundColor(.secondary)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            ForEach(viewModel.activeOpportunities.prefix(3)) { opp in
+                                HStack(spacing: 16) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(colorForOpportunity(opp.type).opacity(0.12))
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: iconForOpportunity(opp.type))
+                                            .font(.system(size: 18, weight: .semibold))
+                                            .foregroundColor(colorForOpportunity(opp.type))
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(opp.title)
+                                            .font(.headline)
+                                        Text(opp.clientName ?? "Unknown Client")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding()
+                                .liquidGlass()
+                            }
+                        }
+                    }
+                }
             }
+            .padding()
         }
-        .listStyle(.insetGrouped)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
     
     private func iconForOpportunity(_ type: OpportunityType) -> String {

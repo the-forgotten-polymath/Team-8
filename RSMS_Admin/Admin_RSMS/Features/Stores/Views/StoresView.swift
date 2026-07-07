@@ -223,13 +223,13 @@ struct StoresView: View {
                                     // Outer glow for selected state
                                     if selectedMapStore?.id == pin.id {
                                         Circle()
-                                            .fill(Color.blue.opacity(0.15))
+                                            .fill(Color.red.opacity(0.15))
                                             .frame(width: 50, height: 50)
                                     }
                                     
                                     Image(systemName: "mappin.circle.fill")
                                         .font(.system(size: selectedMapStore?.id == pin.id ? 36 : 28))
-                                        .foregroundColor(pin.isArchived ? .gray : (selectedMapStore?.id == pin.id ? Color(red: 0.1, green: 0.2, blue: 0.4) : .blue))
+                                        .foregroundColor(pin.isArchived ? .gray : (selectedMapStore?.id == pin.id ? Color(red: 0.1, green: 0.2, blue: 0.4) : .red))
                                         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                                         .opacity(pin.isArchived ? 0.6 : 1.0)
                                         .scaleEffect(selectedMapStore?.id == pin.id ? 1.15 : 1.0)

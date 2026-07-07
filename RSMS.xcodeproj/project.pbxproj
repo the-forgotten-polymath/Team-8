@@ -27,6 +27,7 @@
 		6358E7CF6E9EF51856D230D4 /* InventoryModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14A849CAC1A51C675BFEA412 /* InventoryModule.framework */; };
 		7892BADCA79439CFD688D107 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 02F10ED3825C4B8BCA9841CF /* Functions */; };
 		804151F888AA1220E3C3E21E /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = F6A348D1F1F1BB15EEFD5AD3 /* Storage */; };
+		84AC0297E6D03965DD620AAF /* NoStoreAssignedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */; };
 		87E53904304A7A524F71CE6F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = BB50939E46963CAB435243F8 /* Realtime */; };
 		8BFBDD7423E937F313DC8A11 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 9B1B7A1D8DEF009939508114 /* Storage */; };
 		8E13F7892FFBFFCC002D0D70 /* test_geocoder in Resources */ = {isa = PBXBuildFile; fileRef = 8E13F7872FFBFFCC002D0D70 /* test_geocoder */; };
@@ -48,6 +49,7 @@
 		99404028CA1A7D3DC49B8B29 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = C40E3D475DA5046377BF4D87 /* Functions */; };
 		9A23640B65393C2F3E1BC656 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */; };
 		A0B09E54630C43BCA1FC2E22 /* GatewayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA69B4B435CD8680B7545E56 /* GatewayView.swift */; };
+		A167DBB1A29D7D90C439D132 /* StoreManagerOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FCFA8BFB531C5BC9AAE708A /* StoreManagerOnboardingView.swift */; };
 		A717B24F4218501882374B34 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 98E2439AB3EF1E57ADACA310 /* PostgREST */; };
 		B3856ED720B19D47A076BCF6 /* AdminModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE8FDF16F7B414C3A03B817E /* AdminModule.framework */; };
 		B45154B6D4880D647DA801E1 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DA46FE8CAB17ACFDFB9ADC9 /* Functions */; };
@@ -112,6 +114,7 @@
 
 /* Begin PBXFileReference section */
 		0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
+		0FCFA8BFB531C5BC9AAE708A /* StoreManagerOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreManagerOnboardingView.swift; sourceTree = "<group>"; };
 		14A849CAC1A51C675BFEA412 /* InventoryModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = InventoryModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
@@ -119,6 +122,7 @@
 		16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Admin_RSMS.app; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoStoreAssignedView.swift; sourceTree = "<group>"; };
 		8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
 		8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		8E13F77D2FFBFFCC002D0D70 /* .npmrc */ = {isa = PBXFileReference; lastKnownFileType = text; path = .npmrc; sourceTree = "<group>"; };
@@ -149,21 +153,29 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		797D58228E55F2F0075D559C /* RSMS_Inventory/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Inventory/RSMS_Project;
 			sourceTree = "<group>";
 		};
 		8BE72A006B95AE61498906AD /* RSMS_Sales_Associate/sales_associate_rsms */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Sales_Associate/sales_associate_rsms;
 			sourceTree = "<group>";
 		};
 		B55720CBE8D14CF708411C64 /* RSMS_Admin/Admin_RSMS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Admin/Admin_RSMS;
 			sourceTree = "<group>";
 		};
 		CD0F86B3C36DE94DE31B24AA /* RSMS_Store_Manager/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Store_Manager/RSMS_Project;
 			sourceTree = "<group>";
 		};
@@ -300,6 +312,8 @@
 				797D58228E55F2F0075D559C /* RSMS_Inventory/RSMS_Project */,
 				CD0F86B3C36DE94DE31B24AA /* RSMS_Store_Manager/RSMS_Project */,
 				8BE72A006B95AE61498906AD /* RSMS_Sales_Associate/sales_associate_rsms */,
+				0FCFA8BFB531C5BC9AAE708A /* StoreManagerOnboardingView.swift */,
+				89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -741,6 +755,8 @@
 				993D7D9375BF3DA01DF59F3C /* RSMSApp.swift in Sources */,
 				A0B09E54630C43BCA1FC2E22 /* GatewayView.swift in Sources */,
 				8E13F78E2FFBFFCC002D0D70 /* test_geocoder.swift in Sources */,
+				A167DBB1A29D7D90C439D132 /* StoreManagerOnboardingView.swift in Sources */,
+				84AC0297E6D03965DD620AAF /* NoStoreAssignedView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

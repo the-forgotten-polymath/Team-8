@@ -7,9 +7,9 @@ import Supabase
 import Combine
 import Foundation
 
-private enum GatewayConstants {
-    static let supabaseURL = "https://yldspqgtzyrbdnoromgv.supabase.co"
-    static let supabaseKey = "sb_publishable_6hcPNWOppBItrHk7_F7LoQ_0eGNXAL5"
+public enum GatewayConstants {
+    public static let supabaseURL = "https://yldspqgtzyrbdnoromgv.supabase.co"
+    public static let supabaseKey = "sb_publishable_6hcPNWOppBItrHk7_F7LoQ_0eGNXAL5"
 }
 
 // MARK: - Decodable models for login queries
@@ -24,6 +24,11 @@ struct GatewayUser: Codable {
     let designation: String?
     let phone: String?
     let profileImageURL: String?
+    let isProfileCompleted: Bool?
+    let employeeCode: String?
+    let gender: String?
+    let dateOfBirth: String?
+    let address: String?
     
     init(
         id: UUID,
@@ -34,7 +39,12 @@ struct GatewayUser: Codable {
         storeId: UUID? = nil,
         designation: String? = nil,
         phone: String? = nil,
-        profileImageURL: String? = nil
+        profileImageURL: String? = nil,
+        isProfileCompleted: Bool? = nil,
+        employeeCode: String? = nil,
+        gender: String? = nil,
+        dateOfBirth: String? = nil,
+        address: String? = nil
     ) {
         self.id = id
         self.fullName = fullName
@@ -45,6 +55,11 @@ struct GatewayUser: Codable {
         self.designation = designation
         self.phone = phone
         self.profileImageURL = profileImageURL
+        self.isProfileCompleted = isProfileCompleted
+        self.employeeCode = employeeCode
+        self.gender = gender
+        self.dateOfBirth = dateOfBirth
+        self.address = address
     }
     
     enum CodingKeys: String, CodingKey {
@@ -57,6 +72,11 @@ struct GatewayUser: Codable {
         case designation
         case phone
         case profileImageURL = "profile_image_url"
+        case isProfileCompleted = "profile_verified"
+        case employeeCode = "employee_code"
+        case gender
+        case dateOfBirth = "date_of_birth"
+        case address
     }
 }
 
@@ -272,7 +292,8 @@ struct LoginView: View {
                             roleId: UUID(uuidString: "b24abda2-b031-4548-8641-8511ec2bfff0")!,
                             storeId: UUID(uuidString: "11111111-0000-0000-0000-000000000001")!,
                             designation: "Store Manager",
-                            profileImageURL: nil
+                            profileImageURL: nil,
+                            isProfileCompleted: false
                         )
                         self.isLoading = false
                         self.onLoginSuccess(mockUser, "Manager")
@@ -287,7 +308,8 @@ struct LoginView: View {
                             roleId: UUID(uuidString: "dae0ff3c-0356-4344-a643-22f06a8fee61")!,
                             storeId: UUID(uuidString: "11111111-0000-0000-0000-000000000001")!,
                             designation: "Sales Advisor",
-                            profileImageURL: nil
+                            profileImageURL: nil,
+                            isProfileCompleted: true
                         )
                         self.isLoading = false
                         self.onLoginSuccess(mockUser, "Sales Associate")
@@ -302,7 +324,8 @@ struct LoginView: View {
                             roleId: UUID(uuidString: "c0aa841a-7c57-43f9-b98a-523475ba43af")!,
                             storeId: UUID(uuidString: "11111111-0000-0000-0000-000000000001")!,
                             designation: "Inventory Controller",
-                            profileImageURL: nil
+                            profileImageURL: nil,
+                            isProfileCompleted: true
                         )
                         self.isLoading = false
                         self.onLoginSuccess(mockUser, "Inventory Controller")
@@ -317,7 +340,8 @@ struct LoginView: View {
                             roleId: UUID(uuidString: "196203f9-3fe8-41f8-81c9-c665e004148b")!,
                             storeId: nil,
                             designation: "Corporate Admin",
-                            profileImageURL: nil
+                            profileImageURL: nil,
+                            isProfileCompleted: true
                         )
                         self.isLoading = false
                         self.onLoginSuccess(mockUser, "Admin")
@@ -339,6 +363,10 @@ struct GatewayView: View {
     @StateObject private var sessionManager = CentralSessionManager.shared
     @StateObject private var salesAuthVM = SalesAssociateModule.AuthViewModel()
     
+    @State private var showManagerOnboarding = false
+    @State private var pendingManagerUser: GatewayUser? = nil
+    @State private var showNoStoreAssigned = false
+    
     var body: some View {
         Group {
             if sessionManager.isAuthenticated {
@@ -349,10 +377,17 @@ struct GatewayView: View {
                     }
                     .transition(.opacity)
                 case "manager", "store manager":
-                    StoreManagerRootView {
-                        logout()
+                    if sessionManager.storeId == nil {
+                        NoStoreAssignedView(onLogout: {
+                            logout()
+                        })
+                        .transition(.opacity)
+                    } else {
+                        StoreManagerRootView {
+                            logout()
+                        }
+                        .transition(.opacity)
                     }
-                    .transition(.opacity)
                 case "sales associate":
                     SalesAssociateRootView(onBackToPortal: {
                         logout()
@@ -377,15 +412,23 @@ struct GatewayView: View {
                         Button("Sign Out", action: logout)
                     }
                 }
+            } else if showManagerOnboarding, let user = pendingManagerUser {
+                StoreManagerOnboardingView(user: user, onComplete: { updatedUser in
+                    self.showManagerOnboarding = false
+                    self.handleLoginSuccessInterceptor(updatedUser, "Store Manager")
+                }, onLogout: {
+                    logout()
+                })
+                .transition(.opacity)
             } else {
-                LoginView(onLoginSuccess: handleLoginSuccess)
+                LoginView(onLoginSuccess: handleLoginSuccessInterceptor)
                     .transition(.opacity)
             }
         }
         .animation(.easeInOut(duration: 0.3), value: sessionManager.isAuthenticated)
         // Reactive listening to other modules' logouts
         .onReceive(StoreManagerModule.SessionManager.shared.$currentUser) { user in
-            if sessionManager.isAuthenticated, user == nil, sessionManager.roleName.lowercased().contains("manager") {
+            if sessionManager.isAuthenticated, user == nil, (sessionManager.roleName.lowercased() == "manager" || sessionManager.roleName.lowercased() == "store manager") {
                 logout()
             }
         }
@@ -401,6 +444,19 @@ struct GatewayView: View {
         }
     }
     
+    private func handleLoginSuccessInterceptor(_ user: GatewayUser, _ roleName: String) {
+        let lowercasedRole = roleName.lowercased()
+        if lowercasedRole == "manager" || lowercasedRole == "store manager" {
+            if !(user.isProfileCompleted ?? false) {
+                pendingManagerUser = user
+                showManagerOnboarding = true
+                return
+            }
+        }
+        
+        handleLoginSuccess(user, roleName)
+    }
+    
     private func handleLoginSuccess(_ user: GatewayUser, _ roleName: String) {
         Swift.Task {
             let client = SupabaseClient(
@@ -409,7 +465,9 @@ struct GatewayView: View {
             )
             
             var resolvedStoreId = user.storeId
-            if resolvedStoreId == nil {
+            let lowercasedRoleForStore = roleName.lowercased()
+            let isManagerRole = (lowercasedRoleForStore == "manager" || lowercasedRoleForStore == "store manager")
+            if resolvedStoreId == nil && !isManagerRole {
                 struct StoreIdOnly: Codable {
                     let id: UUID
                 }
@@ -454,7 +512,7 @@ struct GatewayView: View {
                     AdminModule.AuthManager.shared.currentUser = adminUser
                     AdminModule.AuthManager.shared.isAuthenticated = true
                     
-                } else if lowercasedRole.contains("manager") || lowercasedRole.contains("store manager") {
+                } else if lowercasedRole == "manager" || lowercasedRole == "store manager" {
                     let managerUser = StoreManagerModule.User(
                         id: user.id,
                         fullName: user.fullName,
@@ -463,8 +521,14 @@ struct GatewayView: View {
                         isVerified: true,
                         roleId: user.roleId,
                         storeId: resolvedStoreId,
+                        employeeCode: user.employeeCode,
                         designation: user.designation,
-                        phone: user.phone
+                        phone: user.phone,
+                        gender: user.gender,
+                        dateOfBirth: user.dateOfBirth,
+                        address: user.address,
+                        profileImageURL: user.profileImageURL,
+                        isProfileCompleted: user.isProfileCompleted ?? false
                     )
                     StoreManagerModule.SessionManager.shared.currentUser = managerUser
                     StoreManagerModule.SessionManager.shared.isLoading = false
@@ -490,6 +554,8 @@ struct GatewayView: View {
     
     private func logout() {
         sessionManager.clear()
+        showManagerOnboarding = false
+        pendingManagerUser = nil
         
         // Clear sub-modules
         AdminModule.AuthManager.shared.isAuthenticated = false

@@ -1,9 +1,3 @@
-//
-//  Attendance.swift
-//  RSMS_Project
-//
-//  Created by Yatharth Mishra on 30/06/26.
-//
 
 import Foundation
 

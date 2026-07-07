@@ -39,6 +39,7 @@ public struct User: Codable, Identifiable {
     public let employeeStatus: String?
 
     public let profileImageURL: String?
+    public let isProfileCompleted: Bool
 
     // Audit
     public let createdBy: UUID?
@@ -72,6 +73,7 @@ public struct User: Codable, Identifiable {
         case employeeStatus = "employee_status"
 
         case profileImageURL = "profile_image_url"
+        case isProfileCompleted = "profile_verified"
 
         case createdBy = "created_by"
         case createdAt = "created_at"
@@ -98,6 +100,7 @@ public struct User: Codable, Identifiable {
         joiningDate: String? = nil,
         employeeStatus: String? = nil,
         profileImageURL: String? = nil,
+        isProfileCompleted: Bool = false,
         createdBy: UUID? = nil,
         createdAt: String = ISO8601DateFormatter().string(from: Date())
     ) {
@@ -120,6 +123,7 @@ public struct User: Codable, Identifiable {
         self.joiningDate = joiningDate
         self.employeeStatus = employeeStatus
         self.profileImageURL = profileImageURL
+        self.isProfileCompleted = isProfileCompleted
         self.createdBy = createdBy
         self.createdAt = createdAt
     }
@@ -144,6 +148,7 @@ public struct User: Codable, Identifiable {
         joiningDate: String?? = nil,
         employeeStatus: String?? = nil,
         profileImageURL: String?? = nil,
+        isProfileCompleted: Bool? = nil,
         createdBy: UUID?? = nil,
         createdAt: String? = nil
     ) -> User {
@@ -167,6 +172,7 @@ public struct User: Codable, Identifiable {
             joiningDate: joiningDate != nil ? joiningDate! : self.joiningDate,
             employeeStatus: employeeStatus != nil ? employeeStatus! : self.employeeStatus,
             profileImageURL: profileImageURL != nil ? profileImageURL! : self.profileImageURL,
+            isProfileCompleted: isProfileCompleted ?? self.isProfileCompleted,
             createdBy: createdBy != nil ? createdBy! : self.createdBy,
             createdAt: createdAt ?? self.createdAt
         )

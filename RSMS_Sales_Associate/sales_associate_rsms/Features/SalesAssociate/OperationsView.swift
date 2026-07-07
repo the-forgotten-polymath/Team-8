@@ -56,12 +56,12 @@ struct OperationsView: View {
                                 )
                             }
                             
-                            // 4. Checkout
-                            NavigationLink(destination: CheckoutView(isEmbedded: true)) {
+                            // 4. Orders
+                            NavigationLink(destination: OrdersDashboardView(isEmbedded: true)) {
                                 OperationCard(
-                                    title: "Checkout",
-                                    subtitle: "Cart & Tender",
-                                    systemImage: "creditcard.fill",
+                                    title: "Orders",
+                                    subtitle: "Sales & Invoices",
+                                    systemImage: "doc.text.fill",
                                     iconColor: .blue
                                 )
                             }
@@ -113,13 +113,7 @@ struct OperationCard: View {
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 16)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.appleBorder, lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 4)
+        .liquidGlass()
     }
 }
 
@@ -178,14 +172,6 @@ struct ProfileView: View {
                 }
                 
                 Section(header: Text("Actions")) {
-                    NavigationLink(destination: Text("Mock Order History").font(.headline).padding()) {
-                        Label("Orders", systemImage: "cart.fill")
-                    }
-                    
-                    NavigationLink(destination: Text("Mock Activity History").font(.headline).padding()) {
-                        Label("History", systemImage: "clock.fill")
-                    }
-                    
                     NavigationLink(destination: Text("Mock App Settings").font(.headline).padding()) {
                         Label("Settings", systemImage: "gearshape.fill")
                     }

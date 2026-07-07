@@ -203,9 +203,12 @@ struct ProductDetailView: View {
                         Circle()
                             .fill(product.isAvailable ? Color.green : Color.red)
                             .frame(width: 10, height: 10)
-                        Text(product.isAvailable ? "In Stock (\(product.stockLevel) available)" : "Out of Stock")
+                        Text(product.isAvailable ? "In Stock" : "Out of Stock")
                             .font(.subheadline)
                             .foregroundColor(product.isAvailable ? .primary : .red)
+                        Text("(\(product.stockLevel) available)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                         
                         Spacer()
                         

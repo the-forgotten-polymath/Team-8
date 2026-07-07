@@ -166,7 +166,7 @@ struct DashboardView: View {
             ProfileView(userId: userId, warehouseId: warehouseId, onLogout: onLogout)
         }
         .sheet(isPresented: $showNotifications) {
-            NotificationsView(warehouseId: warehouseId, userId: userId)
+            NotificationsView(warehouseId: warehouseId, userId: userId, selectedTab: $selectedTab)
                 .environmentObject(notificationStore)
         }
         .refreshable {

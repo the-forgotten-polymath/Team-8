@@ -142,6 +142,7 @@
 		D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA69B4B435CD8680B7545E56 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
 		DE8FDF16F7B414C3A03B817E /* AdminModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AdminModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E843FB512FFCBAB300B2BE40 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		F972ED49FB8A1B86121E896B /* SalesAssociateModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SalesAssociateModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -413,6 +414,13 @@
 			path = supabase;
 			sourceTree = "<group>";
 		};
+		E843FB542FFCBAB300B2BE40 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		E8C08ABC2FFB827800BE7B39 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -653,6 +661,10 @@
 				{
 					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
 					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
+					ProductGroup = E843FB542FFCBAB300B2BE40 /* Products */;
+					ProjectRef = E843FB512FFCBAB300B2BE40 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
 					ProductGroup = 16A6C2A32FFC086F007A7E84 /* Products */;

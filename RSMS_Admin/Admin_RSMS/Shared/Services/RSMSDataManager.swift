@@ -52,6 +52,7 @@ class RSMSDataManager: ObservableObject {
     @Published var stores:       [AdminStore]   = []
     @Published var managers: [Manager]  = []
     @Published var products: [Product]  = []
+    @Published var targets: [RevenueTarget] = []
     @Published var categories: [Category] = []
     @Published var inventory: [InventoryItem] = []
     @Published var isLoading:    Bool           = false
@@ -64,6 +65,25 @@ class RSMSDataManager: ObservableObject {
     private var storeChannel: RealtimeChannelV2?
     private var managerChannel: RealtimeChannelV2?
     private var productChannel: RealtimeChannelV2?
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – TARGETS: Local Management (No Supabase yet)
+    // ─────────────────────────────────────────────────────────────
+    func addTarget(_ target: RevenueTarget) {
+        targets.append(target)
+    }
+    
+    func updateTarget(_ target: RevenueTarget) {
+        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
+            targets[idx] = target
+        }
+    }
+    
+    func removeTarget(_ target: RevenueTarget) {
+        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
+            targets.remove(at: idx)
+        }
+    }
 
     // ─────────────────────────────────────────────────────────────
     // MARK: – Init: load data & start realtime
@@ -84,13 +104,7 @@ class RSMSDataManager: ObservableObject {
         async let s = fetchStores()
         async let m = fetchManager()
         async let p = fetchProducts()
-        async let c = fetchCategories()
-        async let i = fetchInventory()
-        _ = await (s, m, p, c, i)
-        
-        // After fetching all, calculate categoryQuantities for each store based on inventory
-        calculateStoreCategoryQuantities()
-        
+        _ = await (s, m, p)
         isLoading = false
     }
 

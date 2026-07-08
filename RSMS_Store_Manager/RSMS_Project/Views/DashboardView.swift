@@ -43,10 +43,15 @@ final class DashboardViewModel: ObservableObject {
     
     @Published var lowStockCount: Int = 0
     @Published var todaySalesAmount: Double = 0.0
-    @Published var salesGoal: Double = 35000.0
+    @Published var salesGoal: Double = 0.0
     @Published var chartData: [DailySale] = []
-    @Published var upcomingTasks: [Task] = []
+    @Published var upcomingAppointments: [Appointment] = []
+    @Published var customers: [Customer] = []
     @Published var staffShifts: [StaffShiftDisplay] = []
+    @Published var users: [User] = []
+    @Published var stores: [Store] = []
+    
+    @Published var attendanceValueText: String = "Loading..."
     
     @Published var currentShift: Shift? = nil
     @Published var currentShiftHeader: String = "Staff Shifts"
@@ -85,6 +90,11 @@ final class DashboardViewModel: ObservableObject {
               let storeId = currentUser.storeId else {
             isLoading = false
             return
+        }
+        
+        // Fetch Attendance Data Independently so it always loads
+        Swift.Task {
+            await fetchAttendanceForStaff(storeId: storeId, currentUser: currentUser)
         }
         
         do {
@@ -133,16 +143,24 @@ final class DashboardViewModel: ObservableObject {
             // Today is the last element in tempChartData
             self.todaySalesAmount = tempChartData.last?.amount ?? 0.0
             
-            // 3. Fetch top 5 upcoming tasks
+            // 3. Fetch upcoming tasks (within next 24 hours)
+            let nowString = Date().ISO8601Format()
+            let tomorrowString = Date().addingTimeInterval(86400).ISO8601Format()
+            
             let tasksResponse = try await client
-                .from("tasks")
+                .from("appointments")
                 .select()
                 .eq("store_id", value: storeId.uuidString)
                 .neq("status", value: "done")
-                .order("due_date", ascending: true)
-                .limit(5)
+                .gte("appointment_datetime", value: nowString)
+                .lte("appointment_datetime", value: tomorrowString)
+                .order("appointment_datetime", ascending: true)
                 .execute()
-            self.upcomingTasks = try JSONDecoder.supabaseDecoder.decodeSupabase([Task].self, from: tasksResponse.data)
+            self.upcomingAppointments = try JSONDecoder.supabaseDecoder.decodeSupabase([Appointment].self, from: tasksResponse.data)
+            
+            // 3b. Fetch customers for appointment display
+            let fetchedCustomers: [Customer] = try await dbService.fetch(from: "customers", as: Customer.self)
+            self.customers = fetchedCustomers
             
             // 4. Fetch Shifts, Staff and Roles
             let shiftsResponse = try await client
@@ -168,6 +186,9 @@ final class DashboardViewModel: ObservableObject {
             let roleMap = Dictionary(uniqueKeysWithValues: roles.map { ($0.id, $0.roleName) })
             
             let fetchedStores: [Store] = try await dbService.fetch(from: "stores", as: Store.self)
+            
+            self.users = users
+            self.stores = fetchedStores
             
             // Resolve current shift based on current hour (8 AM to 10 PM)
             let currentHour = calendar.component(.hour, from: Date())
@@ -238,6 +259,41 @@ final class DashboardViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    private func fetchAttendanceForStaff(storeId: UUID, currentUser: User) async {
+        do {
+            let usersResponse = try await client
+                .from("users")
+                .select()
+                .eq("store_id", value: storeId.uuidString)
+                .execute()
+            let users = try JSONDecoder.supabaseDecoder.decodeSupabase([User].self, from: usersResponse.data)
+            
+            let fetchedAttendance: [Attendance] = try await dbService.fetch(from: "attendance", as: Attendance.self)
+            
+            let currentUserId = currentUser.id
+            let storeEmployees = users.filter { $0.id != currentUserId }
+            
+            await MainActor.run {
+                if storeEmployees.isEmpty {
+                    self.attendanceValueText = "No Staff"
+                } else {
+                    let assigned = storeEmployees.count
+                    let calendar = Calendar.current
+                    let todayRecords = fetchedAttendance.filter { calendar.isDateInToday($0.attendanceDate) }
+                    let present = storeEmployees.filter { emp in
+                        todayRecords.contains { $0.employeeId == emp.id && $0.status.lowercased() == "present" }
+                    }.count
+                    self.attendanceValueText = "\(present) / \(assigned)"
+                }
+            }
+        } catch {
+            print("Failed to compute attendanceValueText: \(error)")
+            await MainActor.run {
+                self.attendanceValueText = "Error"
+            }
+        }
+    }
 }
 
 // MARK: - View
@@ -252,6 +308,7 @@ struct DashboardView: View {
     
     @State private var navigateToShifts = false
     @State private var selectedEmployeeDetail: StaffShiftDisplay? = nil
+    @State private var selectedAppointment: Appointment? = nil
     @State private var showingNotifications = false
     @State private var showingProfile = false
     
@@ -318,18 +375,18 @@ struct DashboardView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
 
-                        // Hidden navigation link to shift page
-                        NavigationLink(destination: ShiftManagementView(), isActive: $navigateToShifts) {
-                            EmptyView()
-                        }
-                        .frame(width: 0, height: 0)
-                        .opacity(0)
+                        // Hidden navigation link to shift page removed, using navigationDestination instead
                         
-                        // 1. Interactive Sales Chart Card
+                        // 1. Low Stock Banner/Card (Conditional)
+                        if viewModel.lowStockCount > 0 {
+                            lowStockBannerCard
+                        }
+                        
+                        // 2. Interactive Sales Chart Card
                         salesProgressChartCard
                         
-                        // 2. Low Stock Banner/Card
-                        lowStockBannerCard
+                        // 3. Staff Present (Overview Card)
+                        staffPresentCard
                         
                         // 3. Upcoming Appointments Card (Carousel)
                         upcomingAppointmentsCard
@@ -345,6 +402,9 @@ struct DashboardView: View {
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationBarHidden(true)
+        .navigationDestination(isPresented: $navigateToShifts) {
+            ShiftManagementView()
+        }
         .sheet(item: $selectedEmployeeDetail) { staff in
             NavigationStack {
                 EmployeeDetailView(
@@ -383,6 +443,17 @@ struct DashboardView: View {
         }
         .refreshable {
             await viewModel.loadDashboardData()
+        }
+        .sheet(item: $selectedAppointment, onDismiss: {
+            Swift.Task { await viewModel.loadDashboardData() }
+        }) { appointment in
+            AppointmentDetailView(
+                appointment: appointment,
+                employees: viewModel.users,
+                stores: viewModel.stores,
+                existingAppointments: viewModel.upcomingAppointments,
+                onUpdate: { Swift.Task { await viewModel.loadDashboardData() } }
+            )
         }
     }
     
@@ -431,6 +502,45 @@ struct DashboardView: View {
                     .stroke(Color.orange.opacity(0.3), lineWidth: 1)
             )
             .padding(.horizontal, 20)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var staffPresentCard: some View {
+        Button {
+            withAnimation {
+                selectedTab = 1 // Navigate to Staff Tab
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header
+                HStack(spacing: 6) {
+                    Image(systemName: "person.2.fill")
+                        .foregroundColor(Color(.label))
+                    Text("STAFF")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color(.label))
+                        .tracking(1)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.footnote).fontWeight(.bold)
+                        .foregroundColor(Color(.secondaryLabel))
+                }
+                
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(viewModel.attendanceValueText)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(viewModel.attendanceValueText == "No Staff" ? Color(.secondaryLabel) : Color(.label))
+                }
+            }
+            .padding(20)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.04), radius: 15, x: 0, y: 8)
+            .padding(.horizontal)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -542,8 +652,8 @@ struct DashboardView: View {
     private var upcomingAppointmentsCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
-            NavigationLink(destination: TaskManagementView()) {
-                HStack {
+            NavigationLink(destination: AppointmentManagementView()) {
+                HStack(spacing: 6) {
                     Image(systemName: "calendar")
                         .foregroundColor(Color(.label))
                     Text("UPCOMING APPOINTMENTS")
@@ -551,84 +661,129 @@ struct DashboardView: View {
                         .fontWeight(.bold)
                         .foregroundColor(Color(.label))
                         .tracking(1)
+                    
+
+                    
                     Spacer()
+                    
                     Image(systemName: "chevron.right")
                         .font(.footnote).fontWeight(.bold)
-                        .foregroundColor(Color(.label))
+                        .foregroundColor(Color(.secondaryLabel))
                 }
             }
             .buttonStyle(PlainButtonStyle())
-            .padding(.horizontal, 20)
             
-            // Horizontal Carousel
-            if viewModel.upcomingTasks.isEmpty {
-                VStack(spacing: 12) {
+            // Appointment Rows
+            if viewModel.upcomingAppointments.isEmpty {
+                VStack(spacing: 8) {
                     Image(systemName: "calendar.badge.clock")
-                        .font(.largeTitle).fontWeight(.bold)
+                        .font(.system(size: 32))
+                        .foregroundColor(Color(.tertiaryLabel))
+                    Text("No upcoming appointments")
+                        .font(.subheadline)
                         .foregroundColor(Color(.secondaryLabel))
-                    Text("No upcoming appointments or tasks.")
-                        .foregroundColor(Color(.label))
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-                .background(Color(.secondaryLabel).opacity(0.05))
-                .cornerRadius(16)
-                .padding(.horizontal, 20)
+                .padding(.vertical, 24)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        ForEach(viewModel.upcomingTasks) { task in
-                            NavigationLink(destination: TaskManagementView()) {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    // Time & Icon
-                                    HStack {
-                                        Text(formatTime(task.dueDate))
-                                            .font(.subheadline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(Color(.label))
-                                        Spacer()
-                                        Image(systemName: "star.fill")
-                                            .foregroundColor(.orange)
-                                    }
-                                    
-                                    // Title & Priority/Type
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(task.title)
-                                            .font(.body)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(Color(.label))
-                                            .lineLimit(1)
-                                        
-                                        Text(task.description ?? "\(task.priority.capitalized) Priority")
-                                            .font(.caption2)
-                                            .foregroundColor(Color(.secondaryLabel))
-                                            .lineLimit(1)
-                                    }
-                                }
-                                .padding(16)
-                                .frame(width: 180, height: 100)
-                                .background(Color(.secondaryLabel).opacity(0.05))
-                                .cornerRadius(16)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color(.secondaryLabel).opacity(0.1), lineWidth: 1)
-                                )
-                            }
-                            .buttonStyle(PlainButtonStyle())
+                VStack(spacing: 0) {
+                    let displayAppointments = Array(viewModel.upcomingAppointments.prefix(3))
+                    ForEach(Array(displayAppointments.enumerated()), id: \.element.id) { index, appointment in
+                        Button(action: {
+                            selectedAppointment = appointment
+                        }) {
+                            appointmentRow(for: appointment)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        if index < displayAppointments.count - 1 {
+                            Divider()
+                                .padding(.leading, 62)
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 8)
                 }
+                .padding(.vertical, 4)
+                .background(Color(.secondaryLabel).opacity(0.04))
+                .cornerRadius(14)
             }
         }
-        .padding(.vertical, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.secondarySystemGroupedBackground))
-        )
+        .padding(20)
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(20)
         .shadow(color: Color.black.opacity(0.04), radius: 15, x: 0, y: 8)
         .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private func appointmentRow(for appointment: Appointment) -> some View {
+        HStack(spacing: 12) {
+            // Time badge
+            VStack(spacing: 2) {
+                Text(formatTime(appointment.appointmentDatetime))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(.blue)
+                    .lineLimit(1)
+                
+                // Relative day label if not today
+                if !Calendar.current.isDateInToday(appointment.appointmentDatetime) {
+                    let dayLabel = Calendar.current.isDateInTomorrow(appointment.appointmentDatetime) ? "Tomorrow" : formatShortDate(appointment.appointmentDatetime)
+                    Text(dayLabel)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(Color(.secondaryLabel))
+                        .lineLimit(1)
+                }
+            }
+            .frame(width: 65)
+            
+            // Vertical accent line
+            RoundedRectangle(cornerRadius: 2)
+                .fill(Color.blue.opacity(0.3))
+                .frame(width: 3, height: 36)
+            
+            // Content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(appointment.appointmentName ?? appointment.description ?? "Appointment")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(Color(.label))
+                    .lineLimit(1)
+                
+                if let desc = appointment.description, appointment.appointmentName != nil {
+                    Text(desc)
+                        .font(.caption2)
+                        .foregroundColor(Color(.secondaryLabel))
+                        .lineLimit(1)
+                }
+                
+                HStack(spacing: 8) {
+                    if let customer = viewModel.customers.first(where: { $0.id == appointment.customerId }) {
+                        HStack(spacing: 3) {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 9))
+                                .foregroundColor(Color(.systemBlue))
+                            Text(customer.name)
+                                .font(.caption)
+                                .foregroundColor(Color(.secondaryLabel))
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+            
+            Spacer(minLength: 4)
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(Color(.tertiaryLabel))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+    }
+    
+    private func formatShortDate(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f.string(from: date)
     }
     
     private var staffShiftsCard: some View {

@@ -63,12 +63,10 @@ final class SupabaseDashboardService: DashboardServicing {
         // region, country, city). Decoding as `Store` failed on every
         // required field that doesn't exist in the real table.
         //
-        // There is no `sales_targets`, `shift_assignments`, or `appointments`
-        // table in the real schema (confirmed against the 27-table RSMS
-        // schema doc). Targets live in `store_targets` (one row per store
+        //
+        // Targets live in `store_targets` (one row per store
         // per month); shift assignment is just `users.shift_id`, no join
-        // table involved; appointments are `tasks` rows where
-        // `task_type = 'Appointment'`.
+        // table involved. Appointments live in the `appointments` table.
         async let adminStores = database.fetchResilient(from: "stores", as: AdminStore.self)
         async let sales = database.fetchResilient(from: "sales", as: Sale.self)
         async let saleItems = database.fetchResilient(from: "sale_items", as: SaleItem.self)
@@ -79,7 +77,7 @@ final class SupabaseDashboardService: DashboardServicing {
         async let inventory = database.fetchResilient(from: "inventory", as: InventoryItem.self)
         async let products = database.fetchResilient(from: "products", as: Product.self)
         async let customers = database.fetchResilient(from: "customers", as: Customer.self)
-        async let tasks = database.fetchResilient(from: "tasks", as: TaskRecord.self)
+        async let appointmentsList = database.fetchResilient(from: "appointments", as: Appointment.self)
         async let stockRequests = database.fetchResilient(from: "stock_requests", as: StockRequest.self)
         async let healthScores = database.fetchResilient(from: "health_scores", as: HealthScore.self)
 
@@ -87,14 +85,14 @@ final class SupabaseDashboardService: DashboardServicing {
             adminStores: adminStores, sales: sales, saleItems: saleItems, storeTargets: storeTargets,
             shifts: shifts, attendance: attendance,
             users: users, inventory: inventory, products: products, customers: customers,
-            tasks: tasks, stockRequests: stockRequests, healthScores: healthScores
+            appointments: appointmentsList, stockRequests: stockRequests, healthScores: healthScores
         )
 
         let failureReasons = [
             results.adminStores.failureReason, results.sales.failureReason, results.saleItems.failureReason,
             results.storeTargets.failureReason, results.shifts.failureReason,
             results.attendance.failureReason, results.users.failureReason, results.inventory.failureReason,
-            results.products.failureReason, results.customers.failureReason, results.tasks.failureReason,
+            results.products.failureReason, results.customers.failureReason, results.appointments.failureReason,
             results.stockRequests.failureReason, results.healthScores.failureReason
         ].compactMap { $0 }
 
@@ -114,9 +112,7 @@ final class SupabaseDashboardService: DashboardServicing {
             )
         }
 
-        let appointments = results.tasks.values
-            .filter { ($0.taskType ?? "").caseInsensitiveCompare("Appointment") == .orderedSame }
-            .compactMap(\.asAppointment)
+        let appointments = results.appointments.values
 
         return DashboardData(
             stores: stores,

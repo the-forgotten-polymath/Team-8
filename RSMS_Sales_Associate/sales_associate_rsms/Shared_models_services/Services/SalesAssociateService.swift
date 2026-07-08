@@ -309,60 +309,49 @@ final class SalesAssociateService {
         return target.revenueTarget / daysInMonth
     }
 
-    /// Counts pending and completed tasks assigned to this user.
+    /// Counts pending and completed appointments assigned to this user.
     func fetchTaskCounts(userId: UUID) async throws -> (pending: Int, completed: Int) {
-        let tasks: [AppTask] = (try? await client
-            .from("tasks")
+        let appointments: [AppointmentRecord] = (try? await client
+            .from("appointments")
             .select()
-            .eq("assigned_to", value: userId.uuidString)
+            .eq("sales_associate_id", value: userId.uuidString)
             .execute()
             .value) ?? []
 
-        let pending   = tasks.filter { $0.status.lowercased() == "pending" }.count
-        let completed = tasks.filter { $0.status.lowercased() == "completed" }.count
+        let pending   = appointments.filter { $0.status.lowercased() == "scheduled" || $0.status.lowercased() == "pending" }.count
+        let completed = appointments.filter { $0.status.lowercased() == "completed" }.count
         return (pending, completed)
     }
 
-    /// Fetches tasks mapped to Appointments
+    /// Fetches Appointments
     func fetchAppointments(userId: UUID) async throws -> [Appointment] {
-        let tasks: [AppTask] = (try? await client
-            .from("tasks")
+        let records: [AppointmentRecord] = (try? await client
+            .from("appointments")
             .select()
-            .eq("assigned_to", value: userId.uuidString)
-            .eq("task_type", value: "Appointment")
+            .eq("sales_associate_id", value: userId.uuidString)
             .execute()
             .value) ?? []
             
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-            
-        return tasks.compactMap { task in
+        return records.compactMap { record in
             let aptStatus: AppointmentStatus
-            switch task.status.lowercased() {
+            switch record.status.lowercased() {
             case "completed": aptStatus = .completed
-            case "pending": aptStatus = .scheduled
+            case "pending", "scheduled": aptStatus = .scheduled
             case "cancelled": aptStatus = .cancelled
             default: aptStatus = .scheduled
             }
             
-            var date = task.createdAt
-            if let dateString = task.dueDate, let parsed = dateFormatter.date(from: dateString) {
-                date = parsed
-            }
-            
-            // Schema lacks a client_id on tasks, so we fallback to a mock client for now.
-            // Ideally, a task_customer_link table or a customer_id column should be added to tasks.
-            let mockClientId = UUID(uuidString: "11111111-1111-1111-1111-111111111111") ?? UUID()
+            let mockClientId = record.customerId ?? UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
             
             return Appointment(
-                id: task.id,
+                id: record.id,
                 clientId: mockClientId,
-                associateId: task.assignedTo ?? userId,
-                date: date,
+                associateId: record.salesAssociateId ?? userId,
+                date: record.appointmentDatetime,
                 type: .inStore,
-                notes: task.description,
+                notes: record.description,
                 status: aptStatus,
-                clientName: task.title
+                clientName: "Client" // We don't have title anymore, could fetch from customers if needed
             )
         }
     }
@@ -591,23 +580,29 @@ final class SalesAssociateService {
     }
 }
 
-// MARK: - AppTask (lightweight decode of tasks table)
-// Named AppTask to avoid conflict with Swift's Task type.
-struct AppTask: Decodable, Identifiable {
+// MARK: - AppointmentRecord
+struct AppointmentRecord: Codable, Identifiable {
     let id: UUID
-    let title: String
+    let customerId: UUID?
+    let storeId: UUID
+    let salesAssociateId: UUID?
+    let appointmentDatetime: Date
     let description: String?
     let status: String
-    let assignedTo: UUID?
-    let dueDate: String?
-    let taskType: String?
+    let createdBy: UUID
     let createdAt: Date
+    let updatedAt: Date
 
     enum CodingKeys: String, CodingKey {
-        case id, title, description, status
-        case assignedTo = "assigned_to"
-        case dueDate    = "due_date"
-        case taskType   = "task_type"
-        case createdAt  = "created_at"
+        case id
+        case customerId = "customer_id"
+        case storeId = "store_id"
+        case salesAssociateId = "sales_associate_id"
+        case appointmentDatetime = "appointment_datetime"
+        case description
+        case status
+        case createdBy = "created_by"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
     }
 }

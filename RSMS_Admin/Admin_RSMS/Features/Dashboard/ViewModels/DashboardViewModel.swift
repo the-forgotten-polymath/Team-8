@@ -244,10 +244,9 @@ final class DashboardViewModel: ObservableObject {
         stockAlerts = makeStockAlerts(data: data, storeId: storeId)
         allAppointments = data.appointments
             .filter { $0.storeId == storeId }
-            .sorted { $0.appointmentStart < $1.appointmentStart }
+            .sorted { $0.appointmentDatetime < $1.appointmentDatetime }
         priorityAppointments = allAppointments
-            .filter { calendar.isDateInToday($0.appointmentStart) && $0.status.lowercased() != "cancelled" }
-            .sorted { appointmentRank($0) < appointmentRank($1) }
+            .filter { calendar.isDateInToday($0.appointmentDatetime) && $0.status.lowercased() != "cancelled" }
             .prefix(4)
             .map { $0 }
             
@@ -484,14 +483,6 @@ final class DashboardViewModel: ObservableObject {
                 if $0.isOutOfStock != $1.isOutOfStock { return $0.isOutOfStock }
                 return $0.soldUnits > $1.soldUnits
             }
-    }
-
-    private func appointmentRank(_ appointment: Appointment) -> Int {
-        switch appointment.priority.lowercased() {
-        case "high", "vip": return 0
-        case "medium": return 1
-        default: return 2
-        }
     }
 }
 

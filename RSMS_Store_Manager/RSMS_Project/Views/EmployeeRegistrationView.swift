@@ -31,7 +31,6 @@ struct EmployeeRegistrationView: View {
     
     @State private var address = ""
     
-    @State private var jobRole = "Sales Associate"
     @State private var selectedShiftId: UUID? = nil
 
     // Loaded data
@@ -56,12 +55,6 @@ struct EmployeeRegistrationView: View {
     
     // Constants for Pickers
     let genders = ["Male", "Female", "Other"]
-    let jobRoles = [
-        "Sales Associate",
-        "Cashier",
-        "House Keeping",
-        "Visual Merchandiser"
-    ]
 
     var body: some View {
         Form {
@@ -190,13 +183,6 @@ struct EmployeeRegistrationView: View {
 
             // Employment Details
             Section(header: Text("Employment Details")) {
-                Picker("Job Role", selection: $jobRole) {
-                    ForEach(jobRoles, id: \.self) { role in
-                        Text(role).tag(role)
-                    }
-                }
-                .pickerStyle(.menu)
-
                 if isLoading {
                     HStack {
                         Text("Loading shifts...")
@@ -386,7 +372,7 @@ struct EmployeeRegistrationView: View {
         let newUserId = UUID()
         
         // 1. Map Rich job title role to valid DB Role IDs
-        let mappedRoleId = getDatabaseRoleId(for: jobRole)
+        let mappedRoleId = UUID(uuidString: "dae0ff3c-0356-4344-a643-22f06a8fee61")! // Sales Associate
         
         // 2. Construct Core User struct for Supabase schema
         // Username is auto generated from email prefix
@@ -410,7 +396,7 @@ struct EmployeeRegistrationView: View {
             storeId: SessionManager.shared.currentUser?.storeId ?? shifts.first(where: { $0.id == selectedShiftId })?.storeId,
             shiftId: selectedShiftId,
             employeeCode: employeeId,
-            designation: jobRole,
+            designation: "Sales Associate",
             phone: mobileNumber.trimmingCharacters(in: .whitespaces),
             gender: gender,
             dateOfBirth: dobString,
@@ -427,7 +413,7 @@ struct EmployeeRegistrationView: View {
             mobileNumber: mobileNumber.trimmingCharacters(in: .whitespaces),
             email: email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
             address: address.trimmingCharacters(in: .whitespacesAndNewlines),
-            jobRole: jobRole,
+            jobRole: "Sales Associate",
             shiftId: selectedShiftId,
             profilePhotoData: profilePhotoData
         )
@@ -479,15 +465,4 @@ struct EmployeeRegistrationView: View {
         }
     }
 
-    private func getDatabaseRoleId(for jobRole: String) -> UUID {
-        let salesRoleId = UUID(uuidString: "dae0ff3c-0356-4344-a643-22f06a8fee61")!
-        let inventoryRoleId = UUID(uuidString: "c0aa841a-7c57-43f9-b98a-523475ba43af")!
-        
-        switch jobRole {
-        case "Inventory Planner", "Stock Specialist":
-            return inventoryRoleId
-        default:
-            return salesRoleId
-        }
-    }
 }

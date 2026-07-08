@@ -44,11 +44,11 @@ struct EmployeeTabView: View {
                     }
                     .buttonStyle(CardButtonStyle())
 
-                    // Card 3 — Task Management
-                    NavigationLink(value: ManagementRoute.tasks) {
+                    // Card 3 — Appointments
+                    NavigationLink(value: ManagementRoute.appointments) {
                         ManagementCard(
-                            title: "Task Management",
-                            subtitle: "Create, schedule and assign staff tasks",
+                            title: "Appointments",
+                            subtitle: "Create, schedule and assign staff appointments",
                             illustration: AnyView(TaskIllustration())
                         )
                     }
@@ -65,8 +65,8 @@ struct EmployeeTabView: View {
                     EmployeeListView()
                 case .shifts:
                     ShiftManagementView()
-                case .tasks:
-                    TaskManagementView()
+                case .appointments:
+                    AppointmentManagementView()
                 }
             }
         }
@@ -77,7 +77,7 @@ struct EmployeeTabView: View {
 enum ManagementRoute: Hashable {
     case employees
     case shifts
-    case tasks
+    case appointments
 }
 
 // MARK: - Custom Card Button Style (HIG compliant scale animation)

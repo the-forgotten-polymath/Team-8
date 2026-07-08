@@ -88,7 +88,7 @@ def copy_build_settings(source_target, dest_target)
         end
       end
       # Force iOS 26.5 deployment target
-      dest_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '26.5'
+      dest_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.5'
       # Make sure it builds as dynamic framework and generates Info.plist
       dest_config.build_settings['MACH_O_TYPE'] = 'mh_dylib'
       dest_config.build_settings['GENERATE_INFOPLIST_FILE'] = 'YES'
@@ -107,7 +107,7 @@ main_target = project.targets.find { |t| t.product_type == 'com.apple.product-ty
 main_target.name = 'RSMS'
 main_target.product_name = 'RSMS'
 main_target.build_configurations.each do |c|
-  c.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '26.5'
+  c.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.5'
 end
 puts "Configured main app target: #{main_target.name}"
 

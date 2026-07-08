@@ -14,7 +14,7 @@ struct EmployeeListView: View {
     @State private var roles: [Role] = []
     @State private var stores: [Store] = []
     @State private var shifts: [Shift] = []
-    @State private var allTodayAttendanceRecords: [Attendance] = []
+
 
     @State private var searchText = ""
     @State private var isLoading = true
@@ -76,13 +76,6 @@ struct EmployeeListView: View {
         return shifts.first
     }
 
-    private var attendanceValueText: String {
-        let assigned = employees.count
-        let present = employees.filter { emp in
-            allTodayAttendanceRecords.contains { $0.employeeId == emp.id && $0.status.lowercased() == "present" }
-        }.count
-        return "\(present) / \(assigned)"
-    }
 
     var body: some View {
         Group {
@@ -122,34 +115,7 @@ struct EmployeeListView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Quick Overview Section (Visible only when not actively filtering/searching)
-                        if searchText.isEmpty {
-                            VStack(alignment: .leading, spacing: 14) {
-                                Text("Quick Overview")
-                                    .font(.system(size: 18, weight: .semibold, design: .default))
-                                    .foregroundColor(Color(.label))
-                                    .padding(.top, 8)
-                                
-                                // Attendance Card
-                                Button(action: {}) {
-                                    OverviewCard(
-                                        iconName: "person.2.fill",
-                                        iconBgColor: Color(.systemGreen).opacity(0.15),
-                                        iconColor: Color(.systemGreen),
-                                        value: attendanceValueText,
-                                        subtitle: "Staff Present",
-                                        footerText: nil,
-                                        footerColor: Color(.systemGreen)
-                                    )
-                                }
-                                .buttonStyle(RowButtonStyle())
-                            }
-                            .padding(.bottom, 16)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                            .onAppear {
-                                isOverviewVisible = true
-                            }
-                        }
+
                         
                         if filtered.isEmpty {
                             VStack(spacing: 16) {
@@ -272,7 +238,7 @@ struct EmployeeListView: View {
             let rName = roleName(for: employee.roleId).lowercased()
             return employee.fullName.localizedCaseInsensitiveContains(searchText) ||
                    employee.username.localizedCaseInsensitiveContains(searchText) ||
-                   (employee.email ?? "").localizedCaseInsensitiveContains(searchText) ||
+                   employee.email.localizedCaseInsensitiveContains(searchText) ||
                    rName.contains(searchText.lowercased())
         }
     }
@@ -325,20 +291,10 @@ struct EmployeeListView: View {
                 .execute()
             let shiftList = try JSONDecoder.supabaseDecoder.decodeSupabase([Shift].self, from: shiftResponse.data)
             
-            // Fetch attendance
-            var fetchedAttendance: [Attendance] = []
-            do {
-                fetchedAttendance = try await dbService.fetch(from: "attendance", as: Attendance.self)
-            } catch {
-                print("Failed to fetch attendance for statistics: \(error)")
-            }
-            
             // 3. Filter employees to exclude the current logged-in manager
             let currentUserId = SessionManager.shared.currentUser?.id
             let storeEmployees = empList.filter { $0.id != currentUserId }
             
-            let calendar = Calendar.current
-            self.allTodayAttendanceRecords = fetchedAttendance.filter { calendar.isDateInToday($0.attendanceDate) }
             self.employees = storeEmployees.sorted { $0.fullName.localizedCaseInsensitiveCompare($1.fullName) == .orderedAscending }
             self.roles = roleList
             self.stores = storeList
@@ -368,8 +324,17 @@ struct EmployeeListView: View {
 
     private func deleteEmployee(_ employee: User) async {
         do {
-            try await dbService.delete(from: "users", column: "id", equals: employee.id.uuidString.lowercased())
-            employees.removeAll(where: { $0.id == employee.id })
+            let employeeIdString = employee.id.uuidString.lowercased()
+            
+            // Clean up dependencies first to avoid foreign key constraint errors
+            try? await dbService.delete(from: "appointments", column: "sales_associate_id", equals: employeeIdString)
+            try? await dbService.delete(from: "attendance", column: "employee_id", equals: employeeIdString)
+            
+            try await dbService.delete(from: "users", column: "id", equals: employeeIdString)
+            
+            await MainActor.run {
+                employees.removeAll(where: { $0.id == employee.id })
+            }
         } catch {
             print("Failed to delete user: \(error)")
         }
@@ -410,14 +375,15 @@ struct OverviewCard: View {
             // Value (Format fraction numerator/denominator baseline alignment)
             let parts = value.components(separatedBy: "/")
             if parts.count == 2 {
-                (Text(parts[0].trimmingCharacters(in: .whitespaces))
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(Color(.label))
-                 +
-                 Text("/" + parts[1].trimmingCharacters(in: .whitespaces))
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(.secondaryLabel))
-                )
+                HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    Text(parts[0].trimmingCharacters(in: .whitespaces))
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(Color(.label))
+                    
+                    Text("/" + parts[1].trimmingCharacters(in: .whitespaces))
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(Color(.secondaryLabel))
+                }
                 .lineLimit(1)
                 .padding(.top, 4)
             } else {
@@ -1416,12 +1382,21 @@ struct EmployeeDetailView: View {
 
     private func deleteEmployee() async {
         do {
+            let employeeIdString = currentEmployee.id.uuidString.lowercased()
+            
+            // Clean up dependencies first to avoid foreign key constraint errors
+            try? await DatabaseService.shared.delete(from: "appointments", column: "sales_associate_id", equals: employeeIdString)
+            try? await DatabaseService.shared.delete(from: "attendance", column: "employee_id", equals: employeeIdString)
+
             try await DatabaseService.shared.delete(
                 from: "users",
                 column: "id",
-                equals: currentEmployee.id.uuidString.lowercased()
+                equals: employeeIdString
             )
-            onDelete(currentEmployee)
+            
+            await MainActor.run {
+                onDelete(currentEmployee)
+            }
             dismiss()
         } catch {
             print("Failed to delete user: \(error)")

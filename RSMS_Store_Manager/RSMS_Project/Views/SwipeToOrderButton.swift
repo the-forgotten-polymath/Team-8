@@ -84,7 +84,7 @@ struct SwipeToOrderButton: View {
         }
         .frame(height: buttonHeight)
         .disabled(isLocked || isCompleted)
-        .onChange(of: isLocked) { locked in
+        .onChange(of: isLocked) { _, locked in
             if !locked {
                 // If unlocked/reset, reset the button state
                 withAnimation {

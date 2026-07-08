@@ -13,7 +13,7 @@ struct DashboardView: View {
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .font(.footnote.weight(.medium))
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
@@ -182,50 +182,55 @@ struct DashboardView: View {
     
     @ViewBuilder
     private var bottomCardsView: some View {
-        // 1. Retail Health Score
+        // 1. Most Sold Products
         ActivityCard(
-            title: "Retail Health Score",
-            subtitle: "NETWORK AVG"
+            title: "Most Selled Products",
+            subtitle: "BY VOLUME"
         ) {
             VStack(spacing: 0) {
-                ForEach(viewModel.retailHealthScores) { health in
-                    HStack(spacing: 14) {
-                        ZStack {
-                            Circle()
-                                .stroke(health.color.opacity(0.15), lineWidth: 3.5)
-                            Circle()
-                                .trim(from: 0, to: CGFloat(health.score) / 100)
-                                .stroke(health.color, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
-                                .rotationEffect(.degrees(-90))
-                            
-                            Text("\(health.score)")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                        .frame(width: 44, height: 44)
+                ForEach(viewModel.mostSoldProducts) { product in
+                    HStack(spacing: 12) {
+                        Text("\(product.rank)")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(product.rank <= 3 ? .primary : .secondary)
+                            .frame(width: 16, alignment: .center)
+                        
+                        Circle()
+                            .fill(Color.orange.opacity(0.12))
+                            .frame(width: 36, height: 36)
+                            .overlay(
+                                Image(systemName: "shippingbox.fill")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(.orange)
+                            )
                         
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(health.storeName)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.primary)
+                            Text(product.productName)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(.primary)
                                 .lineLimit(1)
                             
-                            Text(health.statusText)
+                            Text(product.subtitle)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                         
                         Spacer()
                         
-                        Circle()
-                            .fill(health.color)
-                            .frame(width: 8, height: 8)
+                        VStack(alignment: .trailing, spacing: 3) {
+                            Text("\(product.unitsSold)")
+                                .font(.subheadline.weight(.medium).monospacedDigit())
+                                .foregroundStyle(.primary)
+                            Text("UNITS")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .frame(height: 56)
                     
-                    if health.id != viewModel.retailHealthScores.last?.id {
-                        Divider().padding(.leading, 58)
+                    if product.id != viewModel.mostSoldProducts.last?.id {
+                        Divider().padding(.leading, 76)
                     }
                 }
             }
@@ -249,7 +254,7 @@ struct DashboardView: View {
                     HStack(spacing: 12) {
                         Text("\(store.rank)")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(store.rank <= 3 && viewModel.selectedStorePerformanceFilter == .highest ? .primary : .secondary)
+                            .foregroundStyle(store.rank <= 3 && viewModel.selectedStorePerformanceFilter == .highest ? .primary : .secondary)
                             .frame(width: 16, alignment: .center)
                         
                         Circle()
@@ -258,18 +263,18 @@ struct DashboardView: View {
                             .overlay(
                                 Text(store.initials)
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                             )
                         
                         Text(store.storeName)
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                         
                         Text(store.revenueText)
                             .font(.subheadline.weight(.medium).monospacedDigit())
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .frame(height: 56)
                     
@@ -282,7 +287,7 @@ struct DashboardView: View {
         
         // 3. Top Customers
         ActivityCard(
-            title: "Top Customers",
+            title: "Premium Clients",
             subtitle: "BY SPEND"
         ) {
             VStack(spacing: 0) {
@@ -290,7 +295,7 @@ struct DashboardView: View {
                     HStack(spacing: 12) {
                         Text("\(index + 1)")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(index < 3 ? .primary : .secondary)
+                            .foregroundStyle(index < 3 ? .primary : .secondary)
                             .frame(width: 16, alignment: .center)
                         
                         Circle()
@@ -299,18 +304,18 @@ struct DashboardView: View {
                             .overlay(
                                 Text(viewModel.topCustomersList[index].initials)
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(.purple)
+                                    .foregroundStyle(.purple)
                             )
                         
                         Text(viewModel.topCustomersList[index].customerName)
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                         
                         Text(viewModel.topCustomersList[index].spendText)
                             .font(.subheadline.weight(.medium).monospacedDigit())
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .frame(height: 56)
                     

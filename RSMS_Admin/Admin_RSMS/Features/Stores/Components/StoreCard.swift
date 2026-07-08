@@ -48,7 +48,7 @@ struct StoreCard: View {
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
                         .background(Color.black.opacity(0.6))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .clipShape(Capsule())
                         .padding(12)
                 }
@@ -62,7 +62,7 @@ struct StoreCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(store.name)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                             .lineLimit(1)
                         
                         HStack(spacing: 6) {
@@ -71,7 +71,7 @@ struct StoreCard: View {
                             Text(store.address)
                                 .font(.system(size: 11, weight: .medium))
                         }
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                     }
                     Spacer()
@@ -93,9 +93,9 @@ struct StoreCard: View {
                             }
                         }
                     } label: {
-                        Image(systemName: "ellipsis")
+                        Label("Options", systemImage: "ellipsis").labelStyle(.iconOnly)
                             .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.leading, 8)
                             .padding(.bottom, 8)
                             .contentShape(Rectangle())
@@ -110,16 +110,16 @@ struct StoreCard: View {
                         .overlay(
                             Text(store.managerInitials)
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         )
                     
                     VStack(alignment: .leading, spacing: 0) {
                         Text("MANAGER")
                             .font(.system(size: 8, weight: .bold))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text(store.managerName)
                             .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                     }
                     
                     Spacer()
@@ -151,7 +151,7 @@ struct StoreCard: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(bgColor)
-            .foregroundColor(fgColor)
+            .foregroundStyle(fgColor)
             .clipShape(Capsule())
     }
     
@@ -163,7 +163,7 @@ struct StoreCard: View {
             .overlay(
                 Image(systemName: "photo.fill")
                     .font(.largeTitle)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             )
     }
 }

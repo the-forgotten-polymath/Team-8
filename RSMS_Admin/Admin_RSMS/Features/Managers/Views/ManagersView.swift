@@ -23,15 +23,14 @@ struct ManagersView: View {
                 VStack(spacing: 16) {
                     ProgressView()
                         .scaleEffect(1.4)
-                    Text("Loading manager…")
+                    Text("Loading managers…")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBG)
             } else {
                 VStack(spacing: 0) {
-                    // Grid
                     ScrollView {
                         let columns = sizeClass == .compact ? [GridItem(.flexible(), spacing: 20)] : [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 20)]
                         LazyVGrid(columns: columns, spacing: 20) {
@@ -56,11 +55,11 @@ struct ManagersView: View {
                         .padding(.top, 32)
                         .padding(.bottom, 140)
                     }
-                    .background(Color.pageBG)
                 }
+                .searchable(text: $searchText, prompt: "Search by manager")
+                .background(Color.pageBG)
             }
         }
-        .searchable(text: $searchText, prompt: "Search managers, roles, or locations...")
         .alert("Error", isPresented: Binding(
             get: { dataManager.errorMessage != nil },
             set: { if !$0 { dataManager.errorMessage = nil } }
@@ -96,12 +95,11 @@ struct ManagersView: View {
         .navigationTitle("Managers")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingAddMember = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.accentColor)
-                }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Manager", systemImage: "plus", action: { showingAddMember = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
             }
         }
     }

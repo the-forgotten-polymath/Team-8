@@ -52,6 +52,7 @@ class RSMSDataManager: ObservableObject {
     @Published var stores:       [AdminStore]   = []
     @Published var managers: [Manager]  = []
     @Published var products: [Product]  = []
+    @Published var targets: [RevenueTarget] = []
     @Published var categories: [Category] = []
     @Published var inventory: [InventoryItem] = []
     @Published var isLoading:    Bool           = false
@@ -64,6 +65,79 @@ class RSMSDataManager: ObservableObject {
     private var storeChannel: RealtimeChannelV2?
     private var managerChannel: RealtimeChannelV2?
     private var productChannel: RealtimeChannelV2?
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – TARGETS: Local Management (No Supabase yet)
+    // ─────────────────────────────────────────────────────────────
+    struct InsertStoreTarget: Codable {
+        let store_id: UUID
+        let target_month: Date
+        let revenue_target: Double
+    }
+
+    @discardableResult
+    func fetchTargets() async -> [RevenueTarget] {
+        do {
+            let result: [StoreTarget] = try await client
+                .from("store_targets")
+                .select()
+                .execute()
+                .value
+                
+            let grouped = Dictionary(grouping: result, by: { "\($0.targetMonth.timeIntervalSince1970)_\($0.revenueTarget)" })
+            
+            let mappedTargets = grouped.map { (key, group) -> RevenueTarget in
+                let first = group.first!
+                return RevenueTarget(
+                    id: UUID(),
+                    name: "Target for \(first.targetMonth.formatted(.dateTime.month(.wide).year()))",
+                    amount: first.revenueTarget,
+                    period: .monthly,
+                    assignedStoreIDs: group.compactMap { $0.storeId },
+                    startDate: first.targetMonth,
+                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: first.targetMonth) ?? first.targetMonth
+                )
+            }
+            .sorted(by: { $0.startDate > $1.startDate })
+            
+            DispatchQueue.main.async {
+                self.targets = mappedTargets
+            }
+            return mappedTargets
+        } catch {
+            print("[RSMS] fetchTargets error: \(error)")
+            return []
+        }
+    }
+
+    func addTarget(_ target: RevenueTarget) async throws {
+        let inserts = target.assignedStoreIDs.map {
+            InsertStoreTarget(store_id: $0, target_month: target.startDate, revenue_target: target.amount)
+        }
+        try await client
+            .from("store_targets")
+            .insert(inserts)
+            .execute()
+        await fetchTargets()
+    }
+    
+    func updateTarget(_ target: RevenueTarget) async throws {
+        try await removeTarget(target)
+        try await addTarget(target)
+    }
+    
+    func removeTarget(_ target: RevenueTarget) async throws {
+        for storeId in target.assignedStoreIDs {
+            try await client
+                .from("store_targets")
+                .delete()
+                .eq("store_id", value: storeId)
+                .eq("target_month", value: target.startDate)
+                .eq("revenue_target", value: target.amount)
+                .execute()
+        }
+        await fetchTargets()
+    }
 
     // ─────────────────────────────────────────────────────────────
     // MARK: – Init: load data & start realtime
@@ -84,13 +158,8 @@ class RSMSDataManager: ObservableObject {
         async let s = fetchStores()
         async let m = fetchManager()
         async let p = fetchProducts()
-        async let c = fetchCategories()
-        async let i = fetchInventory()
-        _ = await (s, m, p, c, i)
-        
-        // After fetching all, calculate categoryQuantities for each store based on inventory
-        calculateStoreCategoryQuantities()
-        
+        async let t = fetchTargets()
+        _ = await (s, m, p, t)
         isLoading = false
     }
 
@@ -361,7 +430,7 @@ class RSMSDataManager: ObservableObject {
                     let roles: [Role] = try await client
                         .from("roles")
                         .select()
-                        .ilike("role_name", value: "%\(member.role)%")
+                        .ilike("role_name", pattern: "%\(member.role)%")
                         .execute()
                         .value
                     
@@ -460,6 +529,30 @@ class RSMSDataManager: ObservableObject {
                         await unassignManagerFromStore(location: old.location, managerName: old.name)
                     }
                     await syncManagerToStore(member: updatedMember)
+                    
+                    // Update user table
+                    if let old = oldMember {
+                        struct UserUpdate: Encodable {
+                            let email: String
+                            let fullName: String
+                            let storeId: UUID?
+                            
+                            enum CodingKeys: String, CodingKey {
+                                case email
+                                case fullName = "full_name"
+                                case storeId = "store_id"
+                            }
+                        }
+                        
+                        let storeId = self.stores.first(where: { $0.name == member.location })?.id
+                        let userUpdate = UserUpdate(email: member.email, fullName: member.name, storeId: storeId)
+                        
+                        _ = try? await client
+                            .from("users")
+                            .update(userUpdate)
+                            .eq("email", value: old.email)
+                            .execute()
+                    }
                 }
             } catch {
                 errorMessage = "Failed to update manager member: \(error.localizedDescription)"
@@ -582,13 +675,13 @@ class RSMSDataManager: ObservableObject {
     // ─────────────────────────────────────────────────────────────
     private func subscribeToRealtime() async {
         // ── Stores channel ────────────────────────────────────────
-        let storesCh = await client.realtimeV2.channel("stores-changes")
-        let storesChanges = await storesCh.postgresChange(
+        let storesCh = client.realtimeV2.channel("stores-changes")
+        let storesChanges = storesCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "stores"
         )
-        await storesCh.subscribe()
+        try? await storesCh.subscribeWithError()
         storeChannel = storesCh
 
         Task {
@@ -598,13 +691,13 @@ class RSMSDataManager: ObservableObject {
         }
 
         // ── Manager channel ─────────────────────────────────────────
-        let managerCh = await client.realtimeV2.channel("staff-changes")
-        let managerChanges = await managerCh.postgresChange(
+        let managerCh = client.realtimeV2.channel("staff-changes")
+        let managerChanges = managerCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "staff_members"
         )
-        await managerCh.subscribe()
+        try? await managerCh.subscribeWithError()
         managerChannel = managerCh
 
         Task {
@@ -614,13 +707,13 @@ class RSMSDataManager: ObservableObject {
         }
         
         // ── Products channel ────────────────────────────────────────
-        let productCh = await client.realtimeV2.channel("products-changes")
-        let productChanges = await productCh.postgresChange(
+        let productCh = client.realtimeV2.channel("products-changes")
+        let productChanges = productCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "products"
         )
-        await productCh.subscribe()
+        try? await productCh.subscribeWithError()
         productChannel = productCh
 
         Task {

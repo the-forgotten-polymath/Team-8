@@ -142,21 +142,43 @@ struct PromoCard: View {
                     )
                 )
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.tail)
         }
     }
 
     // MARK: - Helpers
 
     private var formattedDateRange: String {
-
-        "\(promotion.startDate) – \(promotion.endDate)"
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "dd MMM yyyy"
+        
+        guard let start = inputFormatter.date(from: promotion.startDate),
+              let end = inputFormatter.date(from: promotion.endDate) else {
+            return "\(promotion.startDate) – \(promotion.endDate)"
+        }
+        
+        return "\(outputFormatter.string(from: start)) - \(outputFormatter.string(from: end))"
     }
 
     private var storeText: String {
-
-        promotion.appliesToAllStores
-        ? "All Stores"
-        : "Selected Store"
+        if promotion.appliesToAllStores {
+            return "All Stores"
+        }
+        
+        if let storeIds = promotion.storeIds, !storeIds.isEmpty {
+            let names = storeIds.compactMap { id in
+                PromotionService.shared.stores.first(where: { $0.id == id })?.name
+            }
+            if !names.isEmpty {
+                return names.joined(separator: ", ")
+            }
+        }
+        
+        return "Selected Store(s)"
     }
 }
 

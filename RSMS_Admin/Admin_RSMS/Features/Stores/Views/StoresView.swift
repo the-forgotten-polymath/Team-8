@@ -92,7 +92,7 @@ struct StoresView: View {
                         .scaleEffect(1.4)
                     Text("Loading stores…")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBG)
@@ -137,7 +137,7 @@ struct StoresView: View {
                         mapViewContent
                     }
                 }
-                .searchable(text: $searchText, prompt: "Search stores or managers...")
+                .searchable(text: $searchText, prompt: "Search by store name")
                 .background(Color.pageBG)
             }
         }
@@ -185,14 +185,13 @@ struct StoresView: View {
         .navigationTitle("Stores")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 sortMenu
                 
-                Button(action: { showingAddStore = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.accentColor)
-                }
+                Button("Add Store", systemImage: "plus", action: { showingAddStore = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
             }
         }
     }
@@ -229,7 +228,7 @@ struct StoresView: View {
                                     
                                     Image(systemName: "mappin.circle.fill")
                                         .font(.system(size: selectedMapStore?.id == pin.id ? 36 : 28))
-                                        .foregroundColor(pin.isArchived ? .gray : (selectedMapStore?.id == pin.id ? Color(red: 0.1, green: 0.2, blue: 0.4) : .red))
+                                        .foregroundStyle(pin.isArchived ? .gray : (selectedMapStore?.id == pin.id ? Color(red: 0.1, green: 0.2, blue: 0.4) : .red))
                                         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                                         .opacity(pin.isArchived ? 0.6 : 1.0)
                                         .scaleEffect(selectedMapStore?.id == pin.id ? 1.15 : 1.0)
@@ -237,7 +236,7 @@ struct StoresView: View {
                                 
                                 Text(pin.name)
                                     .font(.system(size: selectedMapStore?.id == pin.id ? 11 : 9, weight: .bold))
-                                    .foregroundColor(.primary)
+                                    .foregroundStyle(.primary)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 3)
                                     .background(
@@ -266,7 +265,7 @@ struct StoresView: View {
                             .font(.title3.bold())
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                     }
                     Divider().frame(width: 44)
                     Button(action: {
@@ -279,7 +278,7 @@ struct StoresView: View {
                             .font(.title3.bold())
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -321,7 +320,7 @@ struct StoresView: View {
                         }) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                                 .padding(10)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
@@ -336,12 +335,12 @@ struct StoresView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(store.name)
                                 .font(.system(size: 24, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                             
                             HStack(spacing: 8) {
                                 Text(store.storeID ?? "—")
                                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 
                                 Circle().fill(Color.gray.opacity(0.3)).frame(width: 4, height: 4)
                                 
@@ -353,7 +352,7 @@ struct StoresView: View {
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 5)
                                         .background(Color.black.opacity(0.6))
-                                        .foregroundColor(.white)
+                                        .foregroundStyle(.white)
                                         .clipShape(Capsule())
                                 }
                             }
@@ -367,7 +366,7 @@ struct StoresView: View {
                             infoCard(title: "ADDRESS", icon: "mappin.circle.fill", content: AnyView(
                                 Text(store.address)
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.primary)
+                                    .foregroundStyle(.primary)
                             ))
                             
                             // Manager Card
@@ -379,11 +378,11 @@ struct StoresView: View {
                                         .overlay(
                                             Text(store.managerInitials)
                                                 .font(.system(size: 12, weight: .bold))
-                                                .foregroundColor(.primary)
+                                                .foregroundStyle(.primary)
                                         )
                                     Text(store.managerName)
                                         .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(.primary)
+                                        .foregroundStyle(.primary)
                                  }
                             ))
                             
@@ -428,7 +427,7 @@ struct StoresView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .background(Color(red: 0.1, green: 0.2, blue: 0.4))
                     .clipShape(Capsule())
                 }
@@ -444,7 +443,7 @@ struct StoresView: View {
                             .font(.system(size: 14, weight: .bold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                             .background(Color.green.opacity(0.12))
                             .clipShape(Capsule())
                     }
@@ -457,7 +456,7 @@ struct StoresView: View {
                             .font(.system(size: 14, weight: .bold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .background(Color.red.opacity(0.1))
                             .clipShape(Capsule())
                     }
@@ -482,7 +481,7 @@ struct StoresView: View {
                     .font(.system(size: 11, weight: .bold))
                     .tracking(0.5)
             }
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             
             content
         }
@@ -505,7 +504,7 @@ struct StoresView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(bgColor)
-            .foregroundColor(fgColor)
+            .foregroundStyle(fgColor)
             .clipShape(Capsule())
     }
     
@@ -587,7 +586,7 @@ struct StoresView: View {
         } label: {
             Image(systemName: "arrow.up.arrow.down")
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.accentColor)
+                .foregroundStyle(Color.accentColor)
         }
     }
 }

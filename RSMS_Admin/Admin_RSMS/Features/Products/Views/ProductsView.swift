@@ -107,7 +107,7 @@ struct ProductsView: View {
         }
         .navigationTitle("Products")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, prompt: "Search products by name, brand or SKU...")
+        .searchable(text: $searchText, prompt: "Search by product name")
     }
 
     /// Horizontal filter bar — just All and Pending, each labelled with a
@@ -134,7 +134,7 @@ struct ProductsView: View {
         } label: {
             Text("\(filter.rawValue) (\(viewModel.count(for: filter)))")
                 .font(.subheadline.weight(.semibold))
-                .foregroundColor(isSelected ? .white : .primary)
+                .foregroundStyle(isSelected ? .white : .primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(

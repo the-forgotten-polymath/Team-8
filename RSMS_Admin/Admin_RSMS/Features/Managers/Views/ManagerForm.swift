@@ -73,13 +73,13 @@ struct ManagerForm: View {
             .navigationTitle(memberToEdit == nil ? "Add Manager" : "Edit Manager")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         onDismiss()
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: saveManager) {
                         Text(memberToEdit == nil ? "Create" : "Update")
                             .fontWeight(.bold)
@@ -167,15 +167,20 @@ struct ManagerForm: View {
                 .foregroundStyle(.secondary)
                 .tracking(0.5)
             
-            let activeStores = dataManager.stores.filter { !$0.isArchived }
+            let activeStores = dataManager.stores.filter { store in
+                let isActive = !store.isArchived
+                let hasNoManager = store.managerName.lowercased() == "unassigned" || store.managerName.trimmingCharacters(in: .whitespaces).isEmpty
+                let isCurrentManagerStore = store.name == memberToEdit?.location
+                return isActive && (hasNoManager || isCurrentManagerStore)
+            }
             
             if activeStores.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "storefront")
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("No stores available")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .font(.system(size: 15))
                     Spacer()
                 }
@@ -202,19 +207,19 @@ struct ManagerForm: View {
                     HStack(spacing: 8) {
                         Image(systemName: "storefront")
                             .font(.system(size: 13))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         if selectedStore.isEmpty {
                             Text("Select a store...")
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         } else {
                             Text(selectedStore)
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         }
                         Spacer()
                         Image(systemName: "chevron.up.chevron.down")
                             .font(.system(size: 10))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .font(.system(size: 15))
                     .padding(.horizontal, 14)
@@ -231,22 +236,22 @@ struct ManagerForm: View {
     private var onboardingNote: some View {
         HStack(alignment: .top, spacing: 16) {
             Image(systemName: "info.circle.fill")
-                .foregroundColor(.blue)
+                .foregroundStyle(.blue)
                 .font(.system(size: 20))
             
             VStack(alignment: .leading, spacing: 4) {
                 Text("Onboarding Invitation")
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4))
+                    .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4))
                 Text("An invitation email will be sent immediately after account creation with instructions to set their password and complete their profile.")
                     .font(.system(size: 14))
-                    .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4).opacity(0.8))
+                    .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4).opacity(0.8))
             }
         }
         .padding(24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.blue.opacity(0.05))
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 }
 

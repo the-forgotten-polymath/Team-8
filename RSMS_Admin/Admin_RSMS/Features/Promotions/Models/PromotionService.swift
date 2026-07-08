@@ -99,6 +99,32 @@ final class PromotionService: ObservableObject {
                 .insert(payload)
                 .execute()
 
+            // Invoke email edge function for creation
+            struct PromoEmailPayload: Encodable {
+                let promotionId: UUID
+                let storeIds: [UUID]?
+                let appliesToAllStores: Bool
+                let sendOnDate: String?
+            }
+            
+            // 1. Send immediately
+            let immediatePayload = PromoEmailPayload(
+                promotionId: promotion.id,
+                storeIds: promotion.storeIds,
+                appliesToAllStores: promotion.appliesToAllStores,
+                sendOnDate: nil
+            )
+            _ = try? await client.functions.invoke("send-promotion-email", options: FunctionInvokeOptions(body: immediatePayload))
+            
+            // 2. Schedule for start date
+            let scheduledPayload = PromoEmailPayload(
+                promotionId: promotion.id,
+                storeIds: promotion.storeIds,
+                appliesToAllStores: promotion.appliesToAllStores,
+                sendOnDate: promotion.startDate
+            )
+            _ = try? await client.functions.invoke("send-promotion-email", options: FunctionInvokeOptions(body: scheduledPayload))
+
             await fetchPromotions()
 
             return true
@@ -167,10 +193,16 @@ final class PromotionService: ObservableObject {
         promotionId: String
     ) async -> String? {
 
-        let fileName = "\(promotionId).jpg"
-        let bucket = "promotion-banners"
+        // Using "store-images" bucket instead of "promotion-banners"
+        // as a workaround for the RLS policy restrictions on the new bucket.
+        let fileName = "promo_\(promotionId).jpg"
+        let bucket = "store-images"
 
         do {
+            // First, try to remove the existing file (if any) to avoid upsert RLS issues
+            _ = try? await client.storage
+                .from(bucket)
+                .remove(paths: [fileName])
 
             _ = try await client.storage
                 .from(bucket)
@@ -179,7 +211,7 @@ final class PromotionService: ObservableObject {
                     data: data,
                     options: FileOptions(
                         contentType: "image/jpeg",
-                        upsert: true
+                        upsert: false
                     )
                 )
 

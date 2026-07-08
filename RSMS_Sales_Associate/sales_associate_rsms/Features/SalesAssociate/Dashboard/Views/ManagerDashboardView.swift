@@ -89,37 +89,22 @@ struct StoreGoalGaugeView: View {
             Text("Boutique Conversion Goal")
                 .font(.headline)
             
-            Chart {
-                SectorMark(
-                    angle: .value("Conversion Rate", min(metrics.conversionRate, 20.0)),
-                    innerRadius: .ratio(0.8),
-                    angularInset: 1.5
-                )
-                .cornerRadius(4)
-                .foregroundStyle(Color.blue)
+            ZStack {
+                Circle()
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+                Circle()
+                    .trim(from: 0, to: CGFloat(min(metrics.conversionRate / 20.0, 1.0)))
+                    .stroke(Color.blue, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
                 
-                if metrics.conversionRate < 20.0 {
-                    SectorMark(
-                        angle: .value("Remaining", 20.0 - metrics.conversionRate),
-                        innerRadius: .ratio(0.8),
-                        angularInset: 1.5
-                    )
-                    .cornerRadius(4)
-                    .foregroundStyle(Color.gray.opacity(0.2))
+                VStack {
+                    Text(String(format: "%.1f%%", metrics.conversionRate))
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.primary)
                 }
             }
-            .frame(height: 200)
-            .chartBackground { chartProxy in
-                GeometryReader { geometry in
-                    let frame = geometry[chartProxy.plotFrame!]
-                    VStack {
-                        Text(String(format: "%.1f%%", metrics.conversionRate))
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(.primary)
-                    }
-                    .position(x: frame.midX, y: frame.midY)
-                }
-            }
+            .frame(height: 160)
+            .padding()
             
             HStack {
                 VStack(alignment: .leading) {

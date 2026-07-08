@@ -224,13 +224,6 @@ struct RevenueChartCard: View {
                     }
             }
         }
-        .chartXSelection(value: .init(get: {
-            selectedDataPoint?.date
-        }, set: { newDate in
-            if let newDate {
-                selectNearestPoint(to: newDate)
-            }
-        }))
     }
     
     // MARK: - Tooltip View

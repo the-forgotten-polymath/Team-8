@@ -315,7 +315,7 @@ struct OrderDetailView: View {
             simulationTask?.cancel()
             stopPolling()
         }
-        .onChange(of: orderStatus) { _, _ in
+        .onChange(of: orderStatus) { _ in
             startSimulationIfNecessary()
         }
     }

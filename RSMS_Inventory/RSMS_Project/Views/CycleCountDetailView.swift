@@ -92,7 +92,7 @@ struct CycleCountDetailView: View {
                 await viewModel.loadAuditData(warehouseId: warehouseId, zone: count.zone ?? "")
             }
         }
-        .onChange(of: viewModel.isAuditSubmitted) { _, submitted in
+        .onChange(of: viewModel.isAuditSubmitted) { submitted in
             if submitted { dismiss() }
         }
     }

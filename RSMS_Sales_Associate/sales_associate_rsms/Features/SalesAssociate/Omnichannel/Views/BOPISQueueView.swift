@@ -108,7 +108,7 @@ struct BOPISDetailView: View {
         .sheet(isPresented: $showingSignature) {
             SignatureCaptureView(signatureData: $signatureData)
         }
-        .onChange(of: signatureData) { oldData, newData in
+        .onChange(of: signatureData) { newData in
             if let data = newData {
                 Task {
                     await viewModel.completeBOPISPickup(orderID: order.id, signature: data)

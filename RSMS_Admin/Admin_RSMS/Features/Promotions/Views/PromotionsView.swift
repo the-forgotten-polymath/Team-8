@@ -27,11 +27,19 @@ struct PromotionsView: View {
                     ProgressView("Loading Promotions...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if filteredPromotions.isEmpty {
-                    ContentUnavailableView(
-                        "No Promotions Yet",
-                        systemImage: "tag",
-                        description: Text("Create your first promotional campaign.")
-                    )
+                    VStack(spacing: 12) {
+                        Spacer()
+                        Image(systemName: "tag")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text("No Promotions Yet")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text("Create your first promotional campaign.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
                 } else {
                     ScrollView {
                         let columns = sizeClass == .compact ? [GridItem(.flexible(), spacing: 20)] : [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 20)]

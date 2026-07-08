@@ -333,7 +333,7 @@ struct ShiftManagementView: View {
                     let targetId = Calendar.current.startOfDay(for: selectedDate).timeIntervalSince1970
                     proxy.scrollTo(targetId, anchor: .center)
                 }
-                .onChange(of: selectedDate) { _, newDate in
+                .onChange(of: selectedDate) { newDate in
                     withAnimation {
                         let targetId = Calendar.current.startOfDay(for: newDate).timeIntervalSince1970
                         proxy.scrollTo(targetId, anchor: .center)
@@ -1062,7 +1062,7 @@ struct AddShiftView: View {
         } message: {
             Text(alertMessage)
         }
-        .onChange(of: startTime) { _, newValue in
+        .onChange(of: startTime) { newValue in
             let corrected = clampToBusinessHours(newValue)
             if corrected != newValue {
                 startTime = corrected
@@ -1074,7 +1074,7 @@ struct AddShiftView: View {
                 endTime = clampToBusinessHours(newEnd)
             }
         }
-        .onChange(of: endTime) { _, newValue in
+        .onChange(of: endTime) { newValue in
             let corrected = clampToBusinessHours(newValue)
             if corrected != newValue {
                 endTime = corrected

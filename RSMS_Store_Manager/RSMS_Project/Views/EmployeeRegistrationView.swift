@@ -220,7 +220,7 @@ struct EmployeeRegistrationView: View {
         .task {
             await fetchShifts()
         }
-        .onChange(of: selectedPhotoItem) { _, newItem in
+        .onChange(of: selectedPhotoItem) { newItem in
             Swift.Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self) {
                     profilePhotoData = data

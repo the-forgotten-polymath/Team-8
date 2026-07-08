@@ -1025,7 +1025,7 @@ struct EmployeeDetailView: View {
                 await fetchShifts()
                 await fetchAttendance()
             }
-            .onChange(of: selectedPhotoItem) { _, newItem in
+            .onChange(of: selectedPhotoItem) { newItem in
                 Swift.Task {
                     if let data = try? await newItem?.loadTransferable(type: Data.self) {
                         await MainActor.run {

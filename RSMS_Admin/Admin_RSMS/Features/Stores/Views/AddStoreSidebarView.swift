@@ -127,7 +127,7 @@ struct AddStoreSidebarView: View {
                                     .foregroundColor(.secondary)
                                 TextField("Enter address or drop pin...", text: $address)
                                     .autocorrectionDisabled()
-                                    .onChange(of: address) { _, newValue in
+                                    .onChange(of: address) { newValue in
                                         let sanitized = sanitizeToEnglish(newValue)
                                         if sanitized != newValue {
                                             address = sanitized
@@ -361,7 +361,7 @@ struct AddStoreSidebarView: View {
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(image: $selectedImage, sourceType: imageSourceType)
         }
-        .onChange(of: locationManager.hasLocation) { _, hasLoc in
+        .onChange(of: locationManager.hasLocation) { hasLoc in
             if hasLoc && isLocating {
                 // Done loading location
             }
@@ -397,15 +397,10 @@ struct AddStoreSidebarView: View {
     
     private func reverseGeocode(coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        Task {
-            do {
-                guard let request = MKReverseGeocodingRequest(location: location) else {
-                    self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
-                    return
-                }
-                request.preferredLocale = Locale(identifier: "en_US")
-                let mapItems = try await request.mapItems
-                if let placemark = mapItems.first?.placemark {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "en_US")) { placemarks, error in
+            DispatchQueue.main.async {
+                if let placemark = placemarks?.first {
                     let components = [
                         placemark.subThoroughfare,
                         placemark.thoroughfare,
@@ -419,33 +414,22 @@ struct AddStoreSidebarView: View {
                 } else {
                     self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
                 }
-            } catch {
-                self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
             }
         }
     }
     
     private func detectRegionAndGenerateID(coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        Task {
-            do {
-                guard let request = MKReverseGeocodingRequest(location: location) else {
-                    self.detectedRegionCode = "XX"
-                    self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
-                    return
-                }
-                request.preferredLocale = Locale(identifier: "en_US")
-                let mapItems = try await request.mapItems
-                if let isoCode = mapItems.first?.placemark.isoCountryCode {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "en_US")) { placemarks, error in
+            DispatchQueue.main.async {
+                if let isoCode = placemarks?.first?.isoCountryCode {
                     self.detectedRegionCode = isoCode.uppercased()
                     self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: isoCode)
                 } else {
                     self.detectedRegionCode = "XX"
                     self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
                 }
-            } catch {
-                self.detectedRegionCode = "XX"
-                self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
             }
         }
     }

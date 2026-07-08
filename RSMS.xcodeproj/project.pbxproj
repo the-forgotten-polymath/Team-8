@@ -117,9 +117,10 @@
 		16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Admin_RSMS.app; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		545E2F922FEC4E550027DD55 /* RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		84387BFD2FFE261E0069A71F /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
+		846D678B2FFEC9B400B71CE3 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
 		8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		8E13F77D2FFBFFCC002D0D70 /* .npmrc */ = {isa = PBXFileReference; lastKnownFileType = text; path = .npmrc; sourceTree = "<group>"; };
@@ -307,7 +308,7 @@
 		545E2F932FEC4E550027DD55 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				545E2F922FEC4E550027DD55 /* Admin_RSMS.app */,
+				545E2F922FEC4E550027DD55 /* RSMS.app */,
 				DE8FDF16F7B414C3A03B817E /* AdminModule.framework */,
 				14A849CAC1A51C675BFEA412 /* InventoryModule.framework */,
 				D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */,
@@ -325,6 +326,13 @@
 			sourceTree = "<group>";
 		};
 		84387C002FFE261E0069A71F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		846D678E2FFEC9B400B71CE3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -548,7 +556,7 @@
 				8E29515D2FF4F6C200BC2782 /* Supabase */,
 			);
 			productName = RSMS;
-			productReference = 545E2F922FEC4E550027DD55 /* Admin_RSMS.app */;
+			productReference = 545E2F922FEC4E550027DD55 /* RSMS.app */;
 			productType = "com.apple.product-type.application";
 		};
 		8021D4579D215450A41783E2 /* StoreManagerModule */ = {
@@ -651,14 +659,6 @@
 					ProjectRef = 16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = E8C08ABC2FFB827800BE7B39 /* Products */;
-					ProjectRef = E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 8E13F7072FFBFF78002D0D70 /* Products */;
-					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
 					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
 					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
@@ -667,12 +667,24 @@
 					ProjectRef = 84387BFD2FFE261E0069A71F /* sales_associate_rsms.xcodeproj */;
 				},
 				{
+					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
+					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
+					ProductGroup = E8C08ABC2FFB827800BE7B39 /* Products */;
+					ProjectRef = E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
+					ProductGroup = 8E13F7072FFBFF78002D0D70 /* Products */;
+					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
 					ProductGroup = 16A6C2A32FFC086F007A7E84 /* Products */;
 					ProjectRef = 16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
-					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = 846D678E2FFEC9B400B71CE3 /* Products */;
+					ProjectRef = 846D678B2FFEC9B400B71CE3 /* sales_associate_rsms.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1152,7 +1164,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1187,7 +1199,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

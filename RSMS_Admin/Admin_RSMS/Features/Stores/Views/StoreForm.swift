@@ -294,7 +294,7 @@ struct AddStoreView: View {
             locationManager.requestPermission()
             locationManager.startUpdating()
         }
-        .onChange(of: locationManager.hasLocation) { _, newValue in
+        .onChange(of: locationManager.hasLocation) { newValue in
             if newValue, !pinPlaced {
                 withAnimation(.easeInOut(duration: 0.6)) {
                     mapRegion = MKCoordinateRegion(
@@ -465,7 +465,7 @@ struct AddStoreView: View {
                         TextField("Search for address or drop a pin below…", text: $address)
                             .font(.system(size: 15))
                             .autocorrectionDisabled()
-                            .onChange(of: address) { _, newValue in
+                            .onChange(of: address) { newValue in
                                 let sanitized = sanitizeToEnglish(newValue)
                                 if sanitized != newValue {
                                     address = sanitized
@@ -777,15 +777,10 @@ struct AddStoreView: View {
     // MARK: - Reverse geocode to get English address text
     private func reverseGeocode(coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        Task {
-            do {
-                guard let request = MKReverseGeocodingRequest(location: location) else {
-                    self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
-                    return
-                }
-                request.preferredLocale = Locale(identifier: "en_US")
-                let mapItems = try await request.mapItems
-                if let placemark = mapItems.first?.placemark {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "en_US")) { placemarks, error in
+            DispatchQueue.main.async {
+                if let placemark = placemarks?.first {
                     let components = [
                         placemark.subThoroughfare,
                         placemark.thoroughfare,
@@ -799,8 +794,6 @@ struct AddStoreView: View {
                 } else {
                     self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
                 }
-            } catch {
-                self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
             }
         }
     }
@@ -808,25 +801,16 @@ struct AddStoreView: View {
     // MARK: - Detect region from coordinate and auto-generate Store ID
     private func detectRegionAndGenerateID(coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        Task {
-            do {
-                guard let request = MKReverseGeocodingRequest(location: location) else {
-                    self.detectedRegionCode = "XX"
-                    self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
-                    return
-                }
-                request.preferredLocale = Locale(identifier: "en_US")
-                let mapItems = try await request.mapItems
-                if let isoCode = mapItems.first?.placemark.isoCountryCode {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "en_US")) { placemarks, error in
+            DispatchQueue.main.async {
+                if let isoCode = placemarks?.first?.isoCountryCode {
                     self.detectedRegionCode = isoCode.uppercased()
                     self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: isoCode)
                 } else {
                     self.detectedRegionCode = "XX"
                     self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
                 }
-            } catch {
-                self.detectedRegionCode = "XX"
-                self.generatedStoreID = StoreIDGenerator.shared.nextID(forRegion: "XX")
             }
         }
     }

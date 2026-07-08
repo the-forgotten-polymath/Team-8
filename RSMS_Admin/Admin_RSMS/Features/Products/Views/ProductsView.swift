@@ -30,10 +30,16 @@ struct ProductsView: View {
 
             Group {
                 if filteredProducts.isEmpty && !viewModel.isLoading {
-                    ContentUnavailableView(
-                        searchText.isEmpty ? "No \(selectedFilter.rawValue.lowercased()) products" : "No results for \"\(searchText)\"",
-                        systemImage: "shippingbox"
-                    )
+                    VStack(spacing: 12) {
+                        Spacer()
+                        Image(systemName: "shippingbox")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text(searchText.isEmpty ? "No \(selectedFilter.rawValue.lowercased()) products" : "No results for \"\(searchText)\"")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
                 } else {
                     ScrollView {
                         let columns = sizeClass == .compact ? [GridItem(.flexible(), spacing: 20, alignment: .top)] : [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 20, alignment: .top)]

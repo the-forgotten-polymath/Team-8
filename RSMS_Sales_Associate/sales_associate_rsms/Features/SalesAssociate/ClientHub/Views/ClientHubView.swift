@@ -29,7 +29,7 @@ struct ClientHubView: View {
                         .foregroundColor(.secondary)
                     TextField("Search clients by name, email, or phone...", text: $viewModel.searchQuery)
                         .foregroundColor(.primary)
-                        .onChange(of: viewModel.searchQuery) { _, _ in
+                        .onChange(of: viewModel.searchQuery) { _ in
                             viewModel.searchClients()
                         }
                 }

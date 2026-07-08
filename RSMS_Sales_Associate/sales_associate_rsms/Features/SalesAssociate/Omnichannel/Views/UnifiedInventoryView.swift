@@ -48,20 +48,18 @@ struct UnifiedInventoryView: View {
                 ProgressView("Searching Stores...")
                 Spacer()
             } else {
-                Map(initialPosition: .region(region)) {
-                    ForEach(annotatedStores) { store in
-                        Annotation(store.name, coordinate: store.coordinate) {
-                            VStack {
-                                Image(systemName: "mappin.circle.fill")
-                                    .font(.title)
-                                    .foregroundColor(store.hasStock ? .green : .red)
-                                
-                                Text(store.name)
-                                    .font(.caption)
-                                    .padding(4)
-                                    .background(Color(uiColor: .systemBackground))
-                                    .cornerRadius(4)
-                            }
+                Map(coordinateRegion: $region, annotationItems: annotatedStores) { store in
+                    MapAnnotation(coordinate: store.coordinate) {
+                        VStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.title)
+                                .foregroundColor(store.hasStock ? .green : .red)
+                            
+                            Text(store.name)
+                                .font(.caption)
+                                .padding(4)
+                                .background(Color(uiColor: .systemBackground))
+                                .cornerRadius(4)
                         }
                     }
                 }

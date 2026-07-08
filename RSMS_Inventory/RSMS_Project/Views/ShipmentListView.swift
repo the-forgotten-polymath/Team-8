@@ -15,14 +15,12 @@ struct ShipmentListView: View {
     @State private var selectedStatus: String = "all"
     @State private var searchText: String = ""
 
-    // The four allowed statuses (UI only — backend data is untouched)
-    private let allowedStatuses: [String] = ["pending", "rejected", "arrived", "in_transit"]
+    // The two allowed statuses (UI only — backend data is untouched)
+    private let allowedStatuses: [String] = ["pending", "arrived"]
     private let filterLabels: [(label: String, key: String)] = [
         ("All",        "all"),
         ("Pending",    "pending"),
-        ("Rejected",   "rejected"),
-        ("Arrived",    "arrived"),
-        ("In Transit", "in_transit")
+        ("Arrived",    "arrived")
     ]
 
     /// First strip any statuses not in the allowed list, then apply status filter and search.
@@ -36,10 +34,12 @@ struct ShipmentListView: View {
             byStatus = visible.filter { $0.status.lowercased() == selectedStatus }
         }
 
+        let sortedList = byStatus.sorted(by: { $0.createdAt > $1.createdAt })
+
         if searchText.isEmpty {
-            return byStatus
+            return sortedList
         }
-        return byStatus.filter { shipment in
+        return sortedList.filter { shipment in
             let asn = shipment.asnNumber?.localizedCaseInsensitiveContains(searchText) ?? false
             let src = shipment.source.localizedCaseInsensitiveContains(searchText)
             let dst = shipment.destination.localizedCaseInsensitiveContains(searchText)
@@ -111,7 +111,7 @@ struct ShipmentListView: View {
 
             Divider()
 
-            // MARK: - List
+            // MARK: - Cards
             if viewModel.isLoading {
                 LoadingView(message: "Loading shipments list...")
             } else if filteredShipments.isEmpty {
@@ -120,32 +120,80 @@ struct ShipmentListView: View {
                     message: "There are no shipments matching the active filter.",
                     iconName: "truck.box"
                 )
+                .frame(maxHeight: .infinity)
             } else {
-                List(filteredShipments) { shipment in
-                    NavigationLink(destination: ShipmentDetailView(
-                        shipment: shipment,
-                        warehouseId: warehouseId,
-                        userId: userId
-                    )) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(shipment.asnNumber ?? "No ASN")
-                                    .font(.subheadline)
-                                    .fontWeight(.bold)
-
-                                Text("From: \(shipment.source) ➔ \(shipment.destination)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(filteredShipments) { shipment in
+                            NavigationLink(destination: ShipmentDetailView(
+                                shipment: shipment,
+                                warehouseId: warehouseId,
+                                userId: userId
+                            )) {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    HStack(alignment: .top) {
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            // Big bold ASN Number
+                                            Text(shipment.asnNumber ?? "No ASN")
+                                                .font(.system(size: 18, weight: .bold))
+                                                .foregroundColor(.primary)
+                                            
+                                            // Subtitle matching bullet point style
+                                            Text("• \(shipment.shipmentType.capitalized)")
+                                                .font(.system(size: 14))
+                                                .foregroundColor(.secondary)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Status Chip matching reference position
+                                        StatusChip(status: shipment.status)
+                                    }
+                                    
+                                    Divider()
+                                    
+                                    HStack {
+                                        // Route with icon
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "shippingbox.fill")
+                                                .foregroundColor(.secondary)
+                                                .font(.system(size: 16))
+                                            Text("\(shipment.source) ➔ \(shipment.destination)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Right-aligned reference / tracking details
+                                        if let ref = shipment.trackingReference, !ref.isEmpty {
+                                            Text("Ref: \(ref)")
+                                                .font(.subheadline)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.primary)
+                                        }
+                                    }
+                                    
+                                    HStack {
+                                        Spacer()
+                                        Text(formatShipmentDate(shipment.createdAt))
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding()
+                                .background(Color(UIColor.secondarySystemGroupedBackground))
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.appleBorder, lineWidth: 1))
+                                .shadow(color: Color.black.opacity(0.02), radius: 5, y: 2)
                             }
-
-                            Spacer()
-
-                            StatusChip(status: shipment.status)
+                            .buttonStyle(.plain)
                         }
-                        .padding(.vertical, 4)
                     }
+                    .padding()
                 }
-                .listStyle(.plain)
+                .background(Color(UIColor.systemGroupedBackground))
             }
         }
         .navigationTitle("Shipment Verification")
@@ -156,5 +204,11 @@ struct ShipmentListView: View {
         .task {
             await viewModel.loadShipments()
         }
+    }
+    
+    private func formatShipmentDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yy, h:mm a"
+        return formatter.string(from: date)
     }
 }

@@ -261,7 +261,7 @@ struct ProductDetailView: View {
                 }
             }
         }
-        .navigationTitle(product.productName)
+        .navigationTitle("Product Detail")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

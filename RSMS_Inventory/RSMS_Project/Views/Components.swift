@@ -113,7 +113,7 @@ struct StatusChip: View {
         switch status.lowercased() {
         case "pending", "scheduled":
             return .orange
-        case "approved", "completed", "fulfilled", "resolved", "delivered":
+        case "approved", "completed", "fulfilled", "resolved", "delivered", "arrived":
             return .green
         case "rejected", "unresolved", "high", "failed":
             return .red
@@ -128,7 +128,7 @@ struct StatusChip: View {
         switch status.lowercased() {
         case "pending", "scheduled":
             return .orange
-        case "approved", "completed", "fulfilled", "resolved":
+        case "approved", "completed", "fulfilled", "resolved", "delivered", "arrived":
             return .green
         case "rejected", "unresolved", "high", "failed":
             return .red

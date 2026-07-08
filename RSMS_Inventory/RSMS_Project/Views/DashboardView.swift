@@ -138,18 +138,16 @@ struct DashboardView: View {
                         Image(systemName: "bell.fill")
                             .font(.title3)
                             .foregroundColor(.orange)
+                            .padding(.top, 5)
+                            .padding(.trailing, 5)
 
                         if notificationStore.activeCount > 0 {
-                            Text("\(min(notificationStore.activeCount, 99))")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(Color.red)
-                                .clipShape(Capsule())
-                                .offset(x: 8, y: -8)
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
                         }
                     }
+                    .frame(width: 34, height: 34)
                 }
 
                 // Profile button

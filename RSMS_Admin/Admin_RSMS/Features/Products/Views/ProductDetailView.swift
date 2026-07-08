@@ -188,7 +188,7 @@ private struct EditablePriceField: View {
                     } label: {
                         Image(systemName: "pencil.circle.fill")
                             .font(.system(size: 20))
-                            .foregroundColor(.blue)
+                            .foregroundStyle(.blue)
                     }
                     .buttonStyle(.plain)
                 }

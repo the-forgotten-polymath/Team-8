@@ -15,19 +15,19 @@ public struct AdminHeroCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(subtitle.uppercased())
                 .font(Font.overlineText)
-                .foregroundColor(Color.white.opacity(0.8))
+                .foregroundStyle(Color.white.opacity(0.8))
                 .tracking(1.5)
             
             Text(title)
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
             
             content
         }
         .padding(DS.cardPad)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.accentPurple)
-        .cornerRadius(DS.cardRadius)
+        .clipShape(.rect(cornerRadius: DS.cardRadius))
         .cardShadow()
     }
 }
@@ -52,7 +52,7 @@ public struct MetricTile: View {
             HStack {
                 Text(overline.uppercased())
                     .font(Font.overlineText)
-                    .foregroundColor(Color.label2)
+                    .foregroundStyle(Color.label2)
                     .tracking(1.0)
                 Spacer()
                 ZStack {
@@ -61,24 +61,24 @@ public struct MetricTile: View {
                         .frame(width: 32, height: 32)
                     Image(systemName: icon)
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(iconColor)
+                        .foregroundStyle(iconColor)
                 }
             }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(value)
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(Color.label1)
+                    .foregroundStyle(Color.label1)
                 
                 Text(label)
                     .font(Font.bodySecond)
-                    .foregroundColor(Color.label2)
+                    .foregroundStyle(Color.label2)
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.cardBG)
-        .cornerRadius(DS.cardRadius)
+        .clipShape(.rect(cornerRadius: DS.cardRadius))
         .cardShadow()
     }
 }
@@ -101,12 +101,12 @@ public struct StatusBadge: View {
                 .frame(width: 6, height: 6)
             Text(label)
                 .font(Font.captionMed)
-                .foregroundColor(textColor)
+                .foregroundStyle(textColor)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(backgroundColor)
-        .cornerRadius(8)
+        .clipShape(.rect(cornerRadius: 8))
         .chipShadow()
     }
 }
@@ -135,18 +135,18 @@ public struct ListRowCard<TrailingContent: View>: View {
                         .frame(width: 44, height: 44)
                     Image(systemName: icon)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(iconColor)
+                        .foregroundStyle(iconColor)
                 }
             }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color.label1)
+                    .foregroundStyle(Color.label1)
                 
                 Text(subtitle)
                     .font(Font.bodySecond)
-                    .foregroundColor(Color.label2)
+                    .foregroundStyle(Color.label2)
             }
             
             Spacer()
@@ -157,7 +157,7 @@ public struct ListRowCard<TrailingContent: View>: View {
         .padding(.vertical, 12)
         .frame(height: 72)
         .background(Color.cardBG)
-        .cornerRadius(16)
+        .clipShape(.rect(cornerRadius: 16))
         .cardShadow()
     }
 }

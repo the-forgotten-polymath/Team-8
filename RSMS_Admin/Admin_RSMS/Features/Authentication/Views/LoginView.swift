@@ -19,11 +19,11 @@ struct LoginView: View {
                     VStack(spacing: 8) {
                         Text("RSMS Admin")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4))
+                            .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4))
                         
                         Text(showVerification ? "Verify your login" : "Sign in to continue")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.bottom, 20)
                     
@@ -34,18 +34,18 @@ struct LoginView: View {
                                 .disableAutocorrection(true)
                                 .padding()
                                 .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                .cornerRadius(12)
+                                .clipShape(.rect(cornerRadius: 12))
                             
                             SecureField("Password", text: $password)
                                 .padding()
                                 .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                .cornerRadius(12)
+                                .clipShape(.rect(cornerRadius: 12))
                         } else {
                             TextField("6-Digit OTP Code", text: $verificationCode)
                                 .keyboardType(.numberPad)
                                 .padding()
                                 .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                .cornerRadius(12)
+                                .clipShape(.rect(cornerRadius: 12))
                                 .font(.system(size: 24, weight: .medium, design: .monospaced))
                                 .multilineTextAlignment(.center)
                         }
@@ -53,7 +53,7 @@ struct LoginView: View {
                         if let error = authManager.errorMessage {
                             Text(error)
                                 .font(.caption)
-                                .foregroundColor(.red)
+                                .foregroundStyle(.red)
                                 .multilineTextAlignment(.center)
                         }
                         
@@ -71,8 +71,8 @@ struct LoginView: View {
                             }
                             .padding()
                             .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
+                            .foregroundStyle(.white)
+                            .clipShape(.rect(cornerRadius: 12))
                         }
                         .disabled(authManager.isLoading || (showVerification ? verificationCode.isEmpty : (username.isEmpty || password.isEmpty)))
                         .padding(.top, 8)
@@ -84,13 +84,13 @@ struct LoginView: View {
                             }) {
                                 Text("Back to Sign In")
                                     .font(.footnote)
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                             }
                         }
                     }
                     .padding(24)
                     .background(Color(uiColor: .systemBackground))
-                    .cornerRadius(20)
+                    .clipShape(.rect(cornerRadius: 20))
                     .shadow(color: Color.black.opacity(0.05), radius: 15, x: 0, y: 5)
                     .padding(.horizontal, 24)
                 }

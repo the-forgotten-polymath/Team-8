@@ -70,6 +70,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
+
         picker.sourceType = sourceType
         picker.delegate = context.coordinator
         picker.allowsEditing = true
@@ -113,6 +114,7 @@ private func sanitizeToEnglish(_ text: String) -> String {
 }
 
 // MARK: - Region-based Store ID Generator
+@MainActor
 class StoreIDGenerator: ObservableObject {
     // Persisted counters per region prefix using AppStorage pattern
     static let shared = StoreIDGenerator()
@@ -131,8 +133,23 @@ class StoreIDGenerator: ObservableObject {
     /// Generates the next Store ID for a given country code
     func nextID(forRegion regionCode: String) -> String {
         let prefix = regionCode.uppercased()
+        
+        // Check existing stores in DB to find the true max count
+        let existingStores = RSMSDataManager.shared.stores.filter { $0.storeID?.hasPrefix(prefix + "-") ?? false }
+        let maxStoredCount = existingStores.compactMap { store -> Int? in
+            guard let id = store.storeID else { return nil }
+            let parts = id.split(separator: "-")
+            guard parts.count == 2, let num = Int(parts[1]) else { return nil }
+            return num
+        }.max() ?? 0
+        
         var current = counters
-        let count = (current[prefix] ?? 0) + 1
+        let storedCount = current[prefix] ?? 0
+        
+        // Use whichever is higher: the DB's max ID or our local counter
+        let maxCount = max(storedCount, maxStoredCount)
+        let count = maxCount + 1
+        
         current[prefix] = count
         counters = current
         return String(format: "%@-%04d", prefix, count)
@@ -141,7 +158,19 @@ class StoreIDGenerator: ObservableObject {
     /// Peeks at what the next ID would be without incrementing
     func peekNextID(forRegion regionCode: String) -> String {
         let prefix = regionCode.uppercased()
-        let count = (counters[prefix] ?? 0) + 1
+        
+        let existingStores = RSMSDataManager.shared.stores.filter { $0.storeID?.hasPrefix(prefix + "-") ?? false }
+        let maxStoredCount = existingStores.compactMap { store -> Int? in
+            guard let id = store.storeID else { return nil }
+            let parts = id.split(separator: "-")
+            guard parts.count == 2, let num = Int(parts[1]) else { return nil }
+            return num
+        }.max() ?? 0
+        
+        let storedCount = counters[prefix] ?? 0
+        let maxCount = max(storedCount, maxStoredCount)
+        
+        let count = maxCount + 1
         return String(format: "%@-%04d", prefix, count)
     }
 }
@@ -210,6 +239,7 @@ struct AddStoreView: View {
     @State private var detectedRegionCode = ""
     @State private var address = ""
     @State private var storeStatus: StoreStatus = .active
+    @State private var categoryQuantities: [UUID: Int] = [:]
     
     // Map state — starts at world view
     @State private var mapRegion = MKCoordinateRegion(
@@ -220,11 +250,7 @@ struct AddStoreView: View {
     @State private var pinPlaced = false
     @State private var isLocating = false
     
-    // Image picker state
-    @State private var selectedImage: UIImage? = nil
-    @State private var showingImageSourceSheet = false
-    @State private var showingImagePicker = false
-    @State private var imageSourceType: UIImagePickerController.SourceType = .photoLibrary
+    // Image upload handled by store managers
     
     @State private var showingValidationAlert = false
     @State private var validationMessage = ""
@@ -245,9 +271,10 @@ struct AddStoreView: View {
         _generatedStoreID = State(initialValue: editingStore?.storeID ?? "")
         _address = State(initialValue: editingStore?.address == "Address not set" ? "" : editingStore?.address ?? "")
         if let imageData = editingStore?.imageData {
-            _selectedImage = State(initialValue: UIImage(data: imageData))
+            // Unused
         }
         _storeStatus = State(initialValue: editingStore?.status ?? .active)
+        _categoryQuantities = State(initialValue: editingStore?.categoryQuantities ?? [:])
         
         // Initialize coordinates if available
         if let lat = editingStore?.latitude, let lon = editingStore?.longitude {
@@ -276,13 +303,13 @@ struct AddStoreView: View {
             .navigationTitle(editingStore == nil ? "Add Store" : "Edit Store")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         onDismiss()
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: saveStore) {
                         Text(editingStore == nil ? "Create" : "Update")
                             .fontWeight(.bold)
@@ -308,9 +335,7 @@ struct AddStoreView: View {
             }
         }
 
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $selectedImage, sourceType: imageSourceType)
-        }
+        // Image picker sheet removed
         .alert(isPresented: $showingValidationAlert) {
             Alert(
                 title: Text("Missing Information"),
@@ -330,12 +355,12 @@ struct AddStoreView: View {
             VStack(spacing: 20) {
                 locationMapSection
                 basicInfoSection
+                storeCategoriesSection
             }
             .frame(maxWidth: .infinity)
             
-            // Right Column
+            // Right Column (Empty since media section removed)
             VStack(spacing: 20) {
-                storeMediaSection
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
@@ -348,7 +373,7 @@ struct AddStoreView: View {
         VStack(spacing: 20) {
             locationMapSection
             basicInfoSection
-            storeMediaSection
+            storeCategoriesSection
         }
         .padding(20)
     }
@@ -371,14 +396,14 @@ struct AddStoreView: View {
                             
                             Text(generatedStoreID.isEmpty ? "Auto-generated" : generatedStoreID)
                                 .font(.system(size: 15, weight: generatedStoreID.isEmpty ? .regular : .semibold))
-                                .foregroundColor(generatedStoreID.isEmpty ? .secondary.opacity(0.5) : .primary)
+                                .foregroundStyle(generatedStoreID.isEmpty ? Color.secondary.opacity(0.5) : Color.primary)
                             
                             Spacer()
                             
                             if !generatedStoreID.isEmpty {
                                 Image(systemName: "lock.fill")
                                     .font(.system(size: 10))
-                                    .foregroundColor(.secondary.opacity(0.6))
+                                    .foregroundStyle(.secondary.opacity(0.6))
                             }
                         }
                         .padding(.horizontal, 14)
@@ -397,7 +422,7 @@ struct AddStoreView: View {
                                 Text("Region: \(detectedRegionCode)")
                                     .font(.system(size: 10, weight: .medium))
                             }
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -422,35 +447,34 @@ struct AddStoreView: View {
                     .frame(maxWidth: .infinity)
                 }
                 
-                // Store Status
-                VStack(alignment: .leading, spacing: 10) {
-                    FieldLabel(text: "Store Status")
-                    
-                    HStack(spacing: 0) {
-                        ForEach([StoreStatus.active, StoreStatus.maintenance], id: \.self) { status in
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 0.2)) { storeStatus = status }
-                            }) {
-                                HStack(spacing: 5) {
-                                    Circle()
-                                        .fill(statusColor(for: status))
-                                        .frame(width: 6, height: 6)
+                // Store Status - Only visible when editing
+                if editingStore != nil {
+                    VStack(alignment: .leading, spacing: 10) {
+                        FieldLabel(text: "Store Status")
+                        
+                        HStack(spacing: 0) {
+                            ForEach([StoreStatus.active, StoreStatus.maintenance], id: \.self) { status in
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        storeStatus = status
+                                    }
+                                }) {
                                     Text(status.rawValue.capitalized)
-                                        .font(.system(size: 12, weight: .semibold))
+                                        .font(.system(size: 14, weight: storeStatus == status ? .semibold : .regular))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 12)
+                                        .background(storeStatus == status ? FormTheme.navy : Color.clear)
+                                        .foregroundStyle(storeStatus == status ? .white : .secondary)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 11)
-                                .background(storeStatus == status ? Color.white : Color.clear)
-                                .foregroundColor(storeStatus == status ? .primary : .secondary)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .shadow(color: storeStatus == status ? Color.black.opacity(0.06) : .clear, radius: 3, y: 1)
                             }
-                            .buttonStyle(.plain)
-                            .padding(3)
                         }
+                        .background(FormTheme.fieldBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.secondary.opacity(0.1), lineWidth: 1)
+                        )
                     }
-                    .background(FormTheme.fieldBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 
                 // Location / Address
@@ -462,7 +486,7 @@ struct AddStoreView: View {
                             .font(.system(size: 15))
                             .foregroundStyle(.red.opacity(0.7))
                         
-                        TextField("Search for address or drop a pin below…", text: $address)
+                        TextField("Enter address or drop pin...", text: $address)
                             .font(.system(size: 15))
                             .autocorrectionDisabled()
                             .onChange(of: address) { _, newValue in
@@ -470,12 +494,110 @@ struct AddStoreView: View {
                                 if sanitized != newValue {
                                     address = sanitized
                                 }
+                                forwardGeocode(address: sanitized)
                             }
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 13)
                     .background(FormTheme.fieldBackground)
                     .clipShape(RoundedRectangle(cornerRadius: FormTheme.fieldCornerRadius))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Section: Store Categories
+    
+    private var storeCategoriesSection: some View {
+        FormSectionCard(title: "Store Categories", icon: "tag.fill") {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Select the product categories that will be available at this location.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                
+                let categories = RSMSDataManager.shared.categories
+                
+                if categories.isEmpty {
+                    ProgressView()
+                } else {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 16) {
+                        ForEach(categories) { category in
+                            let isSelected = categoryQuantities[category.id] != nil
+                            
+                            VStack(spacing: 0) {
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        if isSelected {
+                                            categoryQuantities.removeValue(forKey: category.id)
+                                        } else {
+                                            categoryQuantities[category.id] = 1
+                                        }
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                                            .foregroundStyle(isSelected ? FormTheme.navy : .secondary.opacity(0.5))
+                                            .font(.system(size: 18))
+                                        
+                                        Text(category.categoryName)
+                                            .font(.system(size: 14, weight: isSelected ? .semibold : .medium))
+                                            .foregroundStyle(isSelected ? Color.primary : Color.secondary)
+                                            .lineLimit(1)
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 14)
+                                    .background(isSelected ? FormTheme.navy.opacity(0.06) : FormTheme.fieldBackground)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(isSelected ? FormTheme.navy.opacity(0.3) : Color.clear, lineWidth: 1)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                
+                                if isSelected {
+                                    HStack {
+                                        Text("Qty:")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundStyle(.secondary)
+                                        
+                                        Stepper(value: Binding(
+                                            get: { categoryQuantities[category.id] ?? 1 },
+                                            set: { categoryQuantities[category.id] = $0 }
+                                        ), in: 1...10000) {
+                                            Text("\(categoryQuantities[category.id] ?? 1)")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundStyle(.primary)
+                                        }
+                                        .labelsHidden()
+                                        
+                                        Spacer()
+                                        
+                                        TextField("Qty", value: Binding(
+                                            get: { categoryQuantities[category.id] ?? 1 },
+                                            set: { categoryQuantities[category.id] = $0 }
+                                        ), format: .number)
+                                        .keyboardType(.numberPad)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 50)
+                                        .padding(6)
+                                        .background(Color.white)
+                                        .clipShape(.rect(cornerRadius: 6))
+                                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(FormTheme.navy.opacity(0.03))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .padding(.horizontal, 2)
+                                    .padding(.bottom, 2)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -493,9 +615,10 @@ struct AddStoreView: View {
                             if pinPlaced {
                                 VStack(spacing: 0) {
                                     Image(systemName: "mappin.circle.fill")
-                                        .font(.system(size: 34))
-                                        .foregroundColor(.red)
-                                        .shadow(color: .red.opacity(0.3), radius: 6, y: 2)
+                                        .font(.system(size: 28))
+                                        .foregroundStyle(.red)
+                                        .background(Circle().fill(Color.white).frame(width: 14, height: 14))
+                                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                                     
                                     Circle()
                                         .fill(Color.red.opacity(0.2))
@@ -520,7 +643,7 @@ struct AddStoreView: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .frame(width: 36, height: 36)
                                 .background(.ultraThinMaterial)
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         }
                         Divider().frame(width: 36)
                         Button(action: {
@@ -533,7 +656,7 @@ struct AddStoreView: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .frame(width: 36, height: 36)
                                 .background(.ultraThinMaterial)
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -545,7 +668,7 @@ struct AddStoreView: View {
                     if !pinPlaced {
                         Image(systemName: "plus")
                             .font(.system(size: 20, weight: .light))
-                            .foregroundColor(FormTheme.navy.opacity(0.5))
+                            .foregroundStyle(FormTheme.navy.opacity(0.5))
                     }
                 }
                 
@@ -563,7 +686,7 @@ struct AddStoreView: View {
                             Text("Drop Pin")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(FormTheme.navy)
@@ -584,7 +707,7 @@ struct AddStoreView: View {
                             Text("My Location")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(FormTheme.navy)
+                        .foregroundStyle(FormTheme.navy)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(FormTheme.navy.opacity(0.08))
@@ -607,7 +730,7 @@ struct AddStoreView: View {
                                 Text("Clear")
                                     .font(.system(size: 13, weight: .semibold))
                             }
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .background(Color.red.opacity(0.06))
@@ -643,98 +766,6 @@ struct AddStoreView: View {
     }
     
 
-    
-    // MARK: - Section: Store Media
-    
-    private var storeMediaSection: some View {
-        FormSectionCard(title: "Store Media", icon: "photo.on.rectangle.angled") {
-            if let image = selectedImage {
-                // Image preview
-                ZStack(alignment: .topTrailing) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 200)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                    
-                    // Overlay buttons
-                    HStack(spacing: 8) {
-                        Button(action: { showingImageSourceSheet = true }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 10))
-                                Text("Change")
-                                    .font(.system(size: 11, weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 7)
-                            .background(.ultraThinMaterial.opacity(0.9))
-                            .background(Color.black.opacity(0.3))
-                            .clipShape(Capsule())
-                        }
-                        
-                        Button(action: {
-                            withAnimation { selectedImage = nil }
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 24))
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.4), radius: 4)
-                        }
-                    }
-                    .padding(12)
-                }
-            } else {
-                // Upload placeholder
-                Button(action: { showingImageSourceSheet = true }) {
-                    VStack(spacing: 14) {
-                        ZStack {
-                            Circle()
-                                .fill(FormTheme.navy.opacity(0.06))
-                                .frame(width: 56, height: 56)
-                            
-                            Image(systemName: "photo.badge.plus")
-                                .font(.system(size: 24))
-                                .foregroundColor(FormTheme.navy.opacity(0.7))
-                        }
-                        
-                        VStack(spacing: 4) {
-                            Text("Upload Store Image")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(.primary)
-                            Text("PNG or JPG, up to 10 MB")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 36)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
-                            .foregroundStyle(Color.secondary.opacity(0.25))
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        // Image source selection dialog attached here so the iPad popover points to this section
-        .confirmationDialog("Select Image Source", isPresented: $showingImageSourceSheet, titleVisibility: .visible) {
-            Button("Choose from Gallery") {
-                imageSourceType = .photoLibrary
-                showingImagePicker = true
-            }
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button("Take Photo") {
-                    imageSourceType = .camera
-                    showingImagePicker = true
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-    }
     
     // MARK: - Helpers
     
@@ -774,33 +805,46 @@ struct AddStoreView: View {
         }
     }
     
-    // MARK: - Reverse geocode to get English address text
+    // MARK: - Reverse geocode to get English address
     private func reverseGeocode(coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        Task {
-            do {
-                guard let request = MKReverseGeocodingRequest(location: location) else {
-                    self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
-                    return
-                }
-                request.preferredLocale = Locale(identifier: "en_US")
-                let mapItems = try await request.mapItems
-                if let placemark = mapItems.first?.placemark {
-                    let components = [
-                        placemark.subThoroughfare,
-                        placemark.thoroughfare,
-                        placemark.locality,
-                        placemark.administrativeArea,
-                        placemark.postalCode,
-                        placemark.country
-                    ].compactMap { $0 }
-                    let fullAddress = components.joined(separator: ", ")
-                    self.address = sanitizeToEnglish(fullAddress)
-                } else {
+        let geocoder = CLGeocoder()
+        
+        geocoder.reverseGeocodeLocation(location) { placemarks, error in
+            guard error == nil, let placemark = placemarks?.first else {
+                DispatchQueue.main.async {
                     self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
                 }
-            } catch {
-                self.address = String(format: "Lat: %.5f, Lon: %.5f", coordinate.latitude, coordinate.longitude)
+                return
+            }
+            
+            DispatchQueue.main.async {
+                let components = [
+                    placemark.subThoroughfare,
+                    placemark.thoroughfare,
+                    placemark.locality,
+                    placemark.administrativeArea,
+                    placemark.postalCode,
+                    placemark.country
+                ].compactMap { $0 }
+                let fullAddress = components.joined(separator: ", ")
+                self.address = sanitizeToEnglish(fullAddress)
+            }
+        }
+    }
+    
+    // MARK: - Forward Geocoding
+    private func forwardGeocode(address: String) {
+        guard address.count > 3 else { return }
+        
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            guard error == nil, let placemark = placemarks?.first, let location = placemark.location else { return }
+            
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.mapRegion.center = location.coordinate
+                }
             }
         }
     }
@@ -857,10 +901,11 @@ struct AddStoreView: View {
             managerName: editingStore?.managerName ?? "Unassigned",
             managerInitials: editingStore?.managerInitials ?? "--",
             status: storeStatus,
-            imageData: selectedImage?.jpegData(compressionQuality: 0.8),
             imageUrl: editingStore?.imageUrl,
             latitude: pinPlaced ? selectedCoordinate.latitude : nil,
-            longitude: pinPlaced ? selectedCoordinate.longitude : nil
+            longitude: pinPlaced ? selectedCoordinate.longitude : nil,
+            isArchived: editingStore?.isArchived ?? false,
+            categoryQuantities: categoryQuantities.isEmpty ? nil : categoryQuantities
         )
         
         onSave(store)

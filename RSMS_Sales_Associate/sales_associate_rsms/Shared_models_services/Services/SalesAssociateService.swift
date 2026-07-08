@@ -117,11 +117,31 @@ final class SalesAssociateService {
                        category: String? = nil,
                        searchQuery: String = "") async throws -> [ProductWithInventory] {
 
-        // 1. Fetch base products (approved only)
+        guard let storeId = storeId else { return [] }
+
+        // 1. Fetch inventory for this store
+        let inventory: [InventoryItem] = (try? await client
+            .from("inventory")
+            .select()
+            .eq("store_id", value: storeId.uuidString)
+            .execute()
+            .value) ?? []
+
+        if inventory.isEmpty { return [] }
+
+        var inventoryMap: [UUID: Int] = [:]
+        for item in inventory {
+            inventoryMap[item.productId, default: 0] += item.quantity
+        }
+        
+        let productIds = Array(inventoryMap.keys).map { $0.uuidString }
+
+        // 2. Fetch base products (approved only) that exist in the inventory
         var productsQuery = client
             .from("products")
             .select("id, sku, product_name, brand, description, short_description, price, material, color, collection_name, serial_number, certificate_number, warranty_duration, status, approval_status, is_new_arrival, is_best_seller, is_limited_edition, created_at, category_id")
             .eq("approval_status", value: "Approved")
+            .in("id", values: productIds)
 
         if !searchQuery.isEmpty {
             productsQuery = productsQuery.or("product_name.ilike.%\(searchQuery)%,sku.ilike.%\(searchQuery)%,brand.ilike.%\(searchQuery)%")
@@ -134,9 +154,7 @@ final class SalesAssociateService {
 
         guard !dbProducts.isEmpty else { return [] }
 
-        let productIds = dbProducts.map { $0.id.uuidString }
-
-        // 2. Fetch primary images for these products
+        // 3. Fetch primary images for these products
         let images: [ProductImage] = (try? await client
             .from("product_images")
             .select("id, product_id, image_url, is_primary")
@@ -148,28 +166,13 @@ final class SalesAssociateService {
             return (img.productId, img.imageURL)
         })
 
-        // 3. Fetch categories
+        // 4. Fetch categories
         let categories: [Category] = (try? await client
             .from("categories")
             .select("id, category_name")
             .execute()
             .value) ?? []
         let categoryMap = Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0.categoryName) })
-
-        // 4. Fetch inventory for this store
-        var inventoryMap: [UUID: Int] = [:]
-        if let storeId = storeId {
-            let inventory: [InventoryItem] = (try? await client
-                .from("inventory")
-                .select("product_id, quantity, store_id")
-                .eq("store_id", value: storeId.uuidString)
-                .in("product_id", values: productIds)
-                .execute()
-                .value) ?? []
-            for item in inventory {
-                inventoryMap[item.productId, default: 0] += item.quantity
-            }
-        }
 
         // 5. Filter by category name if provided (more flexible matching)
         var filteredProducts = dbProducts
@@ -220,7 +223,7 @@ final class SalesAssociateService {
                 createdAt: product.createdAt,
                 categoryName: catName,
                 primaryImageUrl: imageMap[product.id],
-                storeQuantity: inventoryMap[product.id]
+                storeQuantity: inventoryMap[product.id] ?? 0
             )
         }
     }
@@ -588,6 +591,19 @@ final class SalesAssociateService {
             .execute()
 
         return created
+    }
+    
+    /// Fetches all sales for a given store
+    func fetchSales(storeId: UUID) async throws -> [Sale] {
+        let sales: [Sale] = try await client
+            .from("sales")
+            .select()
+            .eq("store_id", value: storeId.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+        
+        return sales
     }
 }
 

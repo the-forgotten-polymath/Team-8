@@ -139,6 +139,39 @@ extension View {
                                             to: nil, from: nil, for: nil)
         }
     }
+    
+    /// Apply an iOS 26 inspired glassmorphism effect
+    func liquidGlass(cornerRadius: CGFloat = 16) -> some View {
+        self.modifier(LiquidGlassModifier(cornerRadius: cornerRadius))
+    }
+}
+
+struct LiquidGlassModifier: ViewModifier {
+    var cornerRadius: CGFloat
+    
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color.white.opacity(0.05))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.5), Color.white.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
 }
 
 // MARK: - UUID Extensions

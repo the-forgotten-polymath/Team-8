@@ -10,7 +10,7 @@ import Foundation
 
 struct Sale: Codable, Identifiable {
     let id: UUID
-    let customerId: UUID
+    let customerId: UUID?
     let userId: UUID?
     let storeId: UUID
     let totalAmount: Double

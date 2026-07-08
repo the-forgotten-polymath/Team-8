@@ -13,7 +13,7 @@ struct DashboardView: View {
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .font(.footnote.weight(.medium))
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
@@ -192,7 +192,7 @@ struct DashboardView: View {
                     HStack(spacing: 12) {
                         Text("\(product.rank)")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(product.rank <= 3 ? .primary : .secondary)
+                            .foregroundStyle(product.rank <= 3 ? .primary : .secondary)
                             .frame(width: 16, alignment: .center)
                         
                         Circle()
@@ -201,18 +201,18 @@ struct DashboardView: View {
                             .overlay(
                                 Image(systemName: "shippingbox.fill")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.orange)
+                                    .foregroundStyle(.orange)
                             )
                         
                         VStack(alignment: .leading, spacing: 3) {
                             Text(product.productName)
                                 .font(.subheadline.weight(.medium))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                                 .lineLimit(1)
                             
                             Text(product.subtitle)
                                 .font(.caption.weight(.medium))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                         
@@ -221,10 +221,10 @@ struct DashboardView: View {
                         VStack(alignment: .trailing, spacing: 3) {
                             Text("\(product.unitsSold)")
                                 .font(.subheadline.weight(.medium).monospacedDigit())
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                             Text("UNITS")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .frame(height: 56)
@@ -254,7 +254,7 @@ struct DashboardView: View {
                     HStack(spacing: 12) {
                         Text("\(store.rank)")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(store.rank <= 3 && viewModel.selectedStorePerformanceFilter == .highest ? .primary : .secondary)
+                            .foregroundStyle(store.rank <= 3 && viewModel.selectedStorePerformanceFilter == .highest ? .primary : .secondary)
                             .frame(width: 16, alignment: .center)
                         
                         Circle()
@@ -263,18 +263,18 @@ struct DashboardView: View {
                             .overlay(
                                 Text(store.initials)
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                             )
                         
                         Text(store.storeName)
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                         
                         Text(store.revenueText)
                             .font(.subheadline.weight(.medium).monospacedDigit())
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .frame(height: 56)
                     
@@ -295,7 +295,7 @@ struct DashboardView: View {
                     HStack(spacing: 12) {
                         Text("\(index + 1)")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(index < 3 ? .primary : .secondary)
+                            .foregroundStyle(index < 3 ? .primary : .secondary)
                             .frame(width: 16, alignment: .center)
                         
                         Circle()
@@ -304,18 +304,18 @@ struct DashboardView: View {
                             .overlay(
                                 Text(viewModel.topCustomersList[index].initials)
                                     .font(.caption.weight(.bold))
-                                    .foregroundColor(.purple)
+                                    .foregroundStyle(.purple)
                             )
                         
                         Text(viewModel.topCustomersList[index].customerName)
                             .font(.subheadline.weight(.medium))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                         
                         Text(viewModel.topCustomersList[index].spendText)
                             .font(.subheadline.weight(.medium).monospacedDigit())
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .frame(height: 56)
                     

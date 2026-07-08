@@ -8,10 +8,10 @@ struct DashboardHeaderView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Dashboard")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
 //                Text("Overview of your retail operations")
 //                    .font(.system(size: 15))
-//                    .foregroundColor(.secondary)
+//                    .foregroundStyle(.secondary)
             }
             
             Spacer()
@@ -19,7 +19,7 @@ struct DashboardHeaderView: View {
             // Search Bar
 //            HStack(spacing: 8) {
 //                Image(systemName: "magnifyingglass")
-//                    .foregroundColor(.secondary)
+//                    .foregroundStyle(.secondary)
 //                TextField("Search stores, products, managers...", text: $searchText)
 //                    .font(.system(size: 15))
 //            }
@@ -35,7 +35,7 @@ struct DashboardHeaderView: View {
 //            ZStack(alignment: .topTrailing) {
 //                Image(systemName: "bell.fill")
 //                    .font(.system(size: 20))
-//                    .foregroundColor(.primary)
+//                    .foregroundStyle(.primary)
 //                
 //                Circle()
 //                    .fill(Color.red)
@@ -43,7 +43,7 @@ struct DashboardHeaderView: View {
 //                    .overlay(
 //                        Text("2")
 //                            .font(.system(size: 9, weight: .bold))
-//                            .foregroundColor(.white)
+//                            .foregroundStyle(.white)
 //                    )
 //                    .offset(x: 4, y: -4)
 //            }
@@ -57,7 +57,7 @@ struct DashboardHeaderView: View {
                 .overlay(
                     Text("AM")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                 )
         }
         .padding(.vertical, 8)

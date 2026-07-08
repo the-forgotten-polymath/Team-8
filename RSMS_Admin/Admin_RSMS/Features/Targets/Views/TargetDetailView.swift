@@ -56,7 +56,7 @@ struct TargetDetailView: View {
                 
                 Image(systemName: "chart.bar.fill")
                     .font(.system(size: 40, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
             .padding(.bottom, 8)
             
@@ -64,12 +64,12 @@ struct TargetDetailView: View {
                 Text(target.name)
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 
                 Text(target.period.rawValue.uppercased() + " TARGET")
                     .font(.system(size: 13, weight: .bold))
                     .tracking(1.0)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             
             Text("₹\(target.amount, specifier: "%.2f")")
@@ -86,7 +86,7 @@ struct TargetDetailView: View {
                 VStack(spacing: 4) {
                     Image(systemName: "building.2.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.blue)
                     Text("\(assignedStoreModels.count) Stores")
                         .font(.system(size: 13, weight: .medium))
                 }
@@ -96,13 +96,13 @@ struct TargetDetailView: View {
                 VStack(spacing: 4) {
                     Image(systemName: "calendar.badge.clock")
                         .font(.system(size: 14))
-                        .foregroundColor(.orange)
+                        .foregroundStyle(.orange)
                     Text("\(target.startDate.formatted(date: .abbreviated, time: .omitted)) - \(target.endDate.formatted(date: .abbreviated, time: .omitted))")
                         .font(.system(size: 13, weight: .medium))
                 }
             }
             .padding(.top, 12)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
         }
         .padding(32)
         .frame(maxWidth: .infinity)
@@ -137,7 +137,7 @@ struct TargetDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: icon)
-                    .foregroundColor(iconColor)
+                    .foregroundStyle(iconColor)
                     .font(.system(size: 16, weight: .bold))
                 Spacer()
             }
@@ -148,7 +148,7 @@ struct TargetDetailView: View {
             
             Text(title)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -169,10 +169,10 @@ struct TargetDetailView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "building.slash.fill")
                         .font(.system(size: 32))
-                        .foregroundColor(.secondary.opacity(0.5))
+                        .foregroundStyle(.secondary.opacity(0.5))
                     Text("No stores assigned to this target.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(40)
@@ -215,7 +215,7 @@ struct TargetDetailView: View {
                     .overlay(
                         Text(store.managerInitials)
                             .font(.system(size: 15, weight: .bold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -223,17 +223,17 @@ struct TargetDetailView: View {
                         .font(.system(size: 16, weight: .semibold))
                     Text("Manager: \(store.managerName)")
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("₹\(current, specifier: "%.0f")")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(isReached ? .green : .primary)
+                        .foregroundStyle(isReached ? .green : .primary)
                     Text("Target: ₹\(target.amount, specifier: "%.0f")")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             
@@ -243,11 +243,11 @@ struct TargetDetailView: View {
                     if isReached {
                         Label("Target Reached!", systemImage: "star.fill")
                             .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.green)
+                            .foregroundStyle(.green)
                     } else {
                         Text("\(Int(percent * 100))% completed")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(themeColor)
+                            .foregroundStyle(themeColor)
                     }
                     Spacer()
                 }

@@ -134,7 +134,7 @@ struct ProductsView: View {
         } label: {
             Text("\(filter.rawValue) (\(viewModel.count(for: filter)))")
                 .font(.subheadline.weight(.semibold))
-                .foregroundColor(isSelected ? .white : .primary)
+                .foregroundStyle(isSelected ? .white : .primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(

@@ -195,13 +195,13 @@ struct AddPromotionView: View {
             .navigationTitle(editingPromotion == nil ? "New Promotion" : "Edit Promotion")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         onDismiss()
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: save) {
                         Text(editingPromotion == nil ? "Save" : "Update")
                             .fontWeight(.bold)
@@ -315,7 +315,7 @@ struct AddPromotionView: View {
                     if description.isEmpty {
                         Text("Enter promotion details, terms, and conditions…")
                             .font(.system(size: 15))
-                            .foregroundColor(.secondary.opacity(0.6))
+                            .foregroundStyle(.secondary.opacity(0.6))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 13)
                     }
@@ -339,25 +339,21 @@ struct AddPromotionView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     PromoFieldLabel(text: "Start Date")
                     
-                    DatePicker("Start Date", selection: $startDate, displayedComponents: [.date])
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(PromoFormTheme.fieldBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+                    HStack {
+                        DatePicker("Start Date", selection: $startDate, displayedComponents: [.date])
+                            .labelsHidden()
+                        Spacer()
+                    }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
                     PromoFieldLabel(text: "End Date")
                     
-                    DatePicker("End Date", selection: $endDate, displayedComponents: [.date])
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(PromoFormTheme.fieldBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+                    HStack {
+                        DatePicker("End Date", selection: $endDate, displayedComponents: [.date])
+                            .labelsHidden()
+                        Spacer()
+                    }
                 }
             }
         }
@@ -383,14 +379,14 @@ struct AddPromotionView: View {
                         }) {
                             Text(selectedStoreIds.count == service.stores.count ? "Deselect All" : "Select All")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(PromoFormTheme.navy)
+                                .foregroundStyle(PromoFormTheme.navy)
                         }
                     }
                 }
                 
                 if service.stores.isEmpty {
                     Text("No stores available.")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 } else {
                     ForEach(service.stores, id: \.id) { store in
                         Button(action: {
@@ -408,11 +404,11 @@ struct AddPromotionView: View {
                                 Spacer()
                                 if selectedStoreIds.contains(store.id) || appliesToAllStores {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.blue)
+                                        .foregroundStyle(.blue)
                                         .font(.system(size: 20))
                                 } else {
                                     Image(systemName: "circle")
-                                        .foregroundColor(.secondary.opacity(0.3))
+                                        .foregroundStyle(.secondary.opacity(0.3))
                                         .font(.system(size: 20))
                                 }
                             }
@@ -487,7 +483,7 @@ struct AddPromotionView: View {
                         Text("Change Photo")
                             .font(.system(size: 11, weight: .semibold))
                     }
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 7)
                     .background(.ultraThinMaterial.opacity(0.9))
@@ -503,7 +499,7 @@ struct AddPromotionView: View {
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 22))
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .shadow(color: .black.opacity(0.4), radius: 4)
                 }
             }
@@ -520,7 +516,7 @@ struct AddPromotionView: View {
                         .frame(width: 56, height: 56)
                     Image(systemName: "photo.badge.plus")
                         .font(.system(size: 24))
-                        .foregroundColor(PromoFormTheme.navy.opacity(0.7))
+                        .foregroundStyle(PromoFormTheme.navy.opacity(0.7))
                 }
                 VStack(spacing: 4) {
                     Text("Upload Banner Image")
@@ -528,7 +524,7 @@ struct AddPromotionView: View {
                         .foregroundStyle(.primary)
                     Text("PNG or JPG, up to 10 MB")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(maxWidth: .infinity)

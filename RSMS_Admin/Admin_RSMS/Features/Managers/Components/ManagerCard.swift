@@ -28,8 +28,8 @@ struct ManagerCard: View {
                         }
                     }
                 } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundColor(.secondary)
+                    Label("Options", systemImage: "ellipsis").labelStyle(.iconOnly)
+                        .foregroundStyle(.secondary)
                         .padding(12)
                         .contentShape(Rectangle())
                 }
@@ -48,7 +48,7 @@ struct ManagerCard: View {
                             .overlay(
                                 Text(member.initials)
                                     .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.primary)
+                                    .foregroundStyle(.primary)
                             )
                     }
                 }
@@ -62,7 +62,7 @@ struct ManagerCard: View {
                                 .overlay(
                                     Text("DEL")
                                         .font(.system(size: 10, weight: .bold))
-                                        .foregroundColor(.white)
+                                        .foregroundStyle(.white)
                                 )
                         }
                     }
@@ -71,10 +71,10 @@ struct ManagerCard: View {
                 VStack(spacing: 1) {
                     Text(member.name)
                         .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     Text(member.role)
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.blue)
                 }
             }
             .padding(.bottom, 12)
@@ -87,20 +87,20 @@ struct ManagerCard: View {
                 HStack(spacing: 6) {
                     Image(systemName: "mappin.circle")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text(member.location)
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 
                 if !member.email.isEmpty {
                     HStack(spacing: 6) {
                         Image(systemName: "envelope")
                             .font(.system(size: 12))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text(member.email)
                             .font(.system(size: 13))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 
@@ -132,16 +132,16 @@ struct InviteMemberCard: View {
                 
                 Image(systemName: "person.badge.plus")
                     .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
             }
             
             VStack(spacing: 4) {
                 Text("Invite Member")
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                 Text("Add to your team.")
                     .font(.system(size: 12))
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundStyle(.white.opacity(0.7))
             }
             
             Button(action: onAdd) {
@@ -151,11 +151,11 @@ struct InviteMemberCard: View {
                         .fontWeight(.semibold)
                 }
                 .font(.system(size: 13))
-                .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4))
+                .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4))
                 .padding(.horizontal, 20)
                 .padding(.vertical, 8)
                 .background(Color.white)
-                .cornerRadius(18)
+                .clipShape(.rect(cornerRadius: 18))
             }
             .buttonStyle(.plain)
             
@@ -163,7 +163,7 @@ struct InviteMemberCard: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(red: 0.1, green: 0.2, blue: 0.4))
-        .cornerRadius(16)
+        .clipShape(.rect(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 4)
     }
 }

@@ -25,11 +25,11 @@ public struct AdminRootView: View {
                             Text("Portal")
                                 .font(.system(size: 15, weight: .semibold))
                         }
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.blue)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(Color(uiColor: .systemBackground).opacity(0.8))
-                        .cornerRadius(20)
+                        .clipShape(.rect(cornerRadius: 20))
                         .shadow(color: Color.black.opacity(0.1), radius: 5)
                     }
                     .padding(.leading, 16)

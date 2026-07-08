@@ -42,7 +42,7 @@ struct AuditLogsView: View {
             NavigationStack {
                 ComplianceInspectorView(content: content, viewModel: viewModel)
                     .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
+                        ToolbarItem(placement: .topBarTrailing) {
                             Button("Done") { viewModel.inspectorContent = nil }
                         }
                     }

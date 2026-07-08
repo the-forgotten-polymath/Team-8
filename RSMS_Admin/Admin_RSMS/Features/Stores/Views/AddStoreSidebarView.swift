@@ -41,10 +41,10 @@ struct AddStoreSidebarView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Register New Store")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4))
+                    .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4))
                 Text("Add a location to the global network.")
                     .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
@@ -61,38 +61,38 @@ struct AddStoreSidebarView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Basic Information")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         // Store Name
                         VStack(alignment: .leading, spacing: 6) {
                             Text("STORE NAME")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             TextField("e.g. London Flagship", text: $storeName)
                                 .padding(12)
                                 .background(Color(uiColor: .systemGray6))
-                                .cornerRadius(8)
+                                .clipShape(.rect(cornerRadius: 8))
                         }
                         
                         // Store ID
                         VStack(alignment: .leading, spacing: 6) {
                             Text("STORE ID")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             HStack {
                                 Text(generatedStoreID.isEmpty ? "Auto-generated" : generatedStoreID)
-                                    .foregroundColor(generatedStoreID.isEmpty ? .secondary.opacity(0.5) : .primary)
+                                    .foregroundStyle(generatedStoreID.isEmpty ? Color.secondary.opacity(0.5) : Color.primary)
                                     .font(.system(size: 14))
                                 Spacer()
                                 if !generatedStoreID.isEmpty {
                                     Image(systemName: "lock.fill")
                                         .font(.system(size: 10))
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                             .padding(12)
                             .background(Color(uiColor: .systemGray6).opacity(0.7))
-                            .cornerRadius(8)
+                            .clipShape(.rect(cornerRadius: 8))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
@@ -100,28 +100,28 @@ struct AddStoreSidebarView: View {
                             if !detectedRegionCode.isEmpty {
                                 Text("Region: \(detectedRegionCode)")
                                     .font(.system(size: 9, weight: .medium))
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
                     .padding(16)
                     .background(Color.white)
-                    .cornerRadius(12)
+                    .clipShape(.rect(cornerRadius: 12))
                     
                     // Location Section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Location Details")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         // Address/Search Input
                         VStack(alignment: .leading, spacing: 6) {
                             Text("ADDRESS")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             HStack {
                                 Image(systemName: "mappin.circle")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 TextField("Enter address or drop pin...", text: $address)
                                     .autocorrectionDisabled()
                                     .onChange(of: address) { _, newValue in
@@ -134,7 +134,7 @@ struct AddStoreSidebarView: View {
                             }
                             .padding(12)
                             .background(Color(uiColor: .systemGray6))
-                            .cornerRadius(8)
+                            .clipShape(.rect(cornerRadius: 8))
                         }
                         
                         // Pin Placed Indicator
@@ -144,7 +144,7 @@ struct AddStoreSidebarView: View {
                                 .frame(width: 8, height: 8)
                             Text(pinPlaced ? "Location Pin Placed" : "No Location Selected")
                                 .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                             Spacer()
                         }
                         .padding(.vertical, 4)
@@ -161,9 +161,9 @@ struct AddStoreSidebarView: View {
                                     .font(.system(size: 12, weight: .semibold))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
-                                    .foregroundColor(.white)
+                                    .foregroundStyle(.white)
                                     .background(Color(red: 0.1, green: 0.2, blue: 0.4))
-                                    .cornerRadius(8)
+                                    .clipShape(.rect(cornerRadius: 8))
                             }
                             
                             Button(action: {
@@ -182,9 +182,9 @@ struct AddStoreSidebarView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
-                                .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.4))
+                                .foregroundStyle(Color(red: 0.1, green: 0.2, blue: 0.4))
                                 .background(Color(uiColor: .systemGray6))
-                                .cornerRadius(8)
+                                .clipShape(.rect(cornerRadius: 8))
                             }
                             .disabled(isLocating)
                             
@@ -199,28 +199,28 @@ struct AddStoreSidebarView: View {
                                         .font(.system(size: 12, weight: .semibold))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)
-                                        .foregroundColor(.red)
+                                        .foregroundStyle(.red)
                                         .background(Color.red.opacity(0.08))
-                                        .cornerRadius(8)
+                                        .clipShape(.rect(cornerRadius: 8))
                                 }
                             }
                         }
                     }
                     .padding(16)
                     .background(Color.white)
-                    .cornerRadius(12)
+                    .clipShape(.rect(cornerRadius: 12))
                     
                     // Operational Section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Operations")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         // Store Type
                         VStack(alignment: .leading, spacing: 6) {
                             Text("STORE TYPE")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             HStack(spacing: 0) {
                                 ForEach(["Flagship", "Warehouse", "Boutique"], id: \.self) { type in
                                     Button(action: { storeType = type }) {
@@ -229,15 +229,15 @@ struct AddStoreSidebarView: View {
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 8)
                                             .background(storeType == type ? Color.white : Color.clear)
-                                            .foregroundColor(storeType == type ? .primary : .secondary)
-                                            .cornerRadius(6)
+                                            .foregroundStyle(storeType == type ? Color.primary : Color.secondary)
+                                            .clipShape(.rect(cornerRadius: 6))
                                             .padding(2)
                                     }
                                     .buttonStyle(.plain)
                                 }
                             }
                             .background(Color(uiColor: .systemGray6))
-                            .cornerRadius(8)
+                            .clipShape(.rect(cornerRadius: 8))
                         }
                         
 
@@ -245,14 +245,14 @@ struct AddStoreSidebarView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("OPENING HOURS")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                             HStack(spacing: 12) {
                                 DatePicker("Opens", selection: $openingTime, displayedComponents: .hourAndMinute)
                                     .datePickerStyle(.compact)
                                     .labelsHidden()
                                 Text("TO")
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                 DatePicker("Closes", selection: $closingTime, displayedComponents: .hourAndMinute)
                                     .datePickerStyle(.compact)
                                     .labelsHidden()
@@ -267,17 +267,17 @@ struct AddStoreSidebarView: View {
                     }
                     .padding(16)
                     .background(Color.white)
-                    .cornerRadius(12)
+                    .clipShape(.rect(cornerRadius: 12))
                     
                     // Categories Section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Store Categories")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         Text("Select categories and specify the starting inventory quantity to assign to this store.")
                             .font(.system(size: 11))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         let categories = RSMSDataManager.shared.categories
                         
@@ -301,12 +301,12 @@ struct AddStoreSidebarView: View {
                                         }) {
                                             HStack {
                                                 Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-                                                    .foregroundColor(isSelected ? Color(red: 0.1, green: 0.2, blue: 0.4) : .secondary)
+                                                    .foregroundStyle(isSelected ? Color(red: 0.1, green: 0.2, blue: 0.4) : .secondary)
                                                     .font(.system(size: 16))
                                                 
                                                 Text(category.categoryName)
                                                     .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                                                    .foregroundColor(isSelected ? .primary : .secondary)
+                                                    .foregroundStyle(isSelected ? Color.primary : Color.secondary)
                                                 
                                                 Spacer()
                                             }
@@ -325,7 +325,7 @@ struct AddStoreSidebarView: View {
                                             HStack {
                                                 Text("Qty:")
                                                     .font(.system(size: 11, weight: .bold))
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundStyle(.secondary)
                                                 
                                                 Stepper(value: Binding(
                                                     get: { categoryQuantities[category.id] ?? 1 },
@@ -348,7 +348,7 @@ struct AddStoreSidebarView: View {
                                                 .frame(width: 50)
                                                 .padding(6)
                                                 .background(Color.white)
-                                                .cornerRadius(6)
+                                                .clipShape(.rect(cornerRadius: 6))
                                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
                                             }
                                             .padding(.horizontal, 12)
@@ -365,17 +365,17 @@ struct AddStoreSidebarView: View {
                     }
                     .padding(16)
                     .background(Color.white)
-                    .cornerRadius(12)
+                    .clipShape(.rect(cornerRadius: 12))
                     
                     // Save Button
                     Button(action: { saveStore() }) {
                         Text("Save Store Registry")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Color(red: 0.1, green: 0.2, blue: 0.4))
-                            .cornerRadius(10)
+                            .clipShape(.rect(cornerRadius: 10))
                             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                     }
                     .buttonStyle(.plain)

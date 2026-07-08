@@ -16,36 +16,30 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $activeView) {
-            NavigationStack {
-                DashboardView()
-                    .navigationTitle("Dashboard")
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar { profileToolbarItem }
+            Tab("Dashboard", systemImage: "square.grid.2x2", value: .dashboard) {
+                NavigationStack {
+                    DashboardView()
+                        .navigationTitle("Dashboard")
+                        .navigationBarTitleDisplayMode(.large)
+                        .toolbar { profileToolbarItem }
+                }
             }
-            .tabItem {
-                Label("Dashboard", systemImage: "square.grid.2x2")
-            }
-            .tag(ActiveView.dashboard)
             
-            NavigationStack {
-                TargetsView()
-                    .toolbar { profileToolbarItem }
+            Tab("Targets", systemImage: "bullseye", value: .targets) {
+                NavigationStack {
+                    TargetsView()
+                        .toolbar { profileToolbarItem }
+                }
             }
-            .tabItem {
-                Label("Targets", systemImage: "bullseye")
-            }
-            .tag(ActiveView.targets)
             
-            NavigationStack {
-                AuditLogsView()
-                    .navigationTitle("Audit Logs")
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar { profileToolbarItem }
+            Tab("Audit Logs", systemImage: "list.clipboard", value: .auditLogs) {
+                NavigationStack {
+                    AuditLogsView()
+                        .navigationTitle("Audit Logs")
+                        .navigationBarTitleDisplayMode(.large)
+                        .toolbar { profileToolbarItem }
+                }
             }
-            .tabItem {
-                Label("Audit Logs", systemImage: "list.clipboard")
-            }
-            .tag(ActiveView.auditLogs)
         }
         .tint(Color.brandGreenDark)
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -53,18 +47,18 @@ struct ContentView: View {
     
     @ToolbarContentBuilder
     private var profileToolbarItem: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarTrailing) {
+        ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 if let user = AuthManager.shared.currentUser {
                     Section {
                         Text("Signed in as:")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text(user.fullName)
                             .font(.headline)
                         Text(user.email)
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 } else {
                     Section {
@@ -87,7 +81,7 @@ struct ContentView: View {
                     .overlay(
                         Text("AM")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                     )
             }
         }

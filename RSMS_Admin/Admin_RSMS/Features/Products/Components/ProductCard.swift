@@ -78,7 +78,7 @@ struct ProductCard: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(status.tint, in: Capsule())
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
                 .padding(8)
         }
         .frame(height: imageHeight)
@@ -91,20 +91,20 @@ struct ProductCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(product.productName)
                         .font(.system(size: 16, weight: .bold)) // Sightly bolder/larger for native feel
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                         // Removed hardcoded nameHeight frame natively
 
                     Text(product.brand)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
                 Spacer(minLength: 8)
                 Text(product.price.asCurrency)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.rsmsBlue)
+                    .foregroundStyle(Color.rsmsBlue)
             }
 
             if showActions {
@@ -114,7 +114,7 @@ struct ProductCard: View {
                         Button(action: onReject) {
                             Text("Reject")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.red)
+                                .foregroundStyle(.red)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                                 .background(Color.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -124,7 +124,7 @@ struct ProductCard: View {
                         Button(action: onApprove) {
                             Text("Approve")
                                 .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                                 .background(Color.green, in: RoundedRectangle(cornerRadius: 10, style: .continuous))

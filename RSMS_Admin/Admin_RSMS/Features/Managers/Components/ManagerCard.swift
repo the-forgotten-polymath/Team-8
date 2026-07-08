@@ -83,32 +83,23 @@ struct ManagerCard: View {
                 .padding(.horizontal, 16)
             
             // Info Section
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
                     Image(systemName: "mappin.circle")
-                        .font(.system(size: 10))
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
                     Text(member.location)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-                
-                HStack(spacing: 6) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                    Text(member.shift)
-                        .font(.system(size: 11))
+                        .font(.system(size: 13))
                         .foregroundColor(.secondary)
                 }
                 
                 if !member.email.isEmpty {
                     HStack(spacing: 6) {
                         Image(systemName: "envelope")
-                            .font(.system(size: 10))
+                            .font(.system(size: 12))
                             .foregroundColor(.secondary)
                         Text(member.email)
-                            .font(.system(size: 11))
+                            .font(.system(size: 13))
                             .foregroundColor(.secondary)
                     }
                 }

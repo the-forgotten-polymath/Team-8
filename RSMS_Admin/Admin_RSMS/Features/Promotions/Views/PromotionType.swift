@@ -46,7 +46,7 @@ struct AdminPromotion: Identifiable, Codable, Hashable {
     var endDate: String
 
     var appliesToAllStores: Bool
-    var storeId: UUID?
+    var storeIds: [UUID]?
 
     var bannerImageUrl: String?
 
@@ -73,7 +73,7 @@ struct AdminPromotion: Identifiable, Codable, Hashable {
         case endDate = "end_date"
 
         case appliesToAllStores = "applies_to_all_stores"
-        case storeId = "store_id"
+        case storeIds = "store_ids"
 
         case bannerImageUrl = "banner_image_url"
 
@@ -95,7 +95,7 @@ struct AdminPromotion: Identifiable, Codable, Hashable {
         startDate: String,
         endDate: String,
         appliesToAllStores: Bool = true,
-        storeId: UUID? = nil,
+        storeIds: [UUID]? = nil,
         bannerImageUrl: String? = nil,
         status: String = "",
         createdBy: UUID? = nil,
@@ -114,7 +114,7 @@ struct AdminPromotion: Identifiable, Codable, Hashable {
         self.endDate = endDate
 
         self.appliesToAllStores = appliesToAllStores
-        self.storeId = storeId
+        self.storeIds = storeIds
 
         self.bannerImageUrl = bannerImageUrl
 
@@ -167,7 +167,7 @@ struct AdminPromotionPayload: Encodable {
     let endDate: String
 
     let appliesToAllStores: Bool
-    let storeId: UUID?
+    let storeIds: [UUID]?
 
     let bannerImageUrl: String?
 
@@ -185,7 +185,7 @@ struct AdminPromotionPayload: Encodable {
         case endDate = "end_date"
 
         case appliesToAllStores = "applies_to_all_stores"
-        case storeId = "store_id"
+        case storeIds = "store_ids"
 
         case bannerImageUrl = "banner_image_url"
 
@@ -205,9 +205,9 @@ struct AdminPromotionPayload: Encodable {
 
         self.appliesToAllStores = promotion.appliesToAllStores
 
-        self.storeId = promotion.appliesToAllStores
+        self.storeIds = promotion.appliesToAllStores
             ? nil
-            : promotion.storeId
+            : promotion.storeIds
 
         self.bannerImageUrl = promotion.bannerImageUrl
 

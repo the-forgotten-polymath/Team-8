@@ -60,7 +60,7 @@ struct ManagersView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search managers, roles, or locations...")
+        .searchable(text: $searchText, prompt: "Search by manager")
         .alert("Error", isPresented: Binding(
             get: { dataManager.errorMessage != nil },
             set: { if !$0 { dataManager.errorMessage = nil } }

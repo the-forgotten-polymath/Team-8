@@ -137,7 +137,7 @@ struct StoresView: View {
                         mapViewContent
                     }
                 }
-                .searchable(text: $searchText, prompt: "Search stores or managers...")
+                .searchable(text: $searchText, prompt: "Search by store name")
                 .background(Color.pageBG)
             }
         }

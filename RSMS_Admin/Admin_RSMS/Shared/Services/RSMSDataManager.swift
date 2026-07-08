@@ -460,6 +460,30 @@ class RSMSDataManager: ObservableObject {
                         await unassignManagerFromStore(location: old.location, managerName: old.name)
                     }
                     await syncManagerToStore(member: updatedMember)
+                    
+                    // Update user table
+                    if let old = oldMember {
+                        struct UserUpdate: Encodable {
+                            let email: String
+                            let fullName: String
+                            let storeId: UUID?
+                            
+                            enum CodingKeys: String, CodingKey {
+                                case email
+                                case fullName = "full_name"
+                                case storeId = "store_id"
+                            }
+                        }
+                        
+                        let storeId = self.stores.first(where: { $0.name == member.location })?.id
+                        let userUpdate = UserUpdate(email: member.email, fullName: member.name, storeId: storeId)
+                        
+                        _ = try? await client
+                            .from("users")
+                            .update(userUpdate)
+                            .eq("email", value: old.email)
+                            .execute()
+                    }
                 }
             } catch {
                 errorMessage = "Failed to update manager member: \(error.localizedDescription)"

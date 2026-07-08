@@ -112,7 +112,8 @@ struct AddPromotionView: View {
     @State private var startDate: Date
     @State private var endDate: Date
     @State private var appliesToAllStores: Bool
-    @State private var selectedStoreId: UUID?
+    @State private var selectedStoreIds: Set<UUID>
+    @State private var isStoreDropdownOpen = false
 
     // ── Banner image state ────────────────────────────────────────
     @State private var selectedImage: UIImage?
@@ -148,7 +149,7 @@ struct AddPromotionView: View {
         _selectedCategoryId = State(initialValue: editingPromotion?.categoryId)
         _description = State(initialValue: editingPromotion?.description ?? "")
         _appliesToAllStores = State(initialValue: editingPromotion?.appliesToAllStores ?? true)
-        _selectedStoreId = State(initialValue: editingPromotion?.storeId)
+        _selectedStoreIds = State(initialValue: Set(editingPromotion?.storeIds ?? []))
 
         _existingBannerURL = State(initialValue: editingPromotion?.bannerImageUrl)
 
@@ -174,7 +175,11 @@ struct AddPromotionView: View {
 
     private var storeDisplayName: String {
         if appliesToAllStores { return "All Stores" }
-        return service.stores.first(where: { $0.id == selectedStoreId })?.name ?? "Select Store"
+        if selectedStoreIds.isEmpty { return "Select Store" }
+        let names = selectedStoreIds.compactMap { id in
+            service.stores.first(where: { $0.id == id })?.name
+        }
+        return names.isEmpty ? "Select Store" : names.joined(separator: ", ")
     }
 
     var body: some View {
@@ -355,31 +360,72 @@ struct AddPromotionView: View {
 
     private var storeAvailabilitySection: some View {
         PromoFormSectionCard(title: "Store Availability", icon: "storefront") {
-            PromoMenuRow(label: "Store", value: storeDisplayName) {
-                Button {
-                    appliesToAllStores = true
-                    selectedStoreId = nil
-                } label: {
-                    if appliesToAllStores {
-                        Label("All Stores", systemImage: "checkmark")
-                    } else {
-                        Text("All Stores")
-                    }
-                }
-
-                ForEach(service.stores) { store in
-                    Button {
-                        appliesToAllStores = false
-                        selectedStoreId = store.id
-                    } label: {
-                        if !appliesToAllStores && selectedStoreId == store.id {
-                            Label(store.name, systemImage: "checkmark")
-                        } else {
-                            Text(store.name)
+            DisclosureGroup(
+                isExpanded: $isStoreDropdownOpen,
+                content: {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Button {
+                            appliesToAllStores = true
+                            selectedStoreIds.removeAll()
+                        } label: {
+                            HStack {
+                                Text("All Stores")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if appliesToAllStores {
+                                    Image(systemName: "checkmark").foregroundColor(PromoFormTheme.navy)
+                                }
+                            }
+                            .padding(.vertical, 12)
+                        }
+                        
+                        Divider()
+                        
+                        ForEach(service.stores) { store in
+                            Button {
+                                appliesToAllStores = false
+                                if selectedStoreIds.contains(store.id) {
+                                    selectedStoreIds.remove(store.id)
+                                    if selectedStoreIds.isEmpty { appliesToAllStores = true }
+                                } else {
+                                    selectedStoreIds.insert(store.id)
+                                }
+                            } label: {
+                                HStack {
+                                    Text(store.name)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    if !appliesToAllStores && selectedStoreIds.contains(store.id) {
+                                        Image(systemName: "checkmark").foregroundColor(PromoFormTheme.navy)
+                                    }
+                                }
+                                .padding(.vertical, 12)
+                            }
+                            if store.id != service.stores.last?.id {
+                                Divider()
+                            }
                         }
                     }
+                    .padding(.top, 8)
+                },
+                label: {
+                    HStack {
+                        Text("Store")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Text(storeDisplayName)
+                            .font(.system(size: 15))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
-            }
+            )
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .background(PromoFormTheme.fieldBackground)
+            .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+            .accentColor(.secondary)
         }
     }
 
@@ -506,7 +552,7 @@ struct AddPromotionView: View {
             validationError = "End date must be on or after the start date."
             return
         }
-        if !appliesToAllStores && selectedStoreId == nil {
+        if !appliesToAllStores && selectedStoreIds.isEmpty {
             validationError = "Select a store, or turn on \"Applies to All Stores\"."
             return
         }
@@ -525,16 +571,10 @@ struct AddPromotionView: View {
                 startDate: Self.dateFormatter.string(from: startDate),
                 endDate: Self.dateFormatter.string(from: endDate),
                 appliesToAllStores: appliesToAllStores,
-                storeId: appliesToAllStores ? nil : selectedStoreId,
+                storeIds: appliesToAllStores ? nil : Array(selectedStoreIds),
                 bannerImageUrl: existingBannerURL,
                 createdBy: editingPromotion?.createdBy ?? AuthManager.shared.currentUser?.id
             )
-
-            if let image = selectedImage, let data = image.jpegData(compressionQuality: 0.8) {
-                if let uploadedURL = await service.uploadBannerImage(data: data, promotionId: promotionId.uuidString) {
-                    promotion.bannerImageUrl = uploadedURL
-                }
-            }
 
             let success: Bool
             if editingPromotion == nil {
@@ -543,10 +583,19 @@ struct AddPromotionView: View {
                 success = await service.updatePromotion(promotion)
             }
 
-            isSaving = false
             if success {
+                if let image = selectedImage, let data = image.jpegData(compressionQuality: 0.8) {
+                    if let uploadedURL = await service.uploadBannerImage(data: data, promotionId: promotionId.uuidString) {
+                        promotion.bannerImageUrl = uploadedURL
+                        await service.updatePromotion(promotion) // Update the record with the URL
+                    }
+                }
+
+                isSaving = false
                 onSaved(promotion)
                 onDismiss()
+            } else {
+                isSaving = false
             }
         }
     }

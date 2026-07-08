@@ -107,7 +107,7 @@ struct ProductsView: View {
         }
         .navigationTitle("Products")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, prompt: "Search products by name, brand or SKU...")
+        .searchable(text: $searchText, prompt: "Search by product name")
     }
 
     /// Horizontal filter bar — just All and Pending, each labelled with a

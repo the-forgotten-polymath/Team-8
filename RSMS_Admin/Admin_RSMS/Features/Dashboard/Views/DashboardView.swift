@@ -287,7 +287,7 @@ struct DashboardView: View {
         
         // 3. Top Customers
         ActivityCard(
-            title: "Top Customers",
+            title: "Premium Clients",
             subtitle: "BY SPEND"
         ) {
             VStack(spacing: 0) {

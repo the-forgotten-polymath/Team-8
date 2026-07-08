@@ -1,7 +1,6 @@
 import Foundation
 
 enum TargetPeriod: String, Codable, CaseIterable {
-    case weekly = "Weekly"
     case monthly = "Monthly"
 }
 

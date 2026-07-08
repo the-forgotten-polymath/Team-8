@@ -304,8 +304,8 @@ struct MostSoldProductItem: Identifiable {
         }
 
         // Top Customers — real spend aggregated from completed sales.
-        let completedSales = data.sales.filter { $0.saleStatus.lowercased() != "cancelled" }
-        let spendByCustomer = Dictionary(grouping: completedSales, by: \.customerId)
+        let completedSales = data.sales.filter { $0.saleStatus.lowercased() != "cancelled" && $0.customerId != nil }
+        let spendByCustomer = Dictionary(grouping: completedSales, by: { $0.customerId! })
             .mapValues { $0.reduce(0) { $0 + $1.totalAmount } }
         let rankedCustomers = spendByCustomer
             .sorted { $0.value > $1.value }

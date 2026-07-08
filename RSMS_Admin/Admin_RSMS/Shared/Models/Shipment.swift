@@ -20,6 +20,8 @@ struct Shipment: Codable, Identifiable {
     let dispatchDate: Date?
     let receivedDate: Date?
     let createdAt: Date
+    let verifiedBy: UUID?
+    let verifiedAt: Date?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -34,5 +36,7 @@ struct Shipment: Codable, Identifiable {
         case dispatchDate = "dispatch_date"
         case receivedDate = "received_date"
         case createdAt = "created_at"
+        case verifiedBy = "verified_by"
+        case verifiedAt = "verified_at"
     }
 }

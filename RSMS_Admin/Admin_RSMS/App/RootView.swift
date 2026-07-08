@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-enum ActiveView {
+enum ActiveView: Hashable {
     case dashboard
     case targets
     case auditLogs
@@ -13,7 +13,7 @@ enum ActiveView {
 
 struct ContentView: View {
     @State private var activeView: ActiveView = .dashboard
-    
+
     var body: some View {
         TabView(selection: $activeView) {
             Tab("Dashboard", systemImage: "square.grid.2x2", value: .dashboard) {

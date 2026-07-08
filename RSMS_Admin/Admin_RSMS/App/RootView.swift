@@ -14,31 +14,63 @@ struct ContentView: View {
     @State private var activeView: ActiveView = .dashboard
     
     var body: some View {
-        TabView(selection: $activeView) {
-            NavigationStack {
-                DashboardView()
-                    .navigationTitle("Dashboard")
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar { profileToolbarItem }
+        NavigationStack {
+            Group {
+                switch activeView {
+                case .dashboard:
+                    DashboardView()
+                case .auditLogs:
+                    AuditLogsView()
+                }
             }
-            .tabItem {
-                Label("Dashboard", systemImage: "square.grid.2x2")
+            .navigationTitle(activeView == .dashboard ? "Dashboard" : "Audit Logs")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    customSegmentedControl
+                }
+                profileToolbarItem
             }
-            .tag(ActiveView.dashboard)
-            
-            NavigationStack {
-                AuditLogsView()
-                    .navigationTitle("Audit Logs")
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar { profileToolbarItem }
-            }
-            .tabItem {
-                Label("Audit Logs", systemImage: "list.clipboard")
-            }
-            .tag(ActiveView.auditLogs)
         }
         .tint(Color.brandGreenDark)
         .ignoresSafeArea(.keyboard, edges: .bottom)
+    }
+    
+    private var customSegmentedControl: some View {
+        HStack(spacing: 0) {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    activeView = .dashboard
+                }
+            }) {
+                Text("Dashboard")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(activeView == .dashboard ? Color.brandGreenLight : Color.clear)
+                    .clipShape(Capsule())
+                    .foregroundColor(activeView == .dashboard ? Color.brandGreenDark : Color.secondary)
+            }
+            .buttonStyle(.plain)
+            
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    activeView = .auditLogs
+                }
+            }) {
+                Text("Audit Logs")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(activeView == .auditLogs ? Color.brandGreenLight : Color.clear)
+                    .clipShape(Capsule())
+                    .foregroundColor(activeView == .auditLogs ? Color.brandGreenDark : Color.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(4)
+        .background(Color(uiColor: .systemGray6))
+        .clipShape(Capsule())
     }
     
     @ToolbarContentBuilder

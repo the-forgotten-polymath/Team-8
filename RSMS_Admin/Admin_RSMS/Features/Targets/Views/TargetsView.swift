@@ -22,13 +22,13 @@ struct TargetsView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "bullseye")
                         .font(.system(size: 48))
-                        .foregroundColor(.secondary.opacity(0.5))
+                        .foregroundStyle(.secondary.opacity(0.5))
                     Text("No Targets Found")
                         .font(.headline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("Get started by adding a new target.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBG)
@@ -51,14 +51,11 @@ struct TargetsView: View {
         .navigationTitle("Targets")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingAddTarget = true
-                }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.accentColor)
-                }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Target", systemImage: "plus", action: { showingAddTarget = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
             }
         }
         .sheet(isPresented: $showingAddTarget) {
@@ -83,7 +80,7 @@ struct TargetsView: View {
                         .fill(Color.blue.opacity(0.1))
                         .frame(width: 48, height: 48)
                     Image(systemName: "chart.bar.fill")
-                        .foregroundColor(.blue)
+                        .foregroundStyle(.blue)
                         .font(.system(size: 20))
                 }
                 
@@ -96,11 +93,11 @@ struct TargetsView: View {
                     HStack(spacing: 12) {
                         Label(target.period.rawValue, systemImage: "calendar")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         Label("\(target.assignedStoreIDs.count) Stores", systemImage: "building.2")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 Spacer()
@@ -110,7 +107,7 @@ struct TargetsView: View {
                     Text("₹\(target.amount, specifier: "%.2f")")
                         .font(.title3)
                         .fontWeight(.heavy)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                 }
             }
             .padding()
@@ -120,7 +117,7 @@ struct TargetsView: View {
             HStack {
                 Text("\(target.startDate.formatted(date: .abbreviated, time: .omitted)) - \(target.endDate.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Menu {
                     Button("Edit") {
@@ -130,8 +127,8 @@ struct TargetsView: View {
                         dataManager.removeTarget(target)
                     }
                 } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundColor(.secondary)
+                    Label("Options", systemImage: "ellipsis").labelStyle(.iconOnly)
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal, 4)
                         .padding(.vertical, 8)
                 }

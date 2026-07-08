@@ -67,10 +67,10 @@ struct AddTargetView: View {
             .navigationTitle(editingTarget == nil ? "Create Revenue Target" : "Edit Revenue Target")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: saveAction) {
                         Text(editingTarget == nil ? "Create" : "Save").fontWeight(.bold)
                     }
@@ -135,13 +135,11 @@ struct AddTargetView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.secondary)
                     
-                    DatePicker("Select Start Date", selection: $targetStartDate, in: Date()..., displayedComponents: [.date])
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(TargetFormTheme.fieldBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: TargetFormTheme.fieldCornerRadius))
+                    HStack {
+                        DatePicker("Select Start Date", selection: $targetStartDate, in: Date()..., displayedComponents: [.date])
+                            .labelsHidden()
+                        Spacer()
+                    }
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -149,13 +147,11 @@ struct AddTargetView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.secondary)
                     
-                    DatePicker("Select End Date", selection: $targetEndDate, in: endDateRange, displayedComponents: [.date])
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(TargetFormTheme.fieldBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: TargetFormTheme.fieldCornerRadius))
+                    HStack {
+                        DatePicker("Select End Date", selection: $targetEndDate, in: endDateRange, displayedComponents: [.date])
+                            .labelsHidden()
+                        Spacer()
+                    }
                 }
             }
         }
@@ -193,14 +189,14 @@ struct AddTargetView: View {
                     }) {
                         Text(selectedStores.count == dataManager.stores.count ? "Deselect All" : "Select All")
                             .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.blue)
+                            .foregroundStyle(.blue)
                     }
                 }
             }
             
             if dataManager.stores.isEmpty {
                 Text("No stores available.")
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else {
                 ForEach(dataManager.stores, id: \.id) { store in
                     Button(action: {
@@ -209,20 +205,20 @@ struct AddTargetView: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(store.name)
-                                    .foregroundColor(.primary)
+                                    .foregroundStyle(.primary)
                                     .fontWeight(.semibold)
                                 Text(store.storeID ?? "")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                             if selectedStores.contains(store.id) {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                                     .font(.system(size: 20))
                             } else {
                                 Image(systemName: "circle")
-                                    .foregroundColor(.secondary.opacity(0.3))
+                                    .foregroundStyle(.secondary.opacity(0.3))
                                     .font(.system(size: 20))
                             }
                         }

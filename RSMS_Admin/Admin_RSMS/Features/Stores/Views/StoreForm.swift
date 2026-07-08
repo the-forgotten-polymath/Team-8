@@ -303,13 +303,13 @@ struct AddStoreView: View {
             .navigationTitle(editingStore == nil ? "Add Store" : "Edit Store")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         onDismiss()
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: saveStore) {
                         Text(editingStore == nil ? "Create" : "Update")
                             .fontWeight(.bold)
@@ -396,14 +396,14 @@ struct AddStoreView: View {
                             
                             Text(generatedStoreID.isEmpty ? "Auto-generated" : generatedStoreID)
                                 .font(.system(size: 15, weight: generatedStoreID.isEmpty ? .regular : .semibold))
-                                .foregroundColor(generatedStoreID.isEmpty ? .secondary.opacity(0.5) : .primary)
+                                .foregroundStyle(generatedStoreID.isEmpty ? Color.secondary.opacity(0.5) : Color.primary)
                             
                             Spacer()
                             
                             if !generatedStoreID.isEmpty {
                                 Image(systemName: "lock.fill")
                                     .font(.system(size: 10))
-                                    .foregroundColor(.secondary.opacity(0.6))
+                                    .foregroundStyle(.secondary.opacity(0.6))
                             }
                         }
                         .padding(.horizontal, 14)
@@ -422,7 +422,7 @@ struct AddStoreView: View {
                                 Text("Region: \(detectedRegionCode)")
                                     .font(.system(size: 10, weight: .medium))
                             }
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -464,7 +464,7 @@ struct AddStoreView: View {
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
                                         .background(storeStatus == status ? FormTheme.navy : Color.clear)
-                                        .foregroundColor(storeStatus == status ? .white : .secondary)
+                                        .foregroundStyle(storeStatus == status ? .white : .secondary)
                                 }
                             }
                         }
@@ -513,7 +513,7 @@ struct AddStoreView: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Select the product categories that will be available at this location.")
                     .font(.system(size: 13))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 let categories = RSMSDataManager.shared.categories
                 
@@ -536,12 +536,12 @@ struct AddStoreView: View {
                                 }) {
                                     HStack {
                                         Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-                                            .foregroundColor(isSelected ? FormTheme.navy : .secondary.opacity(0.5))
+                                            .foregroundStyle(isSelected ? FormTheme.navy : .secondary.opacity(0.5))
                                             .font(.system(size: 18))
                                         
                                         Text(category.categoryName)
                                             .font(.system(size: 14, weight: isSelected ? .semibold : .medium))
-                                            .foregroundColor(isSelected ? .primary : .secondary)
+                                            .foregroundStyle(isSelected ? Color.primary : Color.secondary)
                                             .lineLimit(1)
                                         
                                         Spacer()
@@ -561,7 +561,7 @@ struct AddStoreView: View {
                                     HStack {
                                         Text("Qty:")
                                             .font(.system(size: 12, weight: .bold))
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                         
                                         Stepper(value: Binding(
                                             get: { categoryQuantities[category.id] ?? 1 },
@@ -569,7 +569,7 @@ struct AddStoreView: View {
                                         ), in: 1...10000) {
                                             Text("\(categoryQuantities[category.id] ?? 1)")
                                                 .font(.system(size: 14, weight: .semibold))
-                                                .foregroundColor(.primary)
+                                                .foregroundStyle(.primary)
                                         }
                                         .labelsHidden()
                                         
@@ -585,7 +585,7 @@ struct AddStoreView: View {
                                         .frame(width: 50)
                                         .padding(6)
                                         .background(Color.white)
-                                        .cornerRadius(6)
+                                        .clipShape(.rect(cornerRadius: 6))
                                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
                                     }
                                     .padding(.horizontal, 14)
@@ -616,7 +616,7 @@ struct AddStoreView: View {
                                 VStack(spacing: 0) {
                                     Image(systemName: "mappin.circle.fill")
                                         .font(.system(size: 28))
-                                        .foregroundColor(.red)
+                                        .foregroundStyle(.red)
                                         .background(Circle().fill(Color.white).frame(width: 14, height: 14))
                                         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                                     
@@ -643,7 +643,7 @@ struct AddStoreView: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .frame(width: 36, height: 36)
                                 .background(.ultraThinMaterial)
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         }
                         Divider().frame(width: 36)
                         Button(action: {
@@ -656,7 +656,7 @@ struct AddStoreView: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .frame(width: 36, height: 36)
                                 .background(.ultraThinMaterial)
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
                         }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -668,7 +668,7 @@ struct AddStoreView: View {
                     if !pinPlaced {
                         Image(systemName: "plus")
                             .font(.system(size: 20, weight: .light))
-                            .foregroundColor(FormTheme.navy.opacity(0.5))
+                            .foregroundStyle(FormTheme.navy.opacity(0.5))
                     }
                 }
                 
@@ -686,7 +686,7 @@ struct AddStoreView: View {
                             Text("Drop Pin")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(FormTheme.navy)
@@ -707,7 +707,7 @@ struct AddStoreView: View {
                             Text("My Location")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(FormTheme.navy)
+                        .foregroundStyle(FormTheme.navy)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(FormTheme.navy.opacity(0.08))
@@ -730,7 +730,7 @@ struct AddStoreView: View {
                                 Text("Clear")
                                     .font(.system(size: 13, weight: .semibold))
                             }
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .background(Color.red.opacity(0.06))

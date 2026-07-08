@@ -25,7 +25,7 @@ struct ManagersView: View {
                         .scaleEffect(1.4)
                     Text("Loading managers…")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBG)
@@ -95,12 +95,11 @@ struct ManagersView: View {
         .navigationTitle("Managers")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showingAddMember = true }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.accentColor)
-                }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Manager", systemImage: "plus", action: { showingAddMember = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
             }
         }
     }

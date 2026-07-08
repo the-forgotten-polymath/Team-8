@@ -126,15 +126,15 @@ struct ManagerDetailModalView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label.uppercased())
                 .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text(value)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(valueColor)
+                    .foregroundStyle(valueColor)
             }
         }
     }

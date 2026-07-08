@@ -94,7 +94,7 @@ struct RevenueChartCard: View {
                     .background(selectedPeriod == period ? Color.white : Color.clear)
                     .clipShape(Capsule())
                     .shadow(color: selectedPeriod == period ? Color.black.opacity(0.05) : Color.clear, radius: 2, y: 1)
-                    .foregroundColor(selectedPeriod == period ? .primary : .secondary)
+                    .foregroundStyle(selectedPeriod == period ? .primary : .secondary)
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             selectedPeriod = period

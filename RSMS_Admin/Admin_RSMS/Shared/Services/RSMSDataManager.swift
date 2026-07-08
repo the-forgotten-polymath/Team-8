@@ -375,7 +375,7 @@ class RSMSDataManager: ObservableObject {
                     let roles: [Role] = try await client
                         .from("roles")
                         .select()
-                        .ilike("role_name", value: "%\(member.role)%")
+                        .ilike("role_name", pattern: "%\(member.role)%")
                         .execute()
                         .value
                     
@@ -620,13 +620,13 @@ class RSMSDataManager: ObservableObject {
     // ─────────────────────────────────────────────────────────────
     private func subscribeToRealtime() async {
         // ── Stores channel ────────────────────────────────────────
-        let storesCh = await client.realtimeV2.channel("stores-changes")
-        let storesChanges = await storesCh.postgresChange(
+        let storesCh = client.realtimeV2.channel("stores-changes")
+        let storesChanges = storesCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "stores"
         )
-        await storesCh.subscribe()
+        try? await storesCh.subscribeWithError()
         storeChannel = storesCh
 
         Task {
@@ -636,13 +636,13 @@ class RSMSDataManager: ObservableObject {
         }
 
         // ── Manager channel ─────────────────────────────────────────
-        let managerCh = await client.realtimeV2.channel("staff-changes")
-        let managerChanges = await managerCh.postgresChange(
+        let managerCh = client.realtimeV2.channel("staff-changes")
+        let managerChanges = managerCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "staff_members"
         )
-        await managerCh.subscribe()
+        try? await managerCh.subscribeWithError()
         managerChannel = managerCh
 
         Task {
@@ -652,13 +652,13 @@ class RSMSDataManager: ObservableObject {
         }
         
         // ── Products channel ────────────────────────────────────────
-        let productCh = await client.realtimeV2.channel("products-changes")
-        let productChanges = await productCh.postgresChange(
+        let productCh = client.realtimeV2.channel("products-changes")
+        let productChanges = productCh.postgresChange(
             AnyAction.self,
             schema: "public",
             table:  "products"
         )
-        await productCh.subscribe()
+        try? await productCh.subscribeWithError()
         productChannel = productCh
 
         Task {

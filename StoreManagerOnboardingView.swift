@@ -444,7 +444,7 @@ struct ProfileCompletionScreen: View {
                     do {
                         try await client.storage
                             .from("store-images")
-                            .upload(path: path, file: jpegData, options: FileOptions(contentType: "image/jpeg", upsert: true))
+                            .upload(path, data: jpegData, options: FileOptions(contentType: "image/jpeg", upsert: true))
                         
                         let publicUrl = try client.storage.from("store-images").getPublicURL(path: path)
                         finalProfileImageURL = publicUrl.absoluteString

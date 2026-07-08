@@ -7,6 +7,7 @@ import SwiftUI
 
 enum ActiveView {
     case dashboard
+    case targets
     case auditLogs
 }
 
@@ -25,6 +26,15 @@ struct ContentView: View {
                 Label("Dashboard", systemImage: "square.grid.2x2")
             }
             .tag(ActiveView.dashboard)
+            
+            NavigationStack {
+                TargetsView()
+                    .toolbar { profileToolbarItem }
+            }
+            .tabItem {
+                Label("Targets", systemImage: "bullseye")
+            }
+            .tag(ActiveView.targets)
             
             NavigationStack {
                 AuditLogsView()

@@ -52,6 +52,7 @@ class RSMSDataManager: ObservableObject {
     @Published var stores:       [AdminStore]   = []
     @Published var managers: [Manager]  = []
     @Published var products: [Product]  = []
+    @Published var targets: [RevenueTarget] = []
     @Published var isLoading:    Bool           = false
     @Published var errorMessage: String?        = nil
 
@@ -62,6 +63,25 @@ class RSMSDataManager: ObservableObject {
     private var storeChannel: RealtimeChannelV2?
     private var managerChannel: RealtimeChannelV2?
     private var productChannel: RealtimeChannelV2?
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – TARGETS: Local Management (No Supabase yet)
+    // ─────────────────────────────────────────────────────────────
+    func addTarget(_ target: RevenueTarget) {
+        targets.append(target)
+    }
+    
+    func updateTarget(_ target: RevenueTarget) {
+        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
+            targets[idx] = target
+        }
+    }
+    
+    func removeTarget(_ target: RevenueTarget) {
+        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
+            targets.remove(at: idx)
+        }
+    }
 
     // ─────────────────────────────────────────────────────────────
     // MARK: – Init: load data & start realtime

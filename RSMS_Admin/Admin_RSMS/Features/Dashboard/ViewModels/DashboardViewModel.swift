@@ -105,8 +105,16 @@ final class DashboardViewModel: ObservableObject {
     @Published var staffingManagersTotal: Int = 0
     @Published var marketingPromosCount: Int = 0
 
+struct MostSoldProductItem: Identifiable {
+    let id = UUID()
+    let rank: Int
+    let productName: String
+    let subtitle: String
+    let unitsSold: Int
+}
+
     // Detailed metrics
-    @Published var retailHealthScores: [StoreHealthScore] = []
+    @Published var mostSoldProducts: [MostSoldProductItem] = []
     @Published var storePerformanceList: [StorePerformanceItem] = []
     @Published var topCustomersList: [TopCustomerItem] = []
 
@@ -279,16 +287,21 @@ final class DashboardViewModel: ObservableObject {
             .filter { $0.promotionState == .active }
             .count
 
-        // Retail Health Score — from the `health_scores` table, joined to store names.
-        let storeNamesById = Dictionary(uniqueKeysWithValues: data.stores.map { ($0.id, $0.storeName) })
-        retailHealthScores = data.healthScores
-            .sorted { $0.overallScore > $1.overallScore }
-            .compactMap { health -> StoreHealthScore? in
-                guard let storeName = storeNamesById[health.storeId] else { return nil }
-                let score = Int(health.overallScore.rounded())
-                let (statusText, colorHex) = healthBand(for: score)
-                return StoreHealthScore(storeName: storeName, score: score, statusText: statusText, colorHex: colorHex)
-            }
+        // Most Sold Products — computed real-time from actual product and sale aggregates
+        let productsById = Dictionary(uniqueKeysWithValues: data.products.map { ($0.id, $0) })
+        let unitsByProduct = Dictionary(grouping: data.saleItems, by: \.productId)
+            .mapValues { $0.reduce(0) { $0 + $1.quantity } }
+        let rankedProducts = unitsByProduct.sorted { $0.value > $1.value }.prefix(4)
+        
+        mostSoldProducts = rankedProducts.enumerated().compactMap { index, entry -> MostSoldProductItem? in
+            guard let product = productsById[entry.key] else { return nil }
+            return MostSoldProductItem(
+                rank: index + 1,
+                productName: product.productName,
+                subtitle: product.brand, // Using brand as a secondary text since it's locally available
+                unitsSold: entry.value
+            )
+        }
 
         // Top Customers — real spend aggregated from completed sales.
         let completedSales = data.sales.filter { $0.saleStatus.lowercased() != "cancelled" }
@@ -304,6 +317,7 @@ final class DashboardViewModel: ObservableObject {
         }
 
         // Store Performance — real revenue aggregated from completed sales, per store.
+        let storeNamesById = Dictionary(uniqueKeysWithValues: data.stores.map { ($0.id, $0.storeName) })
         let revenueByStore = Dictionary(grouping: completedSales, by: \.storeId)
             .mapValues { $0.reduce(0) { $0 + $1.totalAmount } }
         let sortedStoreRevenue = selectedStorePerformanceFilter == .highest
@@ -315,14 +329,7 @@ final class DashboardViewModel: ObservableObject {
         }
     }
 
-    private func healthBand(for score: Int) -> (statusText: String, colorHex: String) {
-        switch score {
-        case 80...: return ("Optimal Health", "34C759")
-        case 60..<80: return ("Monitoring Required", "FF9500")
-        case 40..<60: return ("Action Needed", "FF3B30")
-        default: return ("Critical Threshold", "FF2D55")
-        }
-    }
+    // healthBand removed as it pertained to Retail Health
 
     /// Mirrors RSMSDataManager.isManagerRole — kept in sync manually since
     /// that helper is private to RSMSDataManager. Treats any role/designation

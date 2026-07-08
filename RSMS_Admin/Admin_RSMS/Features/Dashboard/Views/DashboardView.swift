@@ -182,35 +182,35 @@ struct DashboardView: View {
     
     @ViewBuilder
     private var bottomCardsView: some View {
-        // 1. Retail Health Score
+        // 1. Most Sold Products
         ActivityCard(
-            title: "Retail Health Score",
-            subtitle: "NETWORK AVG"
+            title: "Most Selled Products",
+            subtitle: "BY VOLUME"
         ) {
             VStack(spacing: 0) {
-                ForEach(viewModel.retailHealthScores) { health in
-                    HStack(spacing: 14) {
-                        ZStack {
-                            Circle()
-                                .stroke(health.color.opacity(0.15), lineWidth: 3.5)
-                            Circle()
-                                .trim(from: 0, to: CGFloat(health.score) / 100)
-                                .stroke(health.color, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
-                                .rotationEffect(.degrees(-90))
-                            
-                            Text("\(health.score)")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                        .frame(width: 44, height: 44)
+                ForEach(viewModel.mostSoldProducts) { product in
+                    HStack(spacing: 12) {
+                        Text("\(product.rank)")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundColor(product.rank <= 3 ? .primary : .secondary)
+                            .frame(width: 16, alignment: .center)
+                        
+                        Circle()
+                            .fill(Color.orange.opacity(0.12))
+                            .frame(width: 36, height: 36)
+                            .overlay(
+                                Image(systemName: "shippingbox.fill")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.orange)
+                            )
                         
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(health.storeName)
-                                .font(.subheadline.weight(.semibold))
+                            Text(product.productName)
+                                .font(.subheadline.weight(.medium))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
                             
-                            Text(health.statusText)
+                            Text(product.subtitle)
                                 .font(.caption.weight(.medium))
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
@@ -218,14 +218,19 @@ struct DashboardView: View {
                         
                         Spacer()
                         
-                        Circle()
-                            .fill(health.color)
-                            .frame(width: 8, height: 8)
+                        VStack(alignment: .trailing, spacing: 3) {
+                            Text("\(product.unitsSold)")
+                                .font(.subheadline.weight(.medium).monospacedDigit())
+                                .foregroundColor(.primary)
+                            Text("UNITS")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.secondary)
+                        }
                     }
                     .frame(height: 56)
                     
-                    if health.id != viewModel.retailHealthScores.last?.id {
-                        Divider().padding(.leading, 58)
+                    if product.id != viewModel.mostSoldProducts.last?.id {
+                        Divider().padding(.leading, 76)
                     }
                 }
             }

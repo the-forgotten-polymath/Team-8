@@ -47,7 +47,7 @@ struct TargetsView: View {
                 .background(Color.pageBG)
             }
         }
-        .searchable(text: $searchText, prompt: "Search targets...")
+        .searchable(text: $searchText, prompt: "Search targets")
         .navigationTitle("Targets")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {

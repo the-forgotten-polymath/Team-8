@@ -335,97 +335,99 @@ struct AddPromotionView: View {
 
     private var scheduleSection: some View {
         PromoFormSectionCard(title: "Schedule", icon: "calendar") {
-            VStack(spacing: 16) {
-                dateRow(label: "Start Date", date: $startDate)
-                dateRow(label: "End Date", date: $endDate)
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    PromoFieldLabel(text: "Start Date")
+                    
+                    DatePicker("Start Date", selection: $startDate, displayedComponents: [.date])
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(PromoFormTheme.fieldBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    PromoFieldLabel(text: "End Date")
+                    
+                    DatePicker("End Date", selection: $endDate, displayedComponents: [.date])
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(PromoFormTheme.fieldBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+                }
             }
         }
-    }
-
-    private func dateRow(label: String, date: Binding<Date>) -> some View {
-        HStack {
-            PromoFieldLabel(text: label)
-            Spacer()
-            DatePicker("", selection: date, displayedComponents: .date)
-                .labelsHidden()
-                .datePickerStyle(.compact)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(PromoFormTheme.fieldBackground)
-        .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
     }
 
     // MARK: - Section: Store Availability
 
     private var storeAvailabilitySection: some View {
         PromoFormSectionCard(title: "Store Availability", icon: "storefront") {
-            DisclosureGroup(
-                isExpanded: $isStoreDropdownOpen,
-                content: {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Button {
-                            appliesToAllStores = true
-                            selectedStoreIds.removeAll()
-                        } label: {
-                            HStack {
-                                Text("All Stores")
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                if appliesToAllStores {
-                                    Image(systemName: "checkmark").foregroundColor(PromoFormTheme.navy)
-                                }
-                            }
-                            .padding(.vertical, 12)
-                        }
-                        
-                        Divider()
-                        
-                        ForEach(service.stores) { store in
-                            Button {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    PromoFieldLabel(text: "Select Stores")
+                    Spacer()
+                    if !service.stores.isEmpty {
+                        Button(action: {
+                            if selectedStoreIds.count == service.stores.count {
+                                selectedStoreIds.removeAll()
                                 appliesToAllStores = false
-                                if selectedStoreIds.contains(store.id) {
-                                    selectedStoreIds.remove(store.id)
-                                    if selectedStoreIds.isEmpty { appliesToAllStores = true }
-                                } else {
-                                    selectedStoreIds.insert(store.id)
-                                }
-                            } label: {
-                                HStack {
-                                    Text(store.name)
-                                        .foregroundStyle(.primary)
-                                    Spacer()
-                                    if !appliesToAllStores && selectedStoreIds.contains(store.id) {
-                                        Image(systemName: "checkmark").foregroundColor(PromoFormTheme.navy)
-                                    }
-                                }
-                                .padding(.vertical, 12)
+                            } else {
+                                selectedStoreIds = Set(service.stores.map { $0.id })
+                                appliesToAllStores = true
                             }
-                            if store.id != service.stores.last?.id {
-                                Divider()
-                            }
+                        }) {
+                            Text(selectedStoreIds.count == service.stores.count ? "Deselect All" : "Select All")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(PromoFormTheme.navy)
                         }
-                    }
-                    .padding(.top, 8)
-                },
-                label: {
-                    HStack {
-                        Text("Store")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Text(storeDisplayName)
-                            .font(.system(size: 15))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
                     }
                 }
-            )
-            .padding(.horizontal, 14)
-            .padding(.vertical, 13)
-            .background(PromoFormTheme.fieldBackground)
-            .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
-            .accentColor(.secondary)
+                
+                if service.stores.isEmpty {
+                    Text("No stores available.")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(service.stores, id: \.id) { store in
+                        Button(action: {
+                            if selectedStoreIds.contains(store.id) {
+                                selectedStoreIds.remove(store.id)
+                            } else {
+                                selectedStoreIds.insert(store.id)
+                            }
+                            appliesToAllStores = (selectedStoreIds.count == service.stores.count)
+                        }) {
+                            HStack {
+                                Text(store.name)
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if selectedStoreIds.contains(store.id) || appliesToAllStores {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.blue)
+                                        .font(.system(size: 20))
+                                } else {
+                                    Image(systemName: "circle")
+                                        .foregroundColor(.secondary.opacity(0.3))
+                                        .font(.system(size: 20))
+                                }
+                            }
+                            .padding()
+                            .background(PromoFormTheme.fieldBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: PromoFormTheme.fieldCornerRadius)
+                                    .stroke((selectedStoreIds.contains(store.id) || appliesToAllStores) ? Color.blue : Color.clear, lineWidth: 2)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
         }
     }
 

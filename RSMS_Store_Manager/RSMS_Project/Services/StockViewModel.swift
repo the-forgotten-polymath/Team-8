@@ -33,7 +33,9 @@ final class StockViewModel: ObservableObject {
     
     @MainActor
     func loadData() async {
-        isLoading = true
+        if summary == nil {
+            isLoading = true
+        }
         errorMessage = nil
         
         debugLog("[DEBUG] StockViewModel.loadData: Entering loadData")
@@ -46,16 +48,20 @@ final class StockViewModel: ObservableObject {
         
         guard let currentUser = SessionManager.shared.currentUser else {
             debugLog("[DEBUG] StockViewModel.loadData: FAILED to resolve currentUser. Showing empty state.")
-            self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, avgValue: 0, lowStockCount: 0, outOfStockCount: 0)
-            self.stockList = []
+            if self.summary == nil {
+                self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, pendingRequestsCount: 0, lowStockCount: 0, outOfStockCount: 0)
+                self.stockList = []
+            }
             self.isLoading = false
             return
         }
         
         guard let storeId = currentUser.storeId else {
             debugLog("[DEBUG] StockViewModel.loadData: currentUser has NIL storeId. User profile: \(currentUser.fullName). Showing empty state.")
-            self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, avgValue: 0, lowStockCount: 0, outOfStockCount: 0)
-            self.stockList = []
+            if self.summary == nil {
+                self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, pendingRequestsCount: 0, lowStockCount: 0, outOfStockCount: 0)
+                self.stockList = []
+            }
             self.isLoading = false
             return
         }
@@ -63,10 +69,7 @@ final class StockViewModel: ObservableObject {
         debugLog("[DEBUG] StockViewModel.loadData: Resolved storeId = \(storeId.uuidString) for user = \(currentUser.fullName)")
         
         do {
-            async let summaryTask = repository.fetchInventorySummary(forStoreId: storeId)
-            async let stockListTask = repository.fetchStockList(forStoreId: storeId)
-            
-            let (summaryResult, stockListResult) = try await (summaryTask, stockListTask)
+            let (summaryResult, stockListResult) = try await repository.fetchStockDashboardData(forStoreId: storeId)
             
             // Main thread update is guaranteed by @MainActor annotation on this method
             self.summary = summaryResult
@@ -76,9 +79,11 @@ final class StockViewModel: ObservableObject {
         } catch {
             debugLog("[DEBUG] StockViewModel.loadData: ERROR loaded: \(error)")
             self.errorMessage = error.localizedDescription
-            // Fallback to empty state on error as per requirements
-            self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, avgValue: 0, lowStockCount: 0, outOfStockCount: 0)
-            self.stockList = []
+            // If we have no data, fallback to empty state, otherwise keep previous data
+            if self.summary == nil {
+                self.summary = InventorySummary(totalValue: 0, totalProducts: 0, totalUnits: 0, pendingRequestsCount: 0, lowStockCount: 0, outOfStockCount: 0)
+                self.stockList = []
+            }
         }
         
         self.isLoading = false

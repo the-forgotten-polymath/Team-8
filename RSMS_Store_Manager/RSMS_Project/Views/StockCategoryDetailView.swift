@@ -57,43 +57,42 @@ struct StockCategoryDetailView: View {
             
             // Floating Restock Cart Button
             if cartManager.totalUnits > 0 {
-                Button(action: {
-                    isShowingCart = true
-                }) {
-                    HStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white.opacity(0.2))
-                                .frame(width: 36, height: 36)
-                            
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isShowingCart = true
+                    }) {
+                        HStack(spacing: 10) {
                             Image(systemName: "cart.fill")
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
+                            
+                            Text("Restock Cart")
+                                .font(.system(size: 14, weight: .bold))
+                            
+                            Text("\(cartManager.totalUnits)")
+                                .font(.system(size: 12, weight: .bold))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.white)
+                                .foregroundColor(.blue)
+                                .clipShape(Circle())
                         }
-                        
-                        Text("Restock Cart")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                        
-                        Spacer()
-                        
-                        Text("\(cartManager.totalUnits)")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color.white.opacity(0.25))
-                            .clipShape(Capsule())
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(
+                            Capsule()
+                                .fill(Color.blue)
+                        )
+                        .foregroundColor(.white)
+                        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
                     }
-                    .padding(.horizontal, 16)
-                    .frame(height: 56)
-                    .background(Color.blue)
-                    .cornerRadius(28)
-                    .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
+                    Spacer()
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .padding(.bottom, 20)
+                .transition(.asymmetric(
+                    insertion: .scale.combined(with: .opacity),
+                    removal: .scale.combined(with: .opacity)
+                ))
             }
         }
         .navigationTitle(titleString)

@@ -19,6 +19,8 @@ struct StockManagementView: View {
     @State private var searchText = ""
     @State private var selectedItemForDetail: StockListItem? = nil
     @State private var isShowingCart = false
+    @State private var navigateToPendingOrders = false
+    @State private var navigateToTotalProducts = false
     @ObservedObject private var cartManager = RestockCartManager.shared
     @Binding var selectedStockFilter: StockFilterType
 
@@ -125,8 +127,28 @@ struct StockManagementView: View {
                     if searchText.isEmpty {
                         VStack(spacing: 12) {
                             // Premium Summary Card
-                            InventorySummaryCard(summary: viewModel.summary, isLoading: viewModel.isLoading)
-                                .padding(.horizontal, 20)
+                            InventorySummaryCard(
+                                summary: viewModel.summary, 
+                                isLoading: viewModel.isLoading,
+                                onTotalProductsTapped: {
+                                    navigateToTotalProducts = true
+                                },
+                                onPendingRequestsTapped: {
+                                    navigateToPendingOrders = true
+                                }
+                            )
+                            .padding(.horizontal, 20)
+                            .background(
+                                VStack {
+                                    NavigationLink(destination: OrderHistoryView(filterStatus: "Pending"), isActive: $navigateToPendingOrders) {
+                                        EmptyView()
+                                    }
+                                    NavigationLink(destination: StockCategoryDetailView(filterType: .all, viewModel: viewModel), isActive: $navigateToTotalProducts) {
+                                        EmptyView()
+                                    }
+                                }
+                                .hidden()
+                            )
                             
                             // Horizontal status indicators
                             HStack(spacing: 16) {
@@ -165,11 +187,6 @@ struct StockManagementView: View {
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(.primary)
                             Spacer()
-                            if !viewModel.isLoading {
-                                Text("\(filteredStockList.count) items")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.secondary)
-                            }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -254,6 +271,11 @@ struct StockManagementView: View {
         .navigationTitle("Stock")
         .navigationBarHidden(true)
         .onAppear {
+            Swift.Task {
+                await viewModel.loadData()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             Swift.Task {
                 await viewModel.loadData()
             }

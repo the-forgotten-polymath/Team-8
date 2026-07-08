@@ -87,6 +87,12 @@ final class OrderHistoryViewModel: ObservableObject {
 
 struct OrderHistoryView: View {
     @StateObject private var viewModel = OrderHistoryViewModel()
+    var filterStatus: String? = nil
+    
+    var filteredOrders: [OrderHistoryViewModel.OrderSummary] {
+        guard let filterStatus = filterStatus else { return viewModel.orders }
+        return viewModel.orders.filter { $0.status.lowercased() == filterStatus.lowercased() }
+    }
     
     var body: some View {
         ZStack {
@@ -111,7 +117,7 @@ struct OrderHistoryView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
                 }
-            } else if viewModel.orders.isEmpty {
+            } else if filteredOrders.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "tray")
                         .font(.system(size: 48))
@@ -125,7 +131,7 @@ struct OrderHistoryView: View {
             } else {
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 12) {
-                        ForEach(viewModel.orders) { order in
+                        ForEach(filteredOrders) { order in
                             NavigationLink(destination: OrderDetailView(orderId: order.orderId)) {
                                 OrderHistoryCard(order: order)
                             }
@@ -140,7 +146,7 @@ struct OrderHistoryView: View {
                 }
             }
         }
-        .navigationTitle("Order History")
+        .navigationTitle(filterStatus?.lowercased() == "pending" ? "Pending Requests" : "Order History")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             Swift.Task {

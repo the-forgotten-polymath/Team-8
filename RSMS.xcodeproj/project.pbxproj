@@ -154,21 +154,29 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		797D58228E55F2F0075D559C /* RSMS_Inventory/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Inventory/RSMS_Project;
 			sourceTree = "<group>";
 		};
 		8BE72A006B95AE61498906AD /* RSMS_Sales_Associate/sales_associate_rsms */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Sales_Associate/sales_associate_rsms;
 			sourceTree = "<group>";
 		};
 		B55720CBE8D14CF708411C64 /* RSMS_Admin/Admin_RSMS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Admin/Admin_RSMS;
 			sourceTree = "<group>";
 		};
 		CD0F86B3C36DE94DE31B24AA /* RSMS_Store_Manager/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Store_Manager/RSMS_Project;
 			sourceTree = "<group>";
 		};

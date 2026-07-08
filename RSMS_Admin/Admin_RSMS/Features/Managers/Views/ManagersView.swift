@@ -29,45 +29,35 @@ struct ManagersView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBG)
-                .navigationTitle("Managers")
-                .navigationBarTitleDisplayMode(.large)
             } else {
-                ScrollView {
-                    let columns = sizeClass == .compact ? [GridItem(.flexible(), spacing: 20)] : [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 20)]
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(filteredMembers) { member in
-                            ManagerCard(member: member, onEdit: {
-                                memberToEdit = member
-                            }, onDelete: {
-                                dataManager.removeManager(member)
-                            }, onRestore: {
-                                var restored = member
-                                restored.isArchived = false
-                                dataManager.updateManager(restored)
-                            })
-                            .frame(maxWidth: .infinity)
-                            .onTapGesture {
-                                selectedManagerForDetails = member
+                VStack(spacing: 0) {
+                    ScrollView {
+                        let columns = sizeClass == .compact ? [GridItem(.flexible(), spacing: 20)] : [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 20)]
+                        LazyVGrid(columns: columns, spacing: 20) {
+                            ForEach(filteredMembers) { member in
+                                ManagerCard(member: member, onEdit: {
+                                    memberToEdit = member
+                                }, onDelete: {
+                                    dataManager.removeManager(member)
+                                }, onRestore: {
+                                    var restored = member
+                                    restored.isArchived = false
+                                    dataManager.updateManager(restored)
+                                })
+                                .frame(maxWidth: .infinity)
+                                .onTapGesture {
+                                    selectedManagerForDetails = member
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, sizeClass == .compact ? 16 : 32)
+                        .padding(.top, 32)
+                        .padding(.bottom, 140)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, sizeClass == .compact ? 16 : 32)
-                    .padding(.top, 8)
-                    .padding(.bottom, 140)
                 }
                 .searchable(text: $searchText, prompt: "Search by manager")
                 .background(Color.pageBG)
-                .navigationTitle("Managers")
-                .navigationBarTitleDisplayMode(.large)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Add Manager", systemImage: "plus", action: { showingAddMember = true })
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Color.accentColor)
-                            .labelStyle(.iconOnly)
-                    }
-                }
             }
         }
         .alert("Error", isPresented: Binding(
@@ -101,6 +91,16 @@ struct ManagersView: View {
             ManagerDetailModalView(manager: member, onDismiss: {
                 selectedManagerForDetails = nil
             })
+        }
+        .navigationTitle("Managers")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Manager", systemImage: "plus", action: { showingAddMember = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
+            }
         }
     }
 }

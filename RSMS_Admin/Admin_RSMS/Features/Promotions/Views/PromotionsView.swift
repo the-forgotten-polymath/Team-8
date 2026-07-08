@@ -60,7 +60,7 @@ struct PromotionsView: View {
         }
         .navigationTitle("Promotions")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, prompt: "Search promotions...")
+        .searchable(text: $searchText, prompt: "Search by promotions")
         .task { await service.fetchPromotions() }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

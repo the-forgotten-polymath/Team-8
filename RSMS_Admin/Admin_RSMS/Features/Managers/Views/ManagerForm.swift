@@ -167,7 +167,12 @@ struct ManagerForm: View {
                 .foregroundStyle(.secondary)
                 .tracking(0.5)
             
-            let activeStores = dataManager.stores.filter { !$0.isArchived }
+            let activeStores = dataManager.stores.filter { store in
+                let isActive = !store.isArchived
+                let hasNoManager = store.managerName.lowercased() == "unassigned" || store.managerName.trimmingCharacters(in: .whitespaces).isEmpty
+                let isCurrentManagerStore = store.name == memberToEdit?.location
+                return isActive && (hasNoManager || isCurrentManagerStore)
+            }
             
             if activeStores.isEmpty {
                 HStack(spacing: 8) {

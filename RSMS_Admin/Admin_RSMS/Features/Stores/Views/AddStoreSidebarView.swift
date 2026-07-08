@@ -28,12 +28,9 @@ struct AddStoreSidebarView: View {
         return Calendar.current.date(from: comps) ?? Date()
     }()
     @State private var weekendOps = true
+    @State private var categoryQuantities: [UUID: Int] = [:]
     
-    // Image picker state
-    @State private var selectedImage: UIImage? = nil
-    @State private var showingImageSourceSheet = false
-    @State private var showingImagePicker = false
-    @State private var imageSourceType: UIImagePickerController.SourceType = .photoLibrary
+    // Image upload handled by store managers
     
     @StateObject private var locationManager = LocationManager()
     @State private var isLocating = false
@@ -132,6 +129,7 @@ struct AddStoreSidebarView: View {
                                         if sanitized != newValue {
                                             address = sanitized
                                         }
+                                        forwardGeocode(address: sanitized)
                                     }
                             }
                             .padding(12)
@@ -212,9 +210,9 @@ struct AddStoreSidebarView: View {
                     .background(Color.white)
                     .cornerRadius(12)
                     
-                    // Operational & Image Section
+                    // Operational Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Operations & Media")
+                        Text("Operations")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.secondary)
                         
@@ -242,30 +240,7 @@ struct AddStoreSidebarView: View {
                             .cornerRadius(8)
                         }
                         
-                        // Store Status
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("STORE STATUS")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
-                            HStack(spacing: 0) {
-                                ForEach(StoreStatus.allCases, id: \.self) { status in
-                                    Button(action: { storeStatus = status }) {
-                                        Text(status.rawValue.capitalized)
-                                            .font(.system(size: 11, weight: .semibold))
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 8)
-                                            .background(storeStatus == status ? Color.white : Color.clear)
-                                            .foregroundColor(storeStatus == status ? .primary : .secondary)
-                                            .cornerRadius(6)
-                                            .padding(2)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                            .background(Color(uiColor: .systemGray6))
-                            .cornerRadius(8)
-                        }
-                        
+
                         // Hours
                         VStack(alignment: .leading, spacing: 6) {
                             Text("OPENING HOURS")
@@ -289,37 +264,103 @@ struct AddStoreSidebarView: View {
                             Text("Weekend Operations")
                                 .font(.system(size: 13, weight: .semibold))
                         }
+                    }
+                    .padding(16)
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    
+                    // Categories Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Store Categories")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.secondary)
                         
-                        // Store Image
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("STORE IMAGE")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.secondary)
-                            
-                            Button(action: { showingImageSourceSheet = true }) {
-                                if let img = selectedImage {
-                                    Image(uiImage: img)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 120)
-                                        .cornerRadius(8)
-                                        .clipped()
-                                } else {
-                                    VStack(spacing: 6) {
-                                        Image(systemName: "photo.on.rectangle.angled")
-                                            .font(.title3)
-                                        Text("Upload Image")
-                                            .font(.system(size: 10))
+                        Text("Select categories and specify the starting inventory quantity to assign to this store.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        
+                        let categories = RSMSDataManager.shared.categories
+                        
+                        if categories.isEmpty {
+                            ProgressView()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            VStack(spacing: 12) {
+                                ForEach(categories) { category in
+                                    let isSelected = categoryQuantities[category.id] != nil
+                                    
+                                    VStack(spacing: 0) {
+                                        Button(action: {
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                if isSelected {
+                                                    categoryQuantities.removeValue(forKey: category.id)
+                                                } else {
+                                                    categoryQuantities[category.id] = 1
+                                                }
+                                            }
+                                        }) {
+                                            HStack {
+                                                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                                                    .foregroundColor(isSelected ? Color(red: 0.1, green: 0.2, blue: 0.4) : .secondary)
+                                                    .font(.system(size: 16))
+                                                
+                                                Text(category.categoryName)
+                                                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                                                    .foregroundColor(isSelected ? .primary : .secondary)
+                                                
+                                                Spacer()
+                                            }
+                                            .padding(.vertical, 10)
+                                            .padding(.horizontal, 12)
+                                            .background(isSelected ? Color(red: 0.1, green: 0.2, blue: 0.4).opacity(0.06) : Color(uiColor: .systemGray6))
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(isSelected ? Color(red: 0.1, green: 0.2, blue: 0.4).opacity(0.3) : Color.clear, lineWidth: 1)
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                        
+                                        if isSelected {
+                                            HStack {
+                                                Text("Qty:")
+                                                    .font(.system(size: 11, weight: .bold))
+                                                    .foregroundColor(.secondary)
+                                                
+                                                Stepper(value: Binding(
+                                                    get: { categoryQuantities[category.id] ?? 1 },
+                                                    set: { categoryQuantities[category.id] = $0 }
+                                                ), in: 1...10000) {
+                                                    Text("\(categoryQuantities[category.id] ?? 1)")
+                                                        .font(.system(size: 13, weight: .semibold))
+                                                }
+                                                .labelsHidden()
+                                                
+                                                Spacer()
+                                                
+                                                TextField("Qty", value: Binding(
+                                                    get: { categoryQuantities[category.id] ?? 1 },
+                                                    set: { categoryQuantities[category.id] = $0 }
+                                                ), format: .number)
+                                                .keyboardType(.numberPad)
+                                                .font(.system(size: 13, weight: .semibold))
+                                                .multilineTextAlignment(.trailing)
+                                                .frame(width: 50)
+                                                .padding(6)
+                                                .background(Color.white)
+                                                .cornerRadius(6)
+                                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.2)))
+                                            }
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color(red: 0.1, green: 0.2, blue: 0.4).opacity(0.03))
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .padding(.horizontal, 2)
+                                            .padding(.bottom, 2)
+                                        }
                                     }
-                                    .foregroundColor(.secondary)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 100)
-                                    .background(Color(uiColor: .systemGray6))
-                                    .cornerRadius(8)
                                 }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     .padding(16)
@@ -347,20 +388,6 @@ struct AddStoreSidebarView: View {
         }
         .frame(width: 400)
         .background(Color(uiColor: .secondarySystemBackground))
-        .confirmationDialog("Select Image Source", isPresented: $showingImageSourceSheet) {
-            Button("Camera") {
-                imageSourceType = .camera
-                showingImagePicker = true
-            }
-            Button("Photo Library") {
-                imageSourceType = .photoLibrary
-                showingImagePicker = true
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $selectedImage, sourceType: imageSourceType)
-        }
         .onChange(of: locationManager.hasLocation) { _, hasLoc in
             if hasLoc && isLocating {
                 // Done loading location
@@ -463,9 +490,9 @@ struct AddStoreSidebarView: View {
             managerName: "Unassigned",
             managerInitials: "--",
             status: storeStatus,
-            imageData: selectedImage?.jpegData(compressionQuality: 0.8),
             latitude: pinPlaced ? selectedCoordinate.latitude : nil,
-            longitude: pinPlaced ? selectedCoordinate.longitude : nil
+            longitude: pinPlaced ? selectedCoordinate.longitude : nil,
+            categoryQuantities: categoryQuantities.isEmpty ? nil : categoryQuantities
         )
         
         onSave(store)
@@ -475,8 +502,8 @@ struct AddStoreSidebarView: View {
         address = ""
         generatedStoreID = ""
         detectedRegionCode = ""
-        selectedImage = nil
         pinPlaced = false
+        categoryQuantities = [:]
     }
     
     private func sanitizeToEnglish(_ text: String) -> String {
@@ -484,5 +511,21 @@ struct AddStoreSidebarView: View {
             .union(.whitespaces)
             .union(CharacterSet(charactersIn: ".,/-#'"))
         return String(text.unicodeScalars.filter { allowed.contains($0) })
+    }
+    
+    // MARK: - Forward Geocoding
+    private func forwardGeocode(address: String) {
+        guard address.count > 3 else { return }
+        
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            guard error == nil, let placemark = placemarks?.first, let location = placemark.location else { return }
+            
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.mapRegion.center = location.coordinate
+                }
+            }
+        }
     }
 }

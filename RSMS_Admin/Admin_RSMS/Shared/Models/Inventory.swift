@@ -30,3 +30,19 @@ struct InventoryItem: Codable, Identifiable {
         case createdAt = "created_at"
     }
 }
+
+struct InventoryPayload: Encodable {
+    let productId: UUID
+    let storeId: UUID
+    let locationType: String
+    let quantity: Int
+    let reorderLevel: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case productId = "product_id"
+        case storeId = "store_id"
+        case locationType = "location_type"
+        case quantity
+        case reorderLevel = "reorder_level"
+    }
+}

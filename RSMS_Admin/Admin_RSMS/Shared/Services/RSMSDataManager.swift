@@ -53,6 +53,8 @@ class RSMSDataManager: ObservableObject {
     @Published var managers: [Manager]  = []
     @Published var products: [Product]  = []
     @Published var targets: [RevenueTarget] = []
+    @Published var categories: [Category] = []
+    @Published var inventory: [InventoryItem] = []
     @Published var isLoading:    Bool           = false
     @Published var errorMessage: String?        = nil
 
@@ -114,11 +116,12 @@ class RSMSDataManager: ObservableObject {
         do {
             let result: [AdminStore] = try await client
                 .from("stores")
-                .select()
+                .select("*, store_categories(category_id)")
                 .order("name")
                 .execute()
                 .value
             stores = result
+            calculateStoreCategoryQuantities()
             return result
         } catch {
             errorMessage = "Failed to load stores: \(error.localizedDescription)"
@@ -147,6 +150,70 @@ class RSMSDataManager: ObservableObject {
             return []
         }
     }
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – CATEGORIES: Fetch
+    // ─────────────────────────────────────────────────────────────
+    @discardableResult
+    func fetchCategories() async -> [Category] {
+        do {
+            let result: [Category] = try await client
+                .from("categories")
+                .select()
+                .order("category_name")
+                .execute()
+                .value
+            categories = result
+            return result
+        } catch {
+            errorMessage = "Failed to load categories: \(error.localizedDescription)"
+            print("[RSMS] fetchCategories error: \(error)")
+            return []
+        }
+    }
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – INVENTORY: Fetch
+    // ─────────────────────────────────────────────────────────────
+    @discardableResult
+    func fetchInventory() async -> [InventoryItem] {
+        do {
+            let result: [InventoryItem] = try await client
+                .from("inventory")
+                .select()
+                .execute()
+                .value
+            inventory = result
+            calculateStoreCategoryQuantities()
+            return result
+        } catch {
+            errorMessage = "Failed to load inventory: \(error.localizedDescription)"
+            print("[RSMS] fetchInventory error: \(error)")
+            return []
+        }
+    }
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – CALCULATE STORE QUANTITIES
+    // ─────────────────────────────────────────────────────────────
+    func calculateStoreCategoryQuantities() {
+        var updatedStores = stores
+        for i in updatedStores.indices {
+            let storeId = updatedStores[i].id
+            let storeInventory = inventory.filter { $0.storeId == storeId }
+            
+            var catQuantities: [UUID: Int] = [:]
+            for item in storeInventory {
+                if let product = products.first(where: { $0.id == item.productId }),
+                   let catId = product.categoryId {
+                    // Average quantity per category (or just take the first we see)
+                    catQuantities[catId] = item.quantity
+                }
+            }
+            updatedStores[i].categoryQuantities = catQuantities
+        }
+        stores = updatedStores
+    }
 
     // ─────────────────────────────────────────────────────────────
     // MARK: – STORES: Add
@@ -170,6 +237,11 @@ class RSMSDataManager: ObservableObject {
                     .execute()
                     .value
                 if let newStore = inserted.first {
+                    if let catQuantities = finalStore.categoryQuantities, !catQuantities.isEmpty {
+                        let rels = catQuantities.map { ["store_id": newStore.id.uuidString, "category_id": $0.key.uuidString] }
+                        try await client.from("store_categories").insert(rels).execute()
+                        await pushInventoryForStore(storeId: newStore.id, quantities: catQuantities)
+                    }
                     stores.append(newStore)
                     assignManagerIfNeeded(for: newStore)
                 }
@@ -201,9 +273,16 @@ class RSMSDataManager: ObservableObject {
                     .select()
                     .execute()
                     .value
-                if let updatedStore = updated.first,
-                   let idx = stores.firstIndex(where: { $0.id == store.id }) {
-                    stores[idx] = updatedStore
+                if let updatedStore = updated.first {
+                    if let catQuantities = finalStore.categoryQuantities, !catQuantities.isEmpty {
+                        try await client.from("store_categories").delete().eq("store_id", value: store.id.uuidString).execute()
+                        let rels = catQuantities.map { ["store_id": updatedStore.id.uuidString, "category_id": $0.key.uuidString] }
+                        try await client.from("store_categories").insert(rels).execute()
+                        await pushInventoryForStore(storeId: updatedStore.id, quantities: catQuantities)
+                    }
+                    if let idx = stores.firstIndex(where: { $0.id == store.id }) {
+                        stores[idx] = updatedStore
+                    }
                 }
             } catch {
                 errorMessage = "Failed to update store: \(error.localizedDescription)"
@@ -562,6 +641,78 @@ class RSMSDataManager: ObservableObject {
             for await _ in productChanges {
                 await fetchProducts()
             }
+        }
+    }
+    
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – INVENTORY: Bulk Push
+    // ─────────────────────────────────────────────────────────────
+    private func pushInventoryForStore(storeId: UUID, quantities: [UUID: Int]) async {
+        do {
+            // Find products matching the selected categories
+            let matchingProducts = products.filter { product in
+                guard let catId = product.categoryId else { return false }
+                return quantities.keys.contains(catId)
+            }
+            
+            var inventoryPayloads: [InventoryPayload] = []
+            
+            for product in matchingProducts {
+                guard let catId = product.categoryId else { continue }
+                let qty = quantities[catId] ?? 1
+                let payload = InventoryPayload(
+                    productId: product.id,
+                    storeId: storeId,
+                    locationType: "Store",
+                    quantity: qty,
+                    reorderLevel: Int(Double(qty) * 0.2) // simple 20% reorder level
+                )
+                inventoryPayloads.append(payload)
+            }
+            
+            if !inventoryPayloads.isEmpty {
+                // Fetch existing inventory for this store to avoid inserting duplicates
+                // Since there is no unique constraint on (store_id, product_id) in the DB,
+                // we must manually filter out existing products before inserting.
+                let existingInventory: [InventoryItem] = try await client.from("inventory")
+                    .select()
+                    .eq("store_id", value: storeId.uuidString)
+                    .execute()
+                    .value
+                
+                let existingDict = Dictionary(uniqueKeysWithValues: existingInventory.map { ($0.productId, $0) })
+                
+                var newPayloads: [InventoryPayload] = []
+                
+                for payload in inventoryPayloads {
+                    if let existing = existingDict[payload.productId] {
+                        // If it exists, check if quantity is different and update it
+                        if existing.quantity != payload.quantity {
+                            try await client.from("inventory")
+                                .update(["quantity": payload.quantity])
+                                .eq("id", value: existing.id.uuidString)
+                                .execute()
+                        }
+                    } else {
+                        // It's a new product for this store, insert it
+                        newPayloads.append(payload)
+                    }
+                }
+                
+                if !newPayloads.isEmpty {
+                    try await client.from("inventory")
+                        .insert(newPayloads)
+                        .execute()
+                    print("[RSMS] Successfully pushed \(newPayloads.count) new inventory items for store \(storeId)")
+                } else {
+                    print("[RSMS] No new inventory items to push for store \(storeId) (updates may have occurred)")
+                }
+                
+                // Refresh inventory list so UI reflects the change
+                await fetchInventory()
+            }
+        } catch {
+            print("[RSMS] Failed to push inventory for store: \(error.localizedDescription)")
         }
     }
 }

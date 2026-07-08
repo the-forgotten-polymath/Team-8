@@ -69,20 +69,74 @@ class RSMSDataManager: ObservableObject {
     // ─────────────────────────────────────────────────────────────
     // MARK: – TARGETS: Local Management (No Supabase yet)
     // ─────────────────────────────────────────────────────────────
-    func addTarget(_ target: RevenueTarget) {
-        targets.append(target)
+    struct InsertStoreTarget: Codable {
+        let store_id: UUID
+        let target_month: Date
+        let revenue_target: Double
     }
-    
-    func updateTarget(_ target: RevenueTarget) {
-        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
-            targets[idx] = target
+
+    @discardableResult
+    func fetchTargets() async -> [RevenueTarget] {
+        do {
+            let result: [StoreTarget] = try await client
+                .from("store_targets")
+                .select()
+                .execute()
+                .value
+                
+            let grouped = Dictionary(grouping: result, by: { "\($0.targetMonth.timeIntervalSince1970)_\($0.revenueTarget)" })
+            
+            let mappedTargets = grouped.map { (key, group) -> RevenueTarget in
+                let first = group.first!
+                return RevenueTarget(
+                    id: UUID(),
+                    name: "Target for \(first.targetMonth.formatted(.dateTime.month(.wide).year()))",
+                    amount: first.revenueTarget,
+                    period: .monthly,
+                    assignedStoreIDs: group.compactMap { $0.storeId },
+                    startDate: first.targetMonth,
+                    endDate: Calendar.current.date(byAdding: .month, value: 1, to: first.targetMonth) ?? first.targetMonth
+                )
+            }
+            .sorted(by: { $0.startDate > $1.startDate })
+            
+            DispatchQueue.main.async {
+                self.targets = mappedTargets
+            }
+            return mappedTargets
+        } catch {
+            print("[RSMS] fetchTargets error: \(error)")
+            return []
         }
     }
-    
-    func removeTarget(_ target: RevenueTarget) {
-        if let idx = targets.firstIndex(where: { $0.id == target.id }) {
-            targets.remove(at: idx)
+
+    func addTarget(_ target: RevenueTarget) async throws {
+        let inserts = target.assignedStoreIDs.map {
+            InsertStoreTarget(store_id: $0, target_month: target.startDate, revenue_target: target.amount)
         }
+        try await client
+            .from("store_targets")
+            .insert(inserts)
+            .execute()
+        await fetchTargets()
+    }
+    
+    func updateTarget(_ target: RevenueTarget) async throws {
+        try await removeTarget(target)
+        try await addTarget(target)
+    }
+    
+    func removeTarget(_ target: RevenueTarget) async throws {
+        for storeId in target.assignedStoreIDs {
+            try await client
+                .from("store_targets")
+                .delete()
+                .eq("store_id", value: storeId)
+                .eq("target_month", value: target.startDate)
+                .eq("revenue_target", value: target.amount)
+                .execute()
+        }
+        await fetchTargets()
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -104,7 +158,8 @@ class RSMSDataManager: ObservableObject {
         async let s = fetchStores()
         async let m = fetchManager()
         async let p = fetchProducts()
-        _ = await (s, m, p)
+        async let t = fetchTargets()
+        _ = await (s, m, p, t)
         isLoading = false
     }
 

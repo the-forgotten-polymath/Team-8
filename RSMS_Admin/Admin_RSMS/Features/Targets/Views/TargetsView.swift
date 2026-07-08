@@ -60,12 +60,16 @@ struct TargetsView: View {
         }
         .sheet(isPresented: $showingAddTarget) {
             AddTargetView(editingTarget: nil) { newTarget in
-                dataManager.addTarget(newTarget)
+                Task {
+                    try? await dataManager.addTarget(newTarget)
+                }
             }
         }
         .sheet(item: $targetToEdit) { target in
             AddTargetView(editingTarget: target) { updatedTarget in
-                dataManager.updateTarget(updatedTarget)
+                Task {
+                    try? await dataManager.updateTarget(updatedTarget)
+                }
             }
         }
     }
@@ -124,7 +128,9 @@ struct TargetsView: View {
                         targetToEdit = target
                     }
                     Button("Delete", role: .destructive) {
-                        dataManager.removeTarget(target)
+                        Task {
+                            try? await dataManager.removeTarget(target)
+                        }
                     }
                 } label: {
                     Label("Options", systemImage: "ellipsis").labelStyle(.iconOnly)

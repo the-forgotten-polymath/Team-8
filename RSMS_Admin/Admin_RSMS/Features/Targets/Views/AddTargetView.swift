@@ -15,7 +15,6 @@ struct AddTargetView: View {
     @ObservedObject private var dataManager = RSMSDataManager.shared
     
     // Form state
-    @State private var targetName = ""
     @State private var targetAmount: Double? = nil
     @State private var targetPeriod: TargetPeriod = .monthly
     @State private var targetStartDate: Date = Date()
@@ -28,7 +27,6 @@ struct AddTargetView: View {
     init(editingTarget: RevenueTarget? = nil, onSave: @escaping (RevenueTarget) -> Void) {
         self.editingTarget = editingTarget
         self.onSave = onSave
-        _targetName = State(initialValue: editingTarget?.name ?? "")
         if let amt = editingTarget?.amount {
             _targetAmount = State(initialValue: amt)
         }
@@ -74,7 +72,7 @@ struct AddTargetView: View {
                     Button(action: saveAction) {
                         Text(editingTarget == nil ? "Create" : "Save").fontWeight(.bold)
                     }
-                    .disabled(targetName.isEmpty || targetAmount == nil)
+                    .disabled(targetAmount == nil || selectedStores.isEmpty)
                 }
             }
         }
@@ -86,17 +84,7 @@ struct AddTargetView: View {
         VStack(alignment: .leading, spacing: 20) {
             sectionHeader(title: "Target Details", icon: "chart.bar.fill")
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("TARGET NAME")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.secondary)
-                
-                TextField("e.g. Q3 Summer Goal", text: $targetName)
-                    .padding()
-                    .background(TargetFormTheme.fieldBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: TargetFormTheme.fieldCornerRadius))
-            }
-            
+
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("AMOUNT (₹)")
@@ -115,17 +103,11 @@ struct AddTargetView: View {
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.secondary)
                     
-                    Picker("Period", selection: $targetPeriod) {
-                        ForEach(TargetPeriod.allCases, id: \.self) { period in
-                            Text(period.rawValue).tag(period)
-                        }
-                    }
-                    .accentColor(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(TargetFormTheme.fieldBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: TargetFormTheme.fieldCornerRadius))
+                    Text(TargetPeriod.monthly.rawValue)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(TargetFormTheme.fieldBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: TargetFormTheme.fieldCornerRadius))
                 }
             }
             
@@ -244,8 +226,6 @@ struct AddTargetView: View {
         let maxDate: Date
         
         switch targetPeriod {
-        case .weekly:
-            maxDate = calendar.date(byAdding: .day, value: 7, to: targetStartDate) ?? targetStartDate
         case .monthly:
             maxDate = calendar.date(byAdding: .month, value: 1, to: targetStartDate) ?? targetStartDate
         }
@@ -256,8 +236,6 @@ struct AddTargetView: View {
     private func autoUpdateEndDate() {
         let calendar = Calendar.current
         switch targetPeriod {
-        case .weekly:
-            targetEndDate = calendar.date(byAdding: .day, value: 7, to: targetStartDate) ?? targetStartDate
         case .monthly:
             targetEndDate = calendar.date(byAdding: .month, value: 1, to: targetStartDate) ?? targetStartDate
         }
@@ -285,7 +263,7 @@ struct AddTargetView: View {
         let finalStores = Array(selectedStores)
         
         var target = editingTarget ?? RevenueTarget(
-            name: targetName,
+            name: "Target",
             amount: targetAmount ?? 0.0,
             period: targetPeriod,
             assignedStoreIDs: finalStores,
@@ -293,7 +271,7 @@ struct AddTargetView: View {
             endDate: targetEndDate
         )
         
-        target.name = targetName
+        target.name = "Target"
         target.amount = targetAmount ?? 0.0
         target.period = targetPeriod
         target.assignedStoreIDs = finalStores

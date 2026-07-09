@@ -122,34 +122,7 @@ struct EmployeeListView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Quick Overview Section (Visible only when not actively filtering/searching)
-                        if searchText.isEmpty {
-                            VStack(alignment: .leading, spacing: 14) {
-                                Text("Quick Overview")
-                                    .font(.system(size: 18, weight: .semibold, design: .default))
-                                    .foregroundColor(Color(.label))
-                                    .padding(.top, 8)
-                                
-                                // Attendance Card
-                                Button(action: {}) {
-                                    OverviewCard(
-                                        iconName: "person.2.fill",
-                                        iconBgColor: Color(.systemGreen).opacity(0.15),
-                                        iconColor: Color(.systemGreen),
-                                        value: attendanceValueText,
-                                        subtitle: "Staff Present",
-                                        footerText: nil,
-                                        footerColor: Color(.systemGreen)
-                                    )
-                                }
-                                .buttonStyle(RowButtonStyle())
-                            }
-                            .padding(.bottom, 16)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                            .onAppear {
-                                isOverviewVisible = true
-                            }
-                        }
+
                         
                         if filtered.isEmpty {
                             VStack(spacing: 16) {

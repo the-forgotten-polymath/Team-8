@@ -114,12 +114,13 @@ public class AuthViewModel: ObservableObject {
                 id: user.id,
                 firstName: firstName,
                 lastName: lastName,
-                email: user.email ?? "",
+                email: user.email,
                 role: staffRole,
                 storeID: user.storeId,
                 avatarURL: user.profileImageURL,
                 isActive: user.employeeStatus?.lowercased() == "active",
-                createdAt: user.createdAt
+                createdAt: user.createdAt,
+                isProfileCompleted: user.isProfileCompleted ?? false
             )
             
             currentUser = profile

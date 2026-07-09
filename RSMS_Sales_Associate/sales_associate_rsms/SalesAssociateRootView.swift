@@ -15,9 +15,13 @@ public struct SalesAssociateRootView: View {
             if authVM.isLoading {
                 SplashView()
             } else if authVM.isAuthenticated {
-                SalesAssociateTabView()
-                    .environmentObject(authVM)
-                    .environmentObject(checkoutEnv)
+                if let user = authVM.currentUser, !user.isProfileCompleted {
+                    CompleteProfileView(authViewModel: authVM)
+                } else {
+                    SalesAssociateTabView()
+                        .environmentObject(authVM)
+                        .environmentObject(checkoutEnv)
+                }
             } else {
                 ZStack(alignment: .topLeading) {
                     LoginView()

@@ -9,11 +9,13 @@ class CheckoutService {
     
     private init() {}
     
-    func finalizeTransaction(cart: ActiveCart, userId: UUID? = nil, storeId: UUID? = nil) async {
-        guard let userId = userId, let storeId = storeId else {
-            print("[CheckoutService] Error: userId and storeId required for checkout")
+    func finalizeTransaction(cart: ActiveCart, userId: UUID? = nil) async {
+        guard let userId = userId else {
+            print("[CheckoutService] Error: userId required for checkout")
             return
         }
+        
+        print("[CheckoutService] Finalizing transaction for user: \(userId), client: \(cart.clientId)")
         
         do {
             // 1. Insert sale and sale_items into Supabase
@@ -22,15 +24,18 @@ class CheckoutService {
             let cartTotal = cart.total ?? 0
             let discountAmount = discountPercent == 0 ? 0 : Double(truncating: (cartTotal * discountPercent / 100) as NSNumber)
             
-            _ = try await SalesAssociateService.shared.insertSale(
+            print("[CheckoutService] Invoking insertSale on SalesAssociateService. Items: \(items)")
+            
+            let sale = try await SalesAssociateService.shared.insertSale(
                 customerId: cart.clientId,
                 userId: userId,
-                storeId: storeId,
                 items: items,
                 paymentMethod: cart.appliedTenders.first?.method.rawValue ?? "Cash",
                 discountAmount: discountAmount,
                 taxAmount: 0
             )
+            
+            print("[CheckoutService] Sales record successfully created in DB: \(sale)")
             
             // 2. Add purchase event to client digital twin
             let purchaseEvent = ClientDigitalTwinEvent(

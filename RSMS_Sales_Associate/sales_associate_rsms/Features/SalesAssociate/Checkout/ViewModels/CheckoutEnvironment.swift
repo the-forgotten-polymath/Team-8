@@ -15,6 +15,7 @@ class CheckoutEnvironment: ObservableObject {
     @Published var requiresManagerApproval: Bool = false
     @Published var managerApproved: Bool = false
     @Published var isCheckoutFlowActive: Bool = false
+    @Published var catalogNavigationStackID = UUID()
     
     // For Sandbox integration
     @Published var paymentStatus: PaymentStatus = .pending
@@ -62,11 +63,11 @@ class CheckoutEnvironment: ObservableObject {
         }
     }
     
-    func finalizeTransaction(userId: UUID? = nil, storeId: UUID? = nil) async {
+    func finalizeTransaction(userId: UUID? = nil) async {
         // Appends events to Client and Product Passports
         guard let cart = activeCart else { return }
         
-        await CheckoutService.shared.finalizeTransaction(cart: cart, userId: userId, storeId: storeId)
+        await CheckoutService.shared.finalizeTransaction(cart: cart, userId: userId)
     }
     
     func addProductToCart(_ product: ProductDigitalTwin) {

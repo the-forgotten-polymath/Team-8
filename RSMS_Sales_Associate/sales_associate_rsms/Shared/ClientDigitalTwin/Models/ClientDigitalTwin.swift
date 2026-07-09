@@ -13,6 +13,9 @@ struct ClientDigitalTwin: Codable, Identifiable, Sendable {
     var email: String?
     var phone: String?
     var dateOfBirth: Date?
+    var gender: String?
+    var anniversaryDate: Date?
+    var address: String?
 
     // Tier
     var tier: CustomerTier
@@ -77,6 +80,9 @@ struct ClientDigitalTwin: Codable, Identifiable, Sendable {
         case lastName         = "last_name"
         case email, phone
         case dateOfBirth      = "date_of_birth"
+        case gender
+        case anniversaryDate  = "anniversary_date"
+        case address
         case tier
         case lifetimeSpend    = "lifetime_spend"
         case preferredStore   = "preferred_store"

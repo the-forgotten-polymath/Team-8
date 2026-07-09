@@ -267,9 +267,10 @@ final class DashboardViewModel: ObservableObject {
                 filteredSales.append(contentsOf: daySales)
             }
         case .month:
-            // Group by 4 weeks (last 28 days)
+            // Group by 4 weeks (last 28 days ending today)
+            let endOfToday = calendar.date(byAdding: .day, value: 1, to: today) ?? Date()
             for i in 0..<4 {
-                let startDate = calendar.date(byAdding: .day, value: -28 + (i * 7), to: today) ?? Date()
+                let startDate = calendar.date(byAdding: .day, value: -28 + (i * 7), to: endOfToday) ?? Date()
                 let endDate = calendar.date(byAdding: .day, value: 7, to: startDate) ?? Date()
                 let label = "W\(i+1)"
                 
@@ -315,8 +316,9 @@ final class DashboardViewModel: ObservableObject {
             let lastWeekEnd = calendar.date(byAdding: .day, value: -7, to: today) ?? Date()
             previousRevenue = allSales.filter { $0.saleDate >= lastWeekStart && $0.saleDate <= lastWeekEnd }.reduce(0.0) { $0 + $1.totalAmount }
         case .month:
-            let lastMonthStart = calendar.date(byAdding: .day, value: -56, to: today) ?? Date()
-            let lastMonthEnd = calendar.date(byAdding: .day, value: -28, to: today) ?? Date()
+            let endOfToday = calendar.date(byAdding: .day, value: 1, to: today) ?? Date()
+            let lastMonthStart = calendar.date(byAdding: .day, value: -56, to: endOfToday) ?? Date()
+            let lastMonthEnd = calendar.date(byAdding: .day, value: -28, to: endOfToday) ?? Date()
             previousRevenue = allSales.filter { $0.saleDate >= lastMonthStart && $0.saleDate < lastMonthEnd }.reduce(0.0) { $0 + $1.totalAmount }
         case .year:
             let lastYearStart = calendar.date(byAdding: .month, value: -23, to: today) ?? Date()

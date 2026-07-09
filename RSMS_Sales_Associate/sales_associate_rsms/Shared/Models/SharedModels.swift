@@ -54,6 +54,7 @@ public struct StaffProfile: Codable, Identifiable {
     public let avatarURL: String?
     public let isActive: Bool
     public let createdAt: Date
+    public let isProfileCompleted: Bool
 
     public var fullName: String { "\(firstName) \(lastName)" }
     public var initials: String {
@@ -71,6 +72,7 @@ public struct StaffProfile: Codable, Identifiable {
         case avatarURL = "avatar_url"
         case isActive  = "is_active"
         case createdAt = "created_at"
+        case isProfileCompleted = "profile_verified"
     }
 
     public init(
@@ -82,7 +84,8 @@ public struct StaffProfile: Codable, Identifiable {
         storeID: UUID?,
         avatarURL: String? = nil,
         isActive: Bool = true,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        isProfileCompleted: Bool = false
     ) {
         self.id = id
         self.firstName = firstName
@@ -93,6 +96,7 @@ public struct StaffProfile: Codable, Identifiable {
         self.avatarURL = avatarURL
         self.isActive = isActive
         self.createdAt = createdAt
+        self.isProfileCompleted = isProfileCompleted
     }
 }
 

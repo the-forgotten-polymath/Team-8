@@ -44,12 +44,12 @@ struct EmployeeTabView: View {
                     }
                     .buttonStyle(CardButtonStyle())
 
-                    // Card 3 — Task Management
-                    NavigationLink(value: ManagementRoute.tasks) {
+                    // Card 3 — Appointments
+                    NavigationLink(value: ManagementRoute.appointments) {
                         ManagementCard(
-                            title: "Task Management",
-                            subtitle: "Create, schedule and assign staff tasks",
-                            illustration: AnyView(TaskIllustration())
+                            title: "Appointments",
+                            subtitle: "Create, schedule and manage appointments",
+                            illustration: AnyView(AppointmentIllustration())
                         )
                     }
                     .buttonStyle(CardButtonStyle())
@@ -65,8 +65,8 @@ struct EmployeeTabView: View {
                     EmployeeListView()
                 case .shifts:
                     ShiftManagementView()
-                case .tasks:
-                    TaskManagementView()
+                case .appointments:
+                    AppointmentManagementView()
                 }
             }
         }
@@ -77,7 +77,7 @@ struct EmployeeTabView: View {
 enum ManagementRoute: Hashable {
     case employees
     case shifts
-    case tasks
+    case appointments
 }
 
 // MARK: - Custom Card Button Style (HIG compliant scale animation)
@@ -259,8 +259,8 @@ struct ShiftIllustration: View {
     }
 }
 
-// Illustration 3: Task (Clipboard and checklist)
-struct TaskIllustration: View {
+// Illustration 3: Appointment (Calendar)
+struct AppointmentIllustration: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 6)

@@ -227,7 +227,7 @@ struct CycleCountDetailView: View {
                     Section {
                         HStack {
                             Image(systemName: "exclamationmark.shield.fill").foregroundColor(.orange)
-                            Text("Submitting will update inventory quantities and automatically log \(s.discrepancies) exception(s) in the Discrepancy Audit Log.")
+                            Text("Submitting will update inventory quantities and log \(s.discrepancies) exception(s).")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

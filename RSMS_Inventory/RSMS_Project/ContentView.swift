@@ -135,7 +135,7 @@ struct ContentView: View {
                 )
             }
             .tabItem {
-                Label("Dashboard", systemImage: "chart.bar.fill")
+                Label("Overview", systemImage: "chart.bar.fill")
             }
             .tag(0)
             
@@ -156,15 +156,10 @@ struct ContentView: View {
             .tag(2)
             
             NavigationStack {
-                MoreOperationsView(warehouseId: wId, userId: uId, onLogout: {
-                    self.isAuthenticated = false
-                    self.userId = nil
-                    self.warehouseId = nil
-                    self.onLogout()
-                })
+                CycleCountView(warehouseId: wId, userId: uId)
             }
             .tabItem {
-                Label("More", systemImage: "ellipsis.circle.fill")
+                Label("Audits", systemImage: "checklist.checked")
             }
             .tag(3)
         }

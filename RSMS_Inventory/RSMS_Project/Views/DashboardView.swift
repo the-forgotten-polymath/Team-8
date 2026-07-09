@@ -26,27 +26,6 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Header Profile Info
-                HStack(spacing: 12) {
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.blue)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(currentUserName.isEmpty
-                             ? "Welcome"
-                             : "Welcome, \(currentUserName)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text("Central Warehouse")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 10)
-                
                 // Metrics grid — Overview (icon removed from card header)
                 DashboardCard(title: "Overview", iconName: nil) {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
@@ -106,7 +85,7 @@ struct DashboardView: View {
                                         Text("Request Details")
                                             .font(.subheadline)
                                             .fontWeight(.bold)
-                                        Text("Qty: \(request.requestedQuantity) • Priority: \(request.priority)")
+                                        Text("Qty: \(request.requestedQuantity)")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
@@ -126,8 +105,8 @@ struct DashboardView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Overview")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 // Notification bell with live badge

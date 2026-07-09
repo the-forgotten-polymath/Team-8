@@ -15,14 +15,7 @@ struct MoreOperationsView: View {
     var body: some View {
         List {
             Section(header: Text("Audit & Compliance")) {
-                NavigationLink(destination: CycleCountView(warehouseId: warehouseId, userId: userId)) {
-                    Label("Cycle Count Audits", systemImage: "calendar.badge.clock")
-                }
-                
-                NavigationLink(destination: ExceptionView(userId: userId)) {
-                    Label("Discrepancy Audit Log", systemImage: "exclamationmark.octagon.fill")
-                        .foregroundColor(.red)
-                }
+                // Cycle Count Audits moved to dedicated tab
             }
         }
         .listStyle(.grouped)

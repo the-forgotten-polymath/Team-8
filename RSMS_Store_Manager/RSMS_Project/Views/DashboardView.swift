@@ -842,6 +842,12 @@ struct DashboardView: View {
     }
     
     @State private var selectedAppointment: Appointment?
+    @AppStorage("hiddenDashboardAppointments") private var hiddenAppointmentsData: String = ""
+    
+    private var visibleAppointments: [Appointment] {
+        let hiddenIds = hiddenAppointmentsData.components(separatedBy: ",")
+        return viewModel.upcomingAppointments.filter { !hiddenIds.contains($0.id.uuidString) }
+    }
 
     private var upcomingAppointmentsCard: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -864,7 +870,7 @@ struct DashboardView: View {
             .buttonStyle(PlainButtonStyle())
             .padding(.horizontal, 20)
             
-            if viewModel.upcomingAppointments.isEmpty {
+            if visibleAppointments.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "calendar.badge.clock")
                         .font(.largeTitle).fontWeight(.bold)
@@ -890,7 +896,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 20)
             } else {
                 VStack(spacing: 12) {
-                    ForEach(viewModel.upcomingAppointments) { appt in
+                    ForEach(visibleAppointments) { appt in
                         appointmentRow(for: appt)
                             .onTapGesture {
                                 selectedAppointment = appt
@@ -959,9 +965,23 @@ struct DashboardView: View {
                 StatusBadge(status: appt.computedStatus)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.footnote).fontWeight(.bold)
-                .foregroundColor(Color(.tertiaryLabel))
+            if appt.computedStatus != "pending" {
+                Button(action: {
+                    var hiddenIds = hiddenAppointmentsData.components(separatedBy: ",").filter { !$0.isEmpty }
+                    hiddenIds.append(appt.id.uuidString)
+                    hiddenAppointmentsData = hiddenIds.joined(separator: ",")
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(Color(.tertiaryLabel))
+                        .font(.system(size: 22))
+                        .padding(.leading, 8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.footnote).fontWeight(.bold)
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
         }
         .padding(12)
         .background(Color(.secondaryLabel).opacity(0.05))

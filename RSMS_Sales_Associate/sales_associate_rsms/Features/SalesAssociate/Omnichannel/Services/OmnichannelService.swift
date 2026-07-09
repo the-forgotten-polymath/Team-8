@@ -19,14 +19,79 @@ class OmnichannelService {
             return MockData.fulfillmentOrders.filter { $0.type == .bopis }
         }
         
-        let shipments: [Shipment] = (try? await client
-            .from("shipments")
-            .select()
-            .eq("shipment_type", value: "BOPIS")
+        struct DbProduct: Decodable {
+            let id: UUID
+            let sku: String
+            let product_name: String
+        }
+        struct DbSaleItem: Decodable {
+            let id: UUID
+            let product_id: UUID
+            let quantity: Int
+            let products: DbProduct?
+        }
+        struct DbCustomer: Decodable {
+            let id: UUID
+            let name: String
+            let phone: String?
+        }
+        struct DbSale: Decodable {
+            let id: UUID
+            let customer_id: UUID?
+            let store_id: UUID?
+            let total_amount: Double
+            let invoice_number: String?
+            let order_status: String?
+            let sale_date: Date
+            let customers: DbCustomer?
+            let sale_items: [DbSaleItem]?
+        }
+        
+        let dbSales: [DbSale] = (try? await client
+            .from("sales")
+            .select("id, customer_id, store_id, total_amount, invoice_number, order_status, sale_date, customers(id, name, phone), sale_items(id, product_id, quantity, products(id, sku, product_name))")
+            .eq("order_type", value: "BOPIS")
             .execute()
             .value) ?? []
             
-        return shipments.map { mapShipmentToOrder($0, type: .bopis) }
+        return dbSales.map { sale in
+            let orderStatus: FulfillmentStatus
+            switch (sale.order_status ?? "").lowercased() {
+            case "purchased": orderStatus = .pending
+            case "packed": orderStatus = .readyForPickup
+            case "received": orderStatus = .pickedUp
+            default: orderStatus = .pending
+            }
+            
+            let items = (sale.sale_items ?? []).map { item in
+                FulfillmentItem(
+                    id: item.id,
+                    productID: item.product_id,
+                    quantity: item.quantity,
+                    productTitle: item.products?.product_name ?? "Unknown Product",
+                    sku: item.products?.sku ?? "No SKU"
+                )
+            }
+            
+            let clientID = sale.customer_id ?? UUID()
+            
+            return FulfillmentOrder(
+                id: sale.id,
+                orderNumber: sale.invoice_number ?? "BOPIS-N/A",
+                clientID: clientID,
+                storeID: sale.store_id ?? UUID(),
+                type: .bopis,
+                status: orderStatus,
+                orderDate: sale.sale_date,
+                items: items,
+                carrier: nil,
+                trackingNumber: nil,
+                signatureData: nil,
+                pickupDate: nil,
+                clientName: sale.customers?.name,
+                clientPhone: sale.customers?.phone
+            )
+        }
     }
     
     func fetchSFSOrders() async throws -> [FulfillmentOrder] {
@@ -57,10 +122,10 @@ class OmnichannelService {
             return
         }
         
-        // Update shipment status in DB
+        // Update sales table in DB
         try await client
-            .from("shipments")
-            .update(["status": "Picked Up"])
+            .from("sales")
+            .update(["order_status": "Received"])
             .eq("id", value: orderID.uuidString)
             .execute()
     }

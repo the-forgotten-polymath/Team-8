@@ -162,6 +162,7 @@ struct CatalogBrowserView: View {
                     await viewModel.fetchCatalog()
                 }
             }
+            .id(checkoutEnv.catalogNavigationStackID)
         }
     }
 }

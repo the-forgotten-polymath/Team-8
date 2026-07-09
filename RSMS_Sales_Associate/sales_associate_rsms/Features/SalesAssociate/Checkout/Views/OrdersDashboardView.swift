@@ -11,6 +11,7 @@ struct OrdersDashboardView: View {
     @State private var orders: [Sale] = []
     @State private var isLoading = false
     @State private var errorMessage: String? = nil
+    @State private var customerNames: [UUID: String] = [:]
     
     @State private var searchQuery = ""
     @State private var selectedStatus: String? = nil
@@ -40,7 +41,7 @@ struct OrdersDashboardView: View {
                 // Header (if not embedded)
                 if !isEmbedded {
                     HStack {
-                        Text("Orders")
+                        Text("Purchases")
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.primary)
                         Spacer()
@@ -95,7 +96,7 @@ struct OrdersDashboardView: View {
                 // Orders List
                 if isLoading {
                     Spacer()
-                    ProgressView("Loading Orders...")
+                    ProgressView("Loading Purchases...")
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                         .scaleEffect(1.2)
                     Spacer()
@@ -130,8 +131,8 @@ struct OrdersDashboardView: View {
                     ScrollView {
                         VStack(spacing: 16) {
                             ForEach(filteredOrders) { order in
-                                NavigationLink(destination: OrderDetailDashboardView(order: order)) {
-                                    OrderRowCard(order: order)
+                                NavigationLink(destination: OrderDetailDashboardView(order: order, customerName: customerNames[order.customerId ?? UUID()] ?? "Guest")) {
+                                    OrderRowCard(order: order, customerName: customerNames[order.customerId ?? UUID()] ?? "Guest")
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -142,7 +143,7 @@ struct OrdersDashboardView: View {
                 }
             }
         }
-        .navigationTitle(isEmbedded ? "Orders" : "")
+        .navigationTitle(isEmbedded ? "Purchases" : "")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
@@ -156,17 +157,33 @@ struct OrdersDashboardView: View {
         
         Task {
             do {
-                guard let storeId = authVM.userStoreID else {
-                    self.errorMessage = "User store ID not found."
+                guard let associateId = authVM.currentUser?.id else {
+                    self.errorMessage = "Sales associate session not found."
                     self.isLoading = false
                     return
                 }
                 
-                let sales = try await SalesAssociateService.shared.fetchSales(storeId: storeId)
+                let sales = try await SalesAssociateService.shared.fetchSalesByAssociate(associateId: associateId)
+                
+                struct CustomerRow: Decodable {
+                    let id: UUID
+                    let name: String
+                }
+                
+                let customers: [CustomerRow] = (try? await SupabaseManager.shared.client
+                    .from("customers")
+                    .select("id, name")
+                    .execute()
+                    .value) ?? []
+                var map: [UUID: String] = [:]
+                for cust in customers {
+                    map[cust.id] = cust.name
+                }
+                self.customerNames = map
                 
                 self.orders = sales
                 if sales.isEmpty {
-                    self.errorMessage = "No orders found for this store."
+                    self.errorMessage = "No orders found for this associate."
                 }
                 isLoading = false
             } catch {
@@ -245,6 +262,7 @@ struct OrdersDashboardView: View {
 
 struct OrderRowCard: View {
     let order: Sale
+    let customerName: String
     
     var body: some View {
         HStack(spacing: 16) {
@@ -262,6 +280,10 @@ struct OrderRowCard: View {
                 Text(order.invoiceNumber ?? "INV-\(String(order.id.uuidString.prefix(6).uppercased()))")
                     .font(.headline)
                     .foregroundColor(.primary)
+                
+                Text(customerName)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
                 
                 Text(order.saleDate.displayDate)
                     .font(.caption)
@@ -317,6 +339,7 @@ struct OrderRowCard: View {
 // Detailed View showing tabs for order details, tracking (trace order), and bill (invoice).
 struct OrderDetailDashboardView: View {
     let order: Sale
+    let customerName: String
     @State private var selectedTab = 0
     @State private var products: [UUID: ProductDigitalTwin] = [:]
     @State private var saleItems: [SaleItem] = []
@@ -330,7 +353,7 @@ struct OrderDetailDashboardView: View {
                 // Segmented picker for sub-views
                 Picker("Options", selection: $selectedTab) {
                     Text("Details").tag(0)
-                    Text("Trace Order").tag(1)
+                    Text("Trace Purchase").tag(1)
                     Text("Bill").tag(2)
                 }
                 .pickerStyle(SegmentedPickerStyle())
@@ -343,11 +366,11 @@ struct OrderDetailDashboardView: View {
                     } else {
                         switch selectedTab {
                         case 0:
-                            OrderDetailTab(order: order, saleItems: saleItems, products: products)
+                            OrderDetailTab(order: order, customerName: customerName, saleItems: saleItems, products: products)
                         case 1:
                             TraceOrderTab(order: order)
                         case 2:
-                            BillInvoiceTab(order: order, saleItems: saleItems, products: products)
+                            BillInvoiceTab(order: order, customerName: customerName, saleItems: saleItems, products: products)
                         default:
                             EmptyView()
                         }
@@ -355,7 +378,7 @@ struct OrderDetailDashboardView: View {
                 }
             }
         }
-        .navigationTitle(order.invoiceNumber ?? "Order Details")
+        .navigationTitle(order.invoiceNumber ?? "Purchase Details")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             loadItems()
@@ -464,6 +487,7 @@ struct OrderDetailDashboardView: View {
 // 1. Order Detail Tab View
 struct OrderDetailTab: View {
     let order: Sale
+    let customerName: String
     let saleItems: [SaleItem]
     let products: [UUID: ProductDigitalTwin]
     
@@ -471,7 +495,7 @@ struct OrderDetailTab: View {
         VStack(spacing: 20) {
             // General Info Card
             VStack(alignment: .leading, spacing: 12) {
-                Text("Order Information")
+                Text("Purchase Information")
                     .font(.headline)
                     .foregroundColor(.primary)
                 
@@ -483,6 +507,14 @@ struct OrderDetailTab: View {
                     Spacer()
                     Text(order.invoiceNumber ?? "INV-\(String(order.id.uuidString.prefix(8).uppercased()))")
                         .fontWeight(.semibold)
+                }
+                
+                HStack {
+                    Text("Customer")
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(customerName)
+                        .fontWeight(.medium)
                 }
                 
                 HStack {
@@ -554,7 +586,7 @@ struct OrderDetailTab: View {
             
             // Payment Summary Card
             VStack(alignment: .leading, spacing: 12) {
-                Text("Order Summary")
+                Text("Purchase Summary")
                     .font(.headline)
                     .foregroundColor(.primary)
                 
@@ -632,16 +664,16 @@ struct TraceOrderTab: View {
         
         if currentStatus == "cancelled" {
             return [
-                ("Order Placed", "cart.badge.plus", "Order has been registered in system.", true, false),
-                ("Cancelled", "xmark.circle.fill", "Order has been cancelled.", true, true)
+                ("Purchase Placed", "cart.badge.plus", "Purchase has been registered in system.", true, false),
+                ("Cancelled", "xmark.circle.fill", "Purchase has been cancelled.", true, true)
             ]
         }
         
         return [
-            ("Order Placed", "cart.fill", "Order received & approved.", pendingCompleted, currentStatus == "pending"),
+            ("Purchase Placed", "cart.fill", "Purchase received & approved.", pendingCompleted, currentStatus == "pending"),
             ("Packed & Prepared", "shippingbox.fill", "Item securely packed at boutique.", packedCompleted, currentStatus == "packed" || currentStatus == "ready_for_pickup"),
-            ("Shipped / Dispatched", "truck.box.fill", "Order in transit via logistics partner.", shippedCompleted, currentStatus == "shipped"),
-            ("Delivered / Picked Up", "checkmark.seal.fill", "Order successfully handed over to client.", deliveredCompleted, currentStatus == "delivered" || currentStatus == "picked_up")
+            ("Shipped / Dispatched", "truck.box.fill", "Purchase in transit via logistics partner.", shippedCompleted, currentStatus == "shipped"),
+            ("Delivered / Picked Up", "checkmark.seal.fill", "Purchase successfully handed over to client.", deliveredCompleted, currentStatus == "delivered" || currentStatus == "picked_up")
         ]
     }
     
@@ -650,7 +682,7 @@ struct TraceOrderTab: View {
             // Live Status Card
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Live Order Tracking")
+                    Text("Live Purchase Tracking")
                         .font(.headline)
                         .foregroundColor(.primary)
                     Text("Invoice: \(order.invoiceNumber ?? String(order.id.uuidString.prefix(8).uppercased()))")
@@ -728,6 +760,7 @@ struct TraceOrderTab: View {
 // 3. Bill / Invoice Tab View
 struct BillInvoiceTab: View {
     let order: Sale
+    let customerName: String
     let saleItems: [SaleItem]
     let products: [UUID: ProductDigitalTwin]
     
@@ -770,10 +803,10 @@ struct BillInvoiceTab: View {
                     }
                     
                     HStack {
-                        Text("Customer ID:")
+                        Text("Customer:")
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(order.customerId?.uuidString.prefix(8).description ?? "Guest")
+                        Text(customerName)
                     }
                 }
                 .font(.subheadline)

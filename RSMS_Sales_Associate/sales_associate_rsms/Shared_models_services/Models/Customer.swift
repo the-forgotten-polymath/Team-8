@@ -46,6 +46,10 @@ struct Customer: Codable, Identifiable {
     let isVip: Bool?
     let isActive: Bool?
 
+    // Promo Codes (single-use)
+    let promoCode: String?
+    let promoCodeUsed: Bool?
+
     // Audit
     let createdAt: Date?
 
@@ -80,6 +84,9 @@ struct Customer: Codable, Identifiable {
 
         case isVip = "is_vip"
         case isActive = "is_active"
+
+        case promoCode = "promo_code"
+        case promoCodeUsed = "promo_code_used"
 
         case createdAt = "created_at"
     }

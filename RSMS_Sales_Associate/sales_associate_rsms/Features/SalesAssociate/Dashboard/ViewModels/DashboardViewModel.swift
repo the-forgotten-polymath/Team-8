@@ -53,7 +53,8 @@ class DashboardViewModel: ObservableObject {
     @Published var userShift: Shift? = nil
     @Published var todayAttendance: Attendance? = nil
     @Published var userStore: Store? = nil
-    
+    @Published var attendanceAlertMessage: String? = nil
+    @Published var showSuccessAlert: Bool = false
     private var customersChannel: RealtimeChannelV2?
     private var salesChannel: RealtimeChannelV2?
     private var isSubscribed = false
@@ -73,7 +74,7 @@ class DashboardViewModel: ObservableObject {
                 self.storeMetrics        = MockData.storeMetrics
                 let today = Date()
                 self.todayAppointments   = MockData.appointments.filter {
-                    Calendar.current.isDate($0.date, inSameDayAs: today)
+                    Calendar.current.isDate($0.date, inSameDayAs: today) && $0.status != .completed
                 }
                 self.userShift = Shift(
                     id: UUID(),
@@ -172,7 +173,7 @@ class DashboardViewModel: ObservableObject {
             // Appointments come from tasks with task_type = 'Appointment' due today
             async let apptsTask = SalesAssociateService.shared.fetchAppointments(userId: userId)
             let allAppts = try await apptsTask
-            self.todayAppointments = allAppts.filter { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+            self.todayAppointments = allAppts.filter { Calendar.current.isDate($0.date, inSameDayAs: Date()) && $0.status != .completed }
  
             // Active opportunities
             self.activeOpportunities = opps.filter { $0.status == .new }
@@ -189,7 +190,6 @@ class DashboardViewModel: ObservableObject {
             
             // Fetch today's attendance record
             self.todayAttendance = try? await SalesAssociateService.shared.fetchTodayAttendance(employeeId: userId)
-            
             // Setup Postgres Realtime change subscriptions (runs once)
             if !isSubscribed {
                 Task {

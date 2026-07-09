@@ -4,18 +4,10 @@ struct TargetDetailView: View {
     let target: RevenueTarget
     @ObservedObject private var dataManager = RSMSDataManager.shared
     
-    // We will generate deterministic mock progress for the assigned stores.
-    // In a real app this would come from a backend query matching target period + store sales.
+    @State private var storeSales: [UUID: Double] = [:]
     
     private var assignedStoreModels: [AdminStore] {
         dataManager.stores.filter { target.assignedStoreIDs.contains($0.id) }
-    }
-    
-    private func mockProgress(for target: RevenueTarget, storeID: UUID) -> Double {
-        // Deterministic mock generation based on target id string and store id
-        let hash = abs((target.id.uuidString + storeID.uuidString).hashValue)
-        let percent = Double(hash % 120) / 100.0 // from 0.0 to 1.19 (0% to 119%)
-        return percent * target.amount
     }
     
     var body: some View {
@@ -23,9 +15,7 @@ struct TargetDetailView: View {
             VStack(spacing: 24) {
                 targetHeroSection
                 
-                if !assignedStoreModels.isEmpty {
-                    metricsSummarySection
-                }
+                // Metrics summary removed per user request
                 
                 storesListSection
             }
@@ -36,6 +26,32 @@ struct TargetDetailView: View {
         .background(Color.pageBG.ignoresSafeArea())
         .navigationTitle(target.name)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            while !Task.isCancelled {
+                await fetchSales()
+                try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+            }
+        }
+    }
+    
+    private func fetchSales() async {
+        let (sales, _) = await DatabaseService.shared.fetchResilient(from: "sales", as: Sale.self)
+        
+        // Sync exactly with the Dashboard logic: all valid, completed sales across all time for this store
+        let validSales = sales.filter { sale in
+            sale.saleStatus.lowercased() != "cancelled" && sale.customerId != nil
+        }
+        
+        var newStoreSales: [UUID: Double] = [:]
+        for store in assignedStoreModels {
+            let total = validSales.filter { $0.storeId == store.id }
+                .reduce(0.0) { $0 + $1.totalAmount }
+            newStoreSales[store.id] = total
+        }
+        
+        await MainActor.run {
+            self.storeSales = newStoreSales
+        }
     }
     
     // MARK: - Sections
@@ -111,51 +127,7 @@ struct TargetDetailView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
     }
     
-    private var metricsSummarySection: some View {
-        let totalCurrent = assignedStoreModels.reduce(0.0) { $0 + mockProgress(for: target, storeID: $1.id) }
-        let totalTarget = target.amount * Double(assignedStoreModels.count)
-        let percent = totalTarget > 0 ? (totalCurrent / totalTarget) : 0
-        let reachedCount = assignedStoreModels.filter { mockProgress(for: target, storeID: $0.id) >= target.amount }.count
-        
-        return HStack(spacing: 16) {
-            metricCard(
-                title: "Aggregated Progress",
-                value: String(format: "%.1f%%", percent * 100),
-                icon: "percent",
-                iconColor: .purple
-            )
-            metricCard(
-                title: "Stores Reached",
-                value: "\(reachedCount) / \(assignedStoreModels.count)",
-                icon: "checkmark.seal.fill",
-                iconColor: .green
-            )
-        }
-    }
-    
-    private func metricCard(title: String, value: String, icon: String, iconColor: Color) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundStyle(iconColor)
-                    .font(.system(size: 16, weight: .bold))
-                Spacer()
-            }
-            
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            Text(title)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.secondary)
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: Color.black.opacity(0.03), radius: 8, y: 3)
-    }
+    // Removed metrics summary and metric card methods per user request
     
     private var storesListSection: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -201,7 +173,7 @@ struct TargetDetailView: View {
     }
     
     private func storeProgressCard(store: AdminStore) -> some View {
-        let current = mockProgress(for: target, storeID: store.id)
+        let current = storeSales[store.id] ?? 0.0
         let percent = current / max(target.amount, 1)
         let isReached = current >= target.amount
         let themeColor = getProgressColor(percent: percent)

@@ -17,6 +17,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var pendingTransfersCount = 0
     @Published var lowStockAlertsCount = 0
     @Published var scheduledCycleCountsCount = 0
+    @Published var pendingCycleCountsCount = 0
     
     @Published var recentShipments: [Shipment] = []
     @Published var recentTransfers: [Transfer] = []
@@ -40,21 +41,29 @@ final class DashboardViewModel: ObservableObject {
             // Fetch Shipments
             let shipments = try await service.fetchShipments()
             self.pendingShipmentsCount = shipments.filter { $0.status.lowercased() == "pending" }.count
-            self.recentShipments = Array(shipments.prefix(3))
+            self.recentShipments = Array(shipments.sorted(by: { 
+                let d0 = $0.receivedDate ?? $0.dispatchDate ?? $0.createdAt
+                let d1 = $1.receivedDate ?? $1.dispatchDate ?? $1.createdAt
+                return d0 > d1
+            }).prefix(3))
             
             // Fetch Requests
             let requests = try await service.fetchStockRequests()
             self.pendingStockRequestsCount = requests.filter { $0.status.lowercased() == "pending" }.count
-            self.recentStockRequests = Array(requests.prefix(3))
+            self.recentStockRequests = Array(requests.sorted(by: { $0.updatedAt > $1.updatedAt }).prefix(3))
             
             // Fetch Transfers
             let transfers = try await service.fetchTransfers()
             self.pendingTransfersCount = transfers.filter { $0.status.lowercased() == "pending" }.count
-            self.recentTransfers = Array(transfers.prefix(3))
+            self.recentTransfers = Array(transfers.sorted(by: { $0.transferDate > $1.transferDate }).prefix(3))
             
             // Fetch Cycle Counts
             let cycleCounts = try await service.fetchCycleCounts()
             self.scheduledCycleCountsCount = cycleCounts.filter { $0.status.lowercased() == "scheduled" }.count
+            self.pendingCycleCountsCount = cycleCounts.filter {
+                $0.status.lowercased() == "scheduled" &&
+                Calendar.current.isDateInToday($0.scheduledDate)
+            }.count
             
         } catch {
             self.errorMessage = error.localizedDescription

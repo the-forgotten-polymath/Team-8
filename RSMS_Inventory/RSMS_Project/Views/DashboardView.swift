@@ -53,8 +53,8 @@ struct DashboardView: View {
                         MetricCard(title: "Warehouse Stock", value: "\(viewModel.warehouseStockCount)", iconName: "shippingbox.fill", iconColor: .blue)
                         MetricCard(title: "Pending Shipments", value: "\(viewModel.pendingShipmentsCount)", iconName: "truck.box.fill", iconColor: .orange)
                         MetricCard(title: "Stock Requests", value: "\(viewModel.pendingStockRequestsCount)", iconName: "doc.text.fill", iconColor: .green)
-                        MetricCard(title: "Store Transfers", value: "\(viewModel.pendingTransfersCount)", iconName: "arrow.left.arrow.right", iconColor: .purple)
                         MetricCard(title: "Low Stock Alerts", value: "\(viewModel.lowStockAlertsCount)", iconName: "exclamationmark.triangle.fill", iconColor: .red)
+                        MetricCard(title: "Pending Cycles", value: "\(viewModel.pendingCycleCountsCount)", iconName: "calendar.badge.exclamationmark", iconColor: .orange)
                         MetricCard(title: "Scheduled Cycles", value: "\(viewModel.scheduledCycleCountsCount)", iconName: "calendar.badge.clock", iconColor: .teal)
                     }
                 }
@@ -138,18 +138,16 @@ struct DashboardView: View {
                         Image(systemName: "bell.fill")
                             .font(.title3)
                             .foregroundColor(.orange)
+                            .padding(.top, 5)
+                            .padding(.trailing, 5)
 
                         if notificationStore.activeCount > 0 {
-                            Text("\(min(notificationStore.activeCount, 99))")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(Color.red)
-                                .clipShape(Capsule())
-                                .offset(x: 8, y: -8)
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
                         }
                     }
+                    .frame(width: 34, height: 34)
                 }
 
                 // Profile button
@@ -166,7 +164,7 @@ struct DashboardView: View {
             ProfileView(userId: userId, warehouseId: warehouseId, onLogout: onLogout)
         }
         .sheet(isPresented: $showNotifications) {
-            NotificationsView(warehouseId: warehouseId, userId: userId)
+            NotificationsView(warehouseId: warehouseId, userId: userId, selectedTab: $selectedTab)
                 .environmentObject(notificationStore)
         }
         .refreshable {

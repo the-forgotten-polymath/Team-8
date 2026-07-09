@@ -73,6 +73,10 @@ struct LowStockNotification: Identifiable {
 final class LowStockNotificationStore: ObservableObject {
 
     @Published var notifications: [LowStockNotification] = []
+    @Published var pendingRequests: [StockRequest] = []
+    @Published var pendingCycleCounts: [CycleCount] = []
+    @Published var products: [Product] = []
+    @Published var stores: [Store] = []
 
     // Services — same ones used by InventoryViewModel / LowStockAlertView
     private let warehouseService = WarehouseService.shared
@@ -84,7 +88,9 @@ final class LowStockNotificationStore: ObservableObject {
         notifications.filter { $0.replenishmentStatus != .completed }
     }
 
-    var activeCount: Int { activeNotifications.count }
+    var activeCount: Int {
+        activeNotifications.count + pendingRequests.count + pendingCycleCounts.count
+    }
 
     // MARK: - Populate
 
@@ -92,7 +98,9 @@ final class LowStockNotificationStore: ObservableObject {
     /// notifications for items at or below reorder level. Skips items already tracked.
     func populate(warehouseId: UUID) async {
         do {
-            let products  = try await productService.fetchProducts()
+            let fetchedProducts = try await productService.fetchProducts()
+            self.products = fetchedProducts
+            
             let inventory = try await warehouseService.fetchWarehouseInventory(warehouseId: warehouseId)
             let warehouses = try await warehouseService.fetchWarehouses()
             let warehouseName = warehouses.first(where: { $0.id == warehouseId })?.warehouseName
@@ -100,10 +108,16 @@ final class LowStockNotificationStore: ObservableObject {
                              ?? "Central Warehouse"
 
             let lowStock = inventory.filter { $0.quantity <= $0.reorderLevel }
+            
+            // Clean up notifications that are no longer low stock and are in idle status
+            notifications.removeAll { note in
+                note.replenishmentStatus == .idle && !lowStock.contains(where: { $0.productId == note.productId })
+            }
+            
             for item in lowStock {
                 // Don't duplicate already-tracked products
                 guard !notifications.contains(where: { $0.productId == item.productId }) else { continue }
-                let product = products.first(where: { $0.id == item.productId })
+                let product = fetchedProducts.first(where: { $0.id == item.productId })
                 let note = LowStockNotification(
                     id: UUID(),
                     productId: item.productId,
@@ -116,6 +130,18 @@ final class LowStockNotificationStore: ObservableObject {
                     detectedAt: Date()
                 )
                 notifications.append(note)
+            }
+            
+            // Fetch stores and pending stock requests
+            self.stores = try await DatabaseService.shared.fetch(from: "stores", as: Store.self)
+            let allRequests = try await warehouseService.fetchStockRequests()
+            self.pendingRequests = allRequests.filter { $0.status.lowercased() == "pending" }
+            
+            // Fetch pending cycle counts scheduled for today
+            let allCycleCounts = try await warehouseService.fetchCycleCounts()
+            self.pendingCycleCounts = allCycleCounts.filter {
+                $0.status.lowercased() == "scheduled" &&
+                Calendar.current.isDateInToday($0.scheduledDate)
             }
         } catch {
             print("LowStockNotificationStore: populate failed — \(error)")

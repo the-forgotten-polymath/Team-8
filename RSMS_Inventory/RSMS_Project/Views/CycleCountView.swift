@@ -136,6 +136,13 @@ struct CycleCountView: View {
         }
     }
 
+    private func getDisplayStatus(for count: CycleCount) -> String {
+        if count.status.lowercased() == "scheduled" && Calendar.current.isDateInToday(count.scheduledDate) {
+            return "pending"
+        }
+        return count.status
+    }
+
     // MARK: - Count Row
 
     @ViewBuilder
@@ -154,7 +161,7 @@ struct CycleCountView: View {
                         .font(.subheadline)
                         .fontWeight(.semibold)
                     Spacer()
-                    StatusChip(status: count.status)
+                    StatusChip(status: getDisplayStatus(for: count))
                 }
 
                 Text("Scheduled: \(count.scheduledDate, style: .date)")

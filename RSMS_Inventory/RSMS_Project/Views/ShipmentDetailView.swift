@@ -12,9 +12,19 @@ struct ShipmentDetailView: View {
     let warehouseId: UUID
     let userId: UUID
     
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ShipmentVerificationViewModel()
     @State private var isShowingScanner = false
     @State private var showConfirmDialog = false
+    @State private var batchCreatedCertificatesCount = 0
+    
+    private func displayStatus(for shipment: Shipment) -> String {
+        let lower = shipment.status.lowercased()
+        if lower == "verified" || lower == "arrived" {
+            return "arrived"
+        }
+        return lower
+    }
     
     var body: some View {
         ZStack {
@@ -26,7 +36,7 @@ struct ShipmentDetailView: View {
                             .font(.title3)
                             .fontWeight(.bold)
                         Spacer()
-                        StatusChip(status: shipment.status)
+                        StatusChip(status: displayStatus(for: shipment))
                     }
                     
                     Divider()
@@ -67,11 +77,6 @@ struct ShipmentDetailView: View {
                         .font(.headline)
                         .foregroundColor(.primary)
                     Spacer()
-                    if shipment.status.lowercased() == "pending" {
-                        Text("Scanned vs Expected")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 8)
@@ -97,8 +102,8 @@ struct ShipmentDetailView: View {
                                     
                                     Spacer()
                                     
-                                    if shipment.status.lowercased() == "verified" {
-                                        Text("Verified")
+                                    if displayStatus(for: shipment) == "arrived" {
+                                        Text("Arrived")
                                             .font(.system(size: 10, weight: .bold))
                                             .foregroundColor(.white)
                                             .padding(.horizontal, 6)
@@ -122,17 +127,9 @@ struct ShipmentDetailView: View {
                                 
                                 // Progress Info
                                 let expected = item.expectedQuantity
-                                let received = shipment.status.lowercased() == "verified" ? item.receivedQuantity : scanned
+                                let received = displayStatus(for: shipment) == "arrived" ? item.receivedQuantity : scanned
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    HStack {
-                                        Text("Expected: \(expected)")
-                                        Spacer()
-                                        Text("Received: \(received)")
-                                    }
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                                    
                                     // Custom Progress Bar
                                     GeometryReader { geo in
                                         ZStack(alignment: .leading) {
@@ -204,14 +201,56 @@ struct ShipmentDetailView: View {
         }
         .alert("Verification Complete", isPresented: $viewModel.isVerifiedSuccess) {
             Button("OK") {
-                // Dismiss details page or refresh parent
+                dismiss()
             }
         } message: {
-            Text("Shipment has been successfully verified, and inventory quantities have been adjusted.")
+            Text("Shipment verified. Certificates generated for \(batchCreatedCertificatesCount) products.\n\nShipment has been successfully verified, and inventory quantities have been adjusted.")
         }
         .confirmationDialog("Are you sure you want to verify this shipment?", isPresented: $showConfirmDialog, titleVisibility: .visible) {
             Button("Confirm & Update Inventory") {
                 Swift.Task {
+                    var count = 0
+                    let details = CertificateManager.shared.getStoreDetailsAndLanguage(for: shipment.destination)
+                    for serial in viewModel.scannedSerials {
+                        if CertificateManager.shared.getCertificate(for: serial) == nil {
+                            let normSerial = serial.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                            if let product = viewModel.products.first(where: { prod in
+                                let normalizedSKU = prod.sku.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-").uppercased()
+                                if let qr = prod.qrValue {
+                                    let normalizedQR = qr.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "-").uppercased()
+                                    if normalizedQR == normSerial || normalizedSKU == normSerial {
+                                        return true
+                                    }
+                                    if normalizedQR.contains(normSerial) && !normSerial.isEmpty && normSerial.count >= 4 {
+                                        return true
+                                    }
+                                    if normSerial.contains(normalizedQR) || normSerial.contains(normalizedSKU) {
+                                        return true
+                                    }
+                                } else {
+                                    if normalizedSKU == normSerial || normSerial.contains(normalizedSKU) {
+                                        return true
+                                    }
+                                }
+                                if let scannedURL = URL(string: serial),
+                                   let lastComponent = scannedURL.pathComponents.last?.uppercased(),
+                                   lastComponent == normalizedSKU {
+                                    return true
+                                }
+                                return false
+                            }) {
+                                _ = CertificateManager.shared.createCertificate(
+                                    serialNumber: serial,
+                                    product: product,
+                                    storeName: details.storeName,
+                                    storeLocation: details.storeLocation,
+                                    language: details.language
+                                )
+                                count += 1
+                            }
+                        }
+                    }
+                    batchCreatedCertificatesCount = count
                     await viewModel.submitVerification(shipment: shipment, warehouseId: warehouseId, userId: userId)
                 }
             }

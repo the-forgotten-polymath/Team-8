@@ -201,6 +201,9 @@ struct ProductDetailView: View {
     @State private var isSaving = false
     @State private var saveSuccess = false
     @State private var errorMessage: String? = nil
+    @ObservedObject private var certificateManager = CertificateManager.shared
+    @State private var selectedCertificateInfo: CertificatePresentationInfo? = nil
+    @State private var showAllCertified = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -226,14 +229,7 @@ struct ProductDetailView: View {
             }
 
             Section(header: Text("Inventory Settings")) {
-                HStack {
-                    Text("Quantity")
-                    Spacer()
-                    TextField("Quantity", value: $quantity, format: .number)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                        .frame(maxWidth: 100)
-                }
+                LabeledContent("Quantity", value: "\(quantity) units")
                 
                 HStack {
                     Text("Minimum Threshold")
@@ -244,12 +240,103 @@ struct ProductDetailView: View {
                         .frame(maxWidth: 100)
                 }
                 
-                LabeledContent("Warehouse", value: warehouseName)
                 if let zone = item.zone {
                     LabeledContent("Zone", value: zone)
                 }
                 if let lastVerified = item.lastVerifiedAt {
                     LabeledContent("Last Verified", value: lastVerified.formatted(date: .abbreviated, time: .shortened))
+                }
+            }
+
+            Section(header: Text("Certificates")) {
+                let existingCerts = certificateManager.certificates.filter { $0.productId == product.id }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(existingCerts.count) of \(item.quantity) units certified")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    ProgressView(value: Double(existingCerts.count), total: Double(max(1, item.quantity)))
+                        .tint(existingCerts.count >= item.quantity ? .green : .orange)
+                        .accessibilityLabel("\(existingCerts.count) of \(item.quantity) units certified progress")
+                }
+                .padding(.vertical, 6)
+
+                if !existingCerts.isEmpty {
+                    DisclosureGroup("Certified Units (\(existingCerts.count))", isExpanded: $showAllCertified) {
+                        ForEach(existingCerts) { cert in
+                            HStack {
+                                Text(cert.serialNumber)
+                                    .font(.body)
+                                Spacer()
+                                Button(action: {
+                                    selectedCertificateInfo = CertificatePresentationInfo(
+                                        serialNumber: cert.serialNumber,
+                                        product: product,
+                                        destination: warehouseName
+                                    )
+                                }) {
+                                    Image(systemName: "checkmark.seal.fill")
+                                        .foregroundColor(.green)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel("Serial number \(cert.serialNumber), Certified. Tap to print.")
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+
+                let remainingCount = max(0, item.quantity - existingCerts.count)
+                if remainingCount > 0 {
+                    ForEach(0..<remainingCount, id: \.self) { idx in
+                        let prefix = product.qrValue ?? (product.sku.isEmpty ? "SN" : product.sku)
+                        let serial = "\(prefix)-\(1001 + idx + existingCerts.count)"
+                        
+                        HStack {
+                            Text(serial)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button("Link Certificate") {
+                                selectedCertificateInfo = CertificatePresentationInfo(
+                                    serialNumber: serial,
+                                    product: product,
+                                    destination: warehouseName
+                                )
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.blue)
+                            .accessibilityLabel("Serial number \(serial), Uncertified. Tap to link.")
+                        }
+                        .padding(.vertical, 4)
+                    }
+
+                    Button(action: {
+                        let prefix = product.qrValue ?? (product.sku.isEmpty ? "SN" : product.sku)
+                        let details = certificateManager.getStoreDetailsAndLanguage(for: warehouseName)
+                        for idx in 0..<remainingCount {
+                            let serial = "\(prefix)-\(1001 + idx + existingCerts.count)"
+                            _ = certificateManager.createCertificate(
+                                serialNumber: serial,
+                                product: product,
+                                storeName: details.storeName,
+                                storeLocation: details.storeLocation,
+                                language: details.language
+                            )
+                        }
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Link all certificates")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .accessibilityLabel("Link all certificates")
+                    .padding(.vertical, 4)
                 }
             }
 
@@ -261,7 +348,10 @@ struct ProductDetailView: View {
                 }
             }
         }
-        .navigationTitle(product.productName)
+        .sheet(item: $selectedCertificateInfo) { info in
+            CertificateView(info: info, onPrintCompleted: {})
+        }
+        .navigationTitle("Product Detail")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -325,9 +415,6 @@ struct ProductDetailView: View {
 
         _Concurrency.Task {
             do {
-                // Update quantity using standard method
-                try await WarehouseService.shared.updateInventoryQuantity(itemId: item.id, newQuantity: quantity)
-                
                 // Update reorder_level (minimum threshold) using generic update
                 struct UpdateReorderLevel: Encodable {
                     let reorderLevel: Int
@@ -347,7 +434,7 @@ struct ProductDetailView: View {
                 try? await WarehouseService.shared.logAction(
                     userId: item.productId, // Fallback user id or system
                     module: "Inventory",
-                    action: "Updated threshold and quantity for item \(product.productName)"
+                    action: "Updated threshold for item \(product.productName)"
                 )
 
                 saveSuccess = true

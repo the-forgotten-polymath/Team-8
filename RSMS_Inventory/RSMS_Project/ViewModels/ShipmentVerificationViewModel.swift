@@ -23,6 +23,7 @@ final class ShipmentVerificationViewModel: ObservableObject {
     
     // Scanned quantities: [ProductId: ReceivedQuantity]
     @Published var scannedQuantities: [UUID: Int] = [:]
+    @Published var scannedSerials: [String] = []
     
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
@@ -35,7 +36,8 @@ final class ShipmentVerificationViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            self.shipments = try await warehouseService.fetchShipments()
+            let fetchedShipments = try await warehouseService.fetchShipments()
+            self.shipments = fetchedShipments.sorted(by: { $0.createdAt > $1.createdAt })
             self.products = try await productService.fetchProducts()
         } catch {
             self.errorMessage = error.localizedDescription
@@ -125,6 +127,11 @@ final class ShipmentVerificationViewModel: ObservableObject {
         let newQty = currentQty + 1
         scannedQuantities[product.id] = newQty
         
+        let normVal = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !scannedSerials.contains(normVal) {
+            scannedSerials.append(normVal)
+        }
+        
         return .success(productName: product.productName, expected: item.expectedQuantity, received: newQty)
     }
     
@@ -162,6 +169,11 @@ final class ShipmentVerificationViewModel: ObservableObject {
         do {
             // 1. Update Shipment status
             try await warehouseService.updateShipmentStatus(shipmentId: shipment.id, status: "verified")
+            
+            // 1b. Update linked Stock Request if exists
+            if let reqId = shipment.stockRequestId {
+                try await warehouseService.updateStockRequestStatus(requestId: reqId, status: "delivered")
+            }
             
             // 2. Update Shipment Items
             for item in shipmentItems {

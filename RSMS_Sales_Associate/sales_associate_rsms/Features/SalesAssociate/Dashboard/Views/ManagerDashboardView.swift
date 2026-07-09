@@ -35,154 +35,277 @@ struct ManagerDashboardView: View {
                     .padding(.horizontal, 4)
                 }
                 
-                // KPI Overview
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Text("Boutique KPI Overview")
-                            .font(.headline)
-                        Spacer()
-                        Picker("TimeFrame", selection: $timeFrame) {
-                            ForEach(TimeFrame.allCases, id: \.self) { frame in
-                                Text(frame.rawValue).tag(frame)
-                            }
+                // Boutique Performance Analytics Header
+                HStack {
+                    Text("Boutique Performance")
+                        .font(.headline)
+                    Spacer()
+                    Picker("TimeFrame", selection: $timeFrame.animation(.easeInOut)) {
+                        ForEach(TimeFrame.allCases, id: \.self) { frame in
+                            Text(frame.rawValue).tag(frame)
                         }
-                        .pickerStyle(.segmented)
-                        .frame(width: 140)
                     }
-                    .padding(.horizontal, 4)
-                    
-                    if let metrics = viewModel.storeMetrics {
-                        VStack(spacing: 16) {
-                            StoreGoalGaugeView(metrics: metrics, timeFrame: timeFrame)
-                                .padding(.vertical)
-                            
-                            Divider()
-                            
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text("Conversion Rate")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text("\(metrics.conversionRate, specifier: "%.1f")%")
-                                        .font(.title3.bold())
-                                        .foregroundColor(metrics.conversionRate > 10.0 ? .green : .red)
-                                }
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .trailing) {
-                                    Text("Average Order Value")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text("$\(metrics.averageOrderValue, specifier: "%.0f")")
-                                        .font(.title3.bold())
-                                }
-                            }
-                            
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text("Client Retention")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text("\(metrics.clientRetentionRate, specifier: "%.1f")%")
-                                        .font(.subheadline.bold())
-                                }
-                                
-                                Spacer()
-                                
-                                VStack(alignment: .trailing) {
-                                    Text("Apt. Conversion")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text("\(metrics.appointmentConversion, specifier: "%.1f")%")
-                                        .font(.subheadline.bold())
-                                }
-                            }
-                        }
-                        .padding()
-                        .liquidGlass()
-                    } else {
-                        Text("No metrics available.")
-                            .foregroundColor(.secondary)
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .liquidGlass()
-                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 140)
                 }
+                .padding(.horizontal, 4)
+                
+                // KPI Metrics Grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    KPICard(title: "Today's Sales", value: formatCurrency(viewModel.todayRevenue), systemImage: "indianrupeesign.circle.fill", color: .green)
+                    KPICard(title: "Today's Orders", value: "\(viewModel.todayOrdersCount)", systemImage: "cart.fill", color: .blue)
+                }
+                .padding(.horizontal, 4)
+                
+                // Revenue Analytics Chart
+                RevenueChartView(
+                    data: timeFrame == .week ? viewModel.weeklyChartData : viewModel.monthlyChartData,
+                    title: timeFrame == .week ? "Weekly Revenue Trend" : "Monthly Revenue Trend"
+                )
+                .padding(.horizontal, 4)
             }
             .padding()
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
+    
+    private func formatCurrency(_ value: Double) -> String {
+        if value >= 1_000_000 {
+            return String(format: "₹%.1fM", value / 1_000_000.0)
+        } else if value >= 1_000 {
+            return String(format: "₹%.0fK", value / 1_000.0)
+        } else {
+            return String(format: "₹%.0f", value)
+        }
+    }
 }
 
-struct StoreGoalGaugeView: View {
-    let metrics: StoreMetrics
-    let timeFrame: TimeFrame
-    
-    // Compute displayed conversion rate based on timeframe mock data
-    private var displayConversionRate: Double {
-        return timeFrame == .week ? metrics.conversionRate : metrics.conversionRate * 0.85
-    }
+struct KPICard: View {
+    let title: String
+    let value: String
+    let systemImage: String
+    let color: Color
     
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Boutique Conversion Goal")
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.12))
+                    .frame(width: 36, height: 36)
+                Image(systemName: systemImage)
+                    .foregroundColor(color)
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                if !title.isEmpty {
+                    Text(title)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.secondary)
+                    Text(value)
+                        .font(.subheadline.bold())
+                        .foregroundColor(.primary)
+                } else {
+                    Text(value)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.primary)
+                }
+            }
+            Spacer()
+        }
+        .padding(12)
+        .whiteCard()
+    }
+}
+
+struct RevenueChartView: View {
+    let data: [RevenueDataPoint]
+    let title: String
+    
+    @State private var selectedPoint: RevenueDataPoint? = nil
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Header
+            Text(title)
                 .font(.subheadline.bold())
                 .foregroundColor(.secondary)
             
-            Chart {
-                SectorMark(
-                    angle: .value("Conversion Rate", min(displayConversionRate, 20.0)),
-                    innerRadius: .ratio(0.8),
-                    angularInset: 1.5
+            // Selection overlay showing Sales & Order counts
+            if let selected = selectedPoint {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(selected.label)
+                        .font(.caption.bold())
+                        .foregroundColor(.secondary)
+                    
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading) {
+                            Text("Revenue")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Text(formatCurrency(selected.amount))
+                                .font(.subheadline.bold())
+                                .foregroundColor(.primary)
+                        }
+                    }
+                    
+                    if let comparison = calculateComparison(for: selected) {
+                        HStack(spacing: 4) {
+                            Image(systemName: comparison.isIncrease ? "arrow.up.right" : "arrow.down.right")
+                            Text("\(comparison.isIncrease ? "Increased" : "Decreased") by \(comparison.diffAmountString) (\(comparison.percentageString))")
+                        }
+                        .font(.caption.bold())
+                        .foregroundColor(comparison.isIncrease ? .green : .red)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(12)
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(10)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            } else {
+                Text("Tap on any chart point to inspect details.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Curve Line Chart
+            Chart(data) { point in
+                // Shaded region under the curve
+                AreaMark(
+                    x: .value("Date", point.label),
+                    y: .value("Revenue", point.amount)
                 )
-                .cornerRadius(4)
-                .foregroundStyle(Color.blue)
-                
-                if displayConversionRate < 20.0 {
-                    SectorMark(
-                        angle: .value("Remaining", 20.0 - displayConversionRate),
-                        innerRadius: .ratio(0.8),
-                        angularInset: 1.5
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.25), Color.blue.opacity(0.0)],
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
-                    .cornerRadius(4)
-                    .foregroundStyle(Color.gray.opacity(0.2))
+                )
+                .interpolationMethod(.monotone)
+                
+                // Curve line
+                LineMark(
+                    x: .value("Date", point.label),
+                    y: .value("Revenue", point.amount)
+                )
+                .foregroundStyle(Color.blue)
+                .lineStyle(StrokeStyle(lineWidth: 2.5))
+                .interpolationMethod(.monotone)
+                
+                // Point markers
+                PointMark(
+                    x: .value("Date", point.label),
+                    y: .value("Revenue", point.amount)
+                )
+                .foregroundStyle(Color.blue)
+                .symbol {
+                    let isToday = isPointToday(point)
+                    Circle()
+                        .fill(isToday ? Color.green : (selectedPoint?.id == point.id ? Color.blue : Color.white))
+                        .frame(width: isToday ? 10 : 8, height: isToday ? 10 : 8)
+                        .overlay(
+                            Circle()
+                                .stroke(isToday ? Color.green : Color.blue, lineWidth: 2)
+                        )
                 }
             }
             .frame(height: 180)
-            .chartBackground { chartProxy in
-                GeometryReader { geometry in
-                    if let anchor = chartProxy.plotFrame {
-                        let frame = geometry[anchor]
-                        VStack {
-                            Text(String(format: "%.1f%%", displayConversionRate))
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(.primary)
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisTick()
+                    AxisValueLabel {
+                        if let doubleValue = value.as(Double.self) {
+                            Text(formatCurrencyYAxis(doubleValue))
+                                .font(.caption2)
                         }
-                        .position(x: frame.midX, y: frame.midY)
                     }
                 }
             }
-            
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Current")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("\(displayConversionRate, specifier: "%.1f")%")
-                        .font(.subheadline.bold())
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("Target")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("20.0%")
-                        .font(.subheadline.bold())
+            .chartOverlay { proxy in
+                GeometryReader { geometry in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let origin = geometry[proxy.plotFrame!].origin
+                                    let location = CGPoint(
+                                        x: value.location.x - origin.x,
+                                        y: value.location.y - origin.y
+                                    )
+                                    if let label: String = proxy.value(atX: location.x) {
+                                        if let point = data.first(where: { $0.label == label }) {
+                                            if selectedPoint?.id != point.id {
+                                                let generator = UIImpactFeedbackGenerator(style: .light)
+                                                generator.impactOccurred()
+                                                withAnimation(.spring()) {
+                                                    selectedPoint = point
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                        )
                 }
             }
-            .padding(.horizontal, 20)
+        }
+        .padding()
+        .liquidGlass()
+    }
+    
+    private func isPointToday(_ point: RevenueDataPoint) -> Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE" // "Mon", "Tue", etc.
+        let todayLabel = formatter.string(from: Date())
+        return point.label.lowercased() == todayLabel.lowercased()
+    }
+    
+    private func calculateComparison(for point: RevenueDataPoint) -> ComparisonResult? {
+        guard let index = data.firstIndex(where: { $0.id == point.id }) else {
+            return nil
+        }
+        if index == 0 {
+            return nil
+        }
+        let prevPoint = data[index - 1]
+        
+        let diff = point.amount - prevPoint.amount
+        let isIncrease = diff >= 0
+        
+        let percent: Double
+        if prevPoint.amount == 0 {
+            percent = point.amount > 0 ? 100.0 : 0.0
+        } else {
+            percent = (abs(diff) / prevPoint.amount) * 100.0
+        }
+        
+        let percentageString = String(format: "%.1f%%", percent)
+        let diffAmountString = formatCurrency(abs(diff))
+        
+        return ComparisonResult(percentageString: percentageString, diffAmountString: diffAmountString, isIncrease: isIncrease)
+    }
+    
+    private func formatCurrencyYAxis(_ value: Double) -> String {
+        if value == 0 { return "0" }
+        return String(format: "%.1fE6", value / 1_000_000.0)
+    }
+    
+    private func formatCurrency(_ value: Double) -> String {
+        if value >= 1_000_000 {
+            return String(format: "₹%.1fM", value / 1_000_000.0)
+        } else if value >= 1_000 {
+            return String(format: "₹%.0fK", value / 1_000.0)
+        } else {
+            return String(format: "₹%.0f", value)
         }
     }
+}
+
+struct ComparisonResult {
+    let percentageString: String
+    let diffAmountString: String
+    let isIncrease: Bool
 }

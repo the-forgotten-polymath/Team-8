@@ -144,6 +144,18 @@ extension View {
     func liquidGlass(cornerRadius: CGFloat = 16) -> some View {
         self.modifier(LiquidGlassModifier(cornerRadius: cornerRadius))
     }
+    
+    /// Apply a clean solid white card styling with a subtle border and shadow
+    func whiteCard(cornerRadius: CGFloat = 16) -> some View {
+        self
+            .background(Color.white)
+            .cornerRadius(cornerRadius)
+            .shadow(color: Color.black.opacity(0.03), radius: 8, x: 0, y: 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(Color.black.opacity(0.04), lineWidth: 1)
+            )
+    }
 }
 
 struct LiquidGlassModifier: ViewModifier {

@@ -49,7 +49,7 @@ struct SalesGoalGaugeView: View {
                     Text("Current")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("$\(metrics.currentSales, specifier: "%.2f")")
+                    Text("\(AppConstants.App.currencySymbol)\(metrics.currentSales, specifier: "%.2f")")
                         .font(.subheadline.bold())
                 }
                 Spacer()
@@ -57,7 +57,7 @@ struct SalesGoalGaugeView: View {
                     Text("Target")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("$\(metrics.dailyGoal, specifier: "%.2f")")
+                    Text("\(AppConstants.App.currencySymbol)\(metrics.dailyGoal, specifier: "%.2f")")
                         .font(.subheadline.bold())
                 }
             }
@@ -65,6 +65,6 @@ struct SalesGoalGaugeView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Daily Sales Goal")
-        .accessibilityValue("\(String(format: "%.0f", metrics.goalProgress * 100)) percent complete. Current sales: \(String(format: "%.0f", metrics.currentSales)) dollars. Target: \(String(format: "%.0f", metrics.dailyGoal)) dollars.")
+        .accessibilityValue("\(String(format: "%.0f", metrics.goalProgress * 100)) percent complete. Current sales: \(String(format: "%.0f", metrics.currentSales)) Rupees. Target: \(String(format: "%.0f", metrics.dailyGoal)) Rupees.")
     }
 }

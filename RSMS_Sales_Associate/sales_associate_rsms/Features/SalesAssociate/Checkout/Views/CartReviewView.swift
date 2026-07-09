@@ -145,33 +145,33 @@ struct CartReviewView: View {
                             HStack {
                                 Text("Subtotal")
                                 Spacer()
-                                Text(cart.subtotal, format: .currency(code: "USD"))
+                                Text(cart.subtotal, format: .currency(code: AppConstants.App.currencyCode))
                             }
                             if cart.orderLevelDiscountPercent != nil {
                                 HStack {
                                     Text("Discounted Subtotal")
                                     Spacer()
-                                    Text(cart.discountedSubtotal, format: .currency(code: "USD"))
+                                    Text(cart.discountedSubtotal, format: .currency(code: AppConstants.App.currencyCode))
                                 }
                                 .foregroundColor(.green)
                             }
                             HStack {
                                 Text("Tax (8.875%)")
                                 Spacer()
-                                Text(cart.tax, format: .currency(code: "USD"))
+                                Text(cart.tax, format: .currency(code: AppConstants.App.currencyCode))
                             }
                             HStack {
                                 Text("Total").bold()
                                 Spacer()
-                                Text(cart.total, format: .currency(code: "USD")).bold()
+                                Text(cart.total, format: .currency(code: AppConstants.App.currencyCode)).bold()
                             }
                         }
                     }
                     
                     // Sticky Bottom Panel with Proceed to Buy Button
                     VStack {
-                        NavigationLink(destination: SplitTenderView()) {
-                            Text("Proceed to Buy")
+                        NavigationLink(destination: CustomerVerificationView()) {
+                            Text("Proceed to Checkout")
                                 .font(.headline)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)

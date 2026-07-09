@@ -5,8 +5,8 @@ import Foundation
 
 enum MockData {
     
-    static let associateID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-    static let storeID = UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
+    static let associateID = UUID(uuidString: "3211f020-f433-4b67-92a5-677f52ca5084")!
+    static let storeID = UUID(uuidString: "f2182a92-1e3a-4ac9-b4c1-87a0a480667a")!
     static let otherStoreID = UUID(uuidString: "44444444-3333-3333-3333-333333333333")!
     
     static let staffProfile = StaffProfile(
@@ -30,7 +30,7 @@ enum MockData {
             email: "emma@example.com",
             phone: "+1 555-0101",
             dateOfBirth: Calendar.current.date(from: DateComponents(year: 1990, month: 4, day: 15)),
-            tier: .vvip,
+            tier: .vip,
             lifetimeSpend: 150000.0,
             preferredStore: storeID,
             preferredAdvisor: associateID,
@@ -173,7 +173,7 @@ enum MockData {
             collection: "Submariner",
             materials: ["Oystersteel", "Yellow Gold", "Ceramic"],
             price: 14750.00,
-            currency: "USD",
+            currency: "INR",
             authenticityCertificateID: "AUTH-RLX-1001",
             dateOfManufacture: Calendar.current.date(from: DateComponents(year: 2023, month: 6)),
             origin: "Switzerland",
@@ -190,7 +190,7 @@ enum MockData {
             collection: "LOVE",
             materials: ["18K Yellow Gold", "Diamonds"],
             price: 4950.00,
-            currency: "USD",
+            currency: "INR",
             authenticityCertificateID: "AUTH-CRT-2001",
             dateOfManufacture: Calendar.current.date(from: DateComponents(year: 2024, month: 1)),
             origin: "France",
@@ -207,7 +207,7 @@ enum MockData {
             collection: "Birkin",
             materials: ["Togo Leather", "Gold Hardware"],
             price: 11900.00,
-            currency: "USD",
+            currency: "INR",
             authenticityCertificateID: "AUTH-HRM-3001",
             dateOfManufacture: Calendar.current.date(from: DateComponents(year: 2024, month: 3)),
             origin: "France",

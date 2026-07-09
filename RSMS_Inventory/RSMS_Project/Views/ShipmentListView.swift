@@ -10,12 +10,18 @@ import SwiftUI
 struct ShipmentListView: View {
     let warehouseId: UUID
     let userId: UUID
+    @Binding var selectedSegment: LogisticsSegment
 
     @StateObject private var viewModel = ShipmentVerificationViewModel()
     @State private var selectedStatus: String = "all"
     @State private var searchText: String = ""
+    @State private var hasLoaded = false
 
+<<<<<<< HEAD
     // The two allowed statuses (UI only — backend data is untouched)
+=======
+    // The allowed statuses (UI only — backend data is untouched)
+>>>>>>> inventory
     private let allowedStatuses: [String] = ["pending", "arrived", "verified"]
     private let filterLabels: [(label: String, key: String)] = [
         ("All",        "all"),
@@ -41,6 +47,8 @@ struct ShipmentListView: View {
         let byStatus: [Shipment]
         if selectedStatus == "all" {
             byStatus = visible
+        } else if selectedStatus == "arrived" {
+            byStatus = visible.filter { $0.status.lowercased() == "arrived" || $0.status.lowercased() == "verified" }
         } else {
             byStatus = visible.filter {
                 let status = displayStatus(for: $0)
@@ -48,7 +56,11 @@ struct ShipmentListView: View {
             }
         }
 
-        let sortedList = byStatus.sorted(by: { $0.createdAt > $1.createdAt })
+        let sortedList = byStatus.sorted(by: { 
+            let date0 = $0.receivedDate ?? $0.dispatchDate ?? $0.createdAt
+            let date1 = $1.receivedDate ?? $1.dispatchDate ?? $1.createdAt
+            return date0 > date1
+        })
 
         if searchText.isEmpty {
             return sortedList
@@ -168,7 +180,12 @@ struct ShipmentListView: View {
                                         
                                         Spacer()
                                         
+<<<<<<< HEAD
                                         StatusChip(status: displayStatus(for: shipment))
+=======
+                                        // Status Chip matching reference position
+                                        StatusChip(status: shipment.status.lowercased() == "verified" ? "arrived" : shipment.status)
+>>>>>>> inventory
                                     }
                                     
                                     Divider()
@@ -187,9 +204,36 @@ struct ShipmentListView: View {
                                         
                                         Spacer()
                                         
+<<<<<<< HEAD
                                         Label(formatShipmentDate(shipment.createdAt), systemImage: "calendar")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
+=======
+                                        // Right-aligned reference / tracking details
+                                        if let ref = shipment.trackingReference, !ref.isEmpty {
+                                            Text("Ref: \(ref)")
+                                                .font(.subheadline)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.primary)
+                                        }
+                                    }
+                                    
+                                    HStack {
+                                        Spacer()
+                                        if let receivedDate = shipment.receivedDate {
+                                            Text("Arrived: \(formatShipmentDate(receivedDate))")
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        } else if let dispatchDate = shipment.dispatchDate {
+                                            Text("Dispatched: \(formatShipmentDate(dispatchDate))")
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        } else {
+                                            Text(formatShipmentDate(shipment.createdAt))
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        }
+>>>>>>> inventory
                                     }
                                 }
                                 .padding()
@@ -209,13 +253,24 @@ struct ShipmentListView: View {
                 .background(Color(UIColor.systemGroupedBackground))
             }
         }
-        .navigationTitle("Shipment Verification")
-        .navigationBarTitleDisplayMode(.inline)
         .refreshable {
             await viewModel.loadShipments()
         }
-        .task {
-            await viewModel.loadShipments()
+        .onAppear {
+            loadDataIfNeeded()
+        }
+        .onChange(of: selectedSegment) { newValue in
+            if newValue == .shipments {
+                loadDataIfNeeded()
+            }
+        }
+    }
+
+    private func loadDataIfNeeded() {
+        if selectedSegment == .shipments {
+            Swift.Task {
+                await viewModel.loadShipments()
+            }
         }
     }
     

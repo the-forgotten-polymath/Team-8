@@ -12,6 +12,7 @@ struct ShipmentDetailView: View {
     let warehouseId: UUID
     let userId: UUID
     
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ShipmentVerificationViewModel()
     @State private var isShowingScanner = false
     @State private var showConfirmDialog = false

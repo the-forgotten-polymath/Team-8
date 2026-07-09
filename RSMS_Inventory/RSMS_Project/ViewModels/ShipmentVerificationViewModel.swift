@@ -170,6 +170,11 @@ final class ShipmentVerificationViewModel: ObservableObject {
             // 1. Update Shipment status
             try await warehouseService.updateShipmentStatus(shipmentId: shipment.id, status: "verified")
             
+            // 1b. Update linked Stock Request if exists
+            if let reqId = shipment.stockRequestId {
+                try await warehouseService.updateStockRequestStatus(requestId: reqId, status: "delivered")
+            }
+            
             // 2. Update Shipment Items
             for item in shipmentItems {
                 let scannedQty = scannedQuantities[item.productId] ?? 0

@@ -17,6 +17,9 @@ final class InventoryViewModel: ObservableObject {
     @Published var sortOption = SortOption.name
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
+    @Published var categories: [Category] = []
+    @Published var selectedCategoryIds: Set<UUID> = []
+    @Published var lowStockOnly = false
     
     private let warehouseService = WarehouseService.shared
     private let productService = ProductService()
@@ -28,9 +31,25 @@ final class InventoryViewModel: ObservableObject {
     var filteredInventory: [InventoryItem] {
         let items = inventoryItems.filter { item in
             guard let product = getProduct(for: item.productId) else { return false }
-            if searchText.isEmpty { return true }
-            return product.productName.localizedCaseInsensitiveContains(searchText) ||
-                   product.sku.localizedCaseInsensitiveContains(searchText)
+            
+            // Text search
+            if !searchText.isEmpty {
+                let matchesSearch = product.productName.localizedCaseInsensitiveContains(searchText) ||
+                                    product.sku.localizedCaseInsensitiveContains(searchText)
+                if !matchesSearch { return false }
+            }
+            
+            // Category filter
+            if !selectedCategoryIds.isEmpty {
+                if !selectedCategoryIds.contains(product.categoryId) { return false }
+            }
+            
+            // Low stock filter
+            if lowStockOnly {
+                if item.quantity > item.reorderLevel { return false }
+            }
+            
+            return true
         }
         
         switch sortOption {
@@ -58,6 +77,7 @@ final class InventoryViewModel: ObservableObject {
         do {
             self.products = try await productService.fetchProducts()
             self.inventoryItems = try await warehouseService.fetchWarehouseInventory(warehouseId: warehouseId)
+            self.categories = try await DatabaseService.shared.fetch(from: "categories", as: Category.self)
         } catch {
             guard !Swift.Task.isCancelled else { return }
             self.errorMessage = error.localizedDescription

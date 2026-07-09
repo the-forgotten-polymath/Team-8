@@ -23,6 +23,7 @@ final class ShipmentVerificationViewModel: ObservableObject {
     
     // Scanned quantities: [ProductId: ReceivedQuantity]
     @Published var scannedQuantities: [UUID: Int] = [:]
+    @Published var scannedSerials: [String] = []
     
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
@@ -125,6 +126,11 @@ final class ShipmentVerificationViewModel: ObservableObject {
         let currentQty = scannedQuantities[product.id] ?? 0
         let newQty = currentQty + 1
         scannedQuantities[product.id] = newQty
+        
+        let normVal = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !scannedSerials.contains(normVal) {
+            scannedSerials.append(normVal)
+        }
         
         return .success(productName: product.productName, expected: item.expectedQuantity, received: newQty)
     }

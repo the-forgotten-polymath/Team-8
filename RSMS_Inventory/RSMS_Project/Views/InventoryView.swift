@@ -9,15 +9,94 @@ import SwiftUI
 
 struct InventoryView: View {
     @StateObject private var viewModel = InventoryViewModel()
+    @ObservedObject private var certificateManager = CertificateManager.shared
     let warehouseId: UUID
     
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar & Filter Headers
-            SearchBar(text: $viewModel.searchText, placeholder: "Search by Product Name or SKU")
-                .padding(.horizontal)
-                .padding(.vertical, 10)
-                .background(Color(UIColor.systemBackground))
+            HStack(spacing: 12) {
+                SearchBar(text: $viewModel.searchText, placeholder: "Search by Product Name or SKU")
+                
+                // Filter Button Menu
+                Menu {
+                    // 1. "Low Stock Only" Toggle
+                    Button(action: {
+                        viewModel.lowStockOnly.toggle()
+                    }) {
+                        Label(
+                            "Low Stock Only",
+                            systemImage: viewModel.lowStockOnly ? "checkmark.circle.fill" : "circle"
+                        )
+                    }
+                    
+                    Divider()
+                    
+                    // 2. Categories
+                    if !viewModel.categories.isEmpty {
+                        Text("Categories")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        ForEach(viewModel.categories) { category in
+                            Button(action: {
+                                if viewModel.selectedCategoryIds.contains(category.id) {
+                                    viewModel.selectedCategoryIds.remove(category.id)
+                                } else {
+                                    viewModel.selectedCategoryIds.insert(category.id)
+                                }
+                            }) {
+                                Label(
+                                    category.categoryName,
+                                    systemImage: viewModel.selectedCategoryIds.contains(category.id)
+                                        ? "checkmark.circle.fill"
+                                        : "circle"
+                                )
+                            }
+                        }
+                        
+                        Divider()
+                    }
+                    
+                    // 3. Clear Filters
+                    if viewModel.lowStockOnly || !viewModel.selectedCategoryIds.isEmpty {
+                        Button(role: .destructive, action: {
+                            viewModel.lowStockOnly = false
+                            viewModel.selectedCategoryIds.removeAll()
+                        }) {
+                            Label("Clear Filters", systemImage: "trash")
+                        }
+                    }
+                } label: {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(
+                                (viewModel.lowStockOnly || !viewModel.selectedCategoryIds.isEmpty)
+                                ? .orange
+                                : .blue
+                            )
+                        
+                        // Active-filter indicator badge
+                        let activeCount = (viewModel.lowStockOnly ? 1 : 0) + viewModel.selectedCategoryIds.count
+                        if activeCount > 0 {
+                            Text("\(activeCount)")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 14, height: 14)
+                                .background(Color.orange)
+                                .clipShape(Circle())
+                                .offset(x: 6, y: -6)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 10)
+            .background(Color(UIColor.systemBackground))
             
             // List of items
             if let error = viewModel.errorMessage {
@@ -43,40 +122,53 @@ struct InventoryView: View {
             } else if viewModel.filteredInventory.isEmpty {
                 EmptyStateView(
                     title: "No Inventory Found",
-                    message: "No stock matching your search query was found in this warehouse.\n(Active Warehouse ID: \(warehouseId.uuidString.lowercased()))",
+                    message: "No stock matching your search query or filters was found in this warehouse.\n(Active Warehouse ID: \(warehouseId.uuidString.lowercased()))",
                     iconName: "shippingbox"
                 )
             } else {
                 List(viewModel.filteredInventory) { item in
                     let product = viewModel.getProduct(for: item.productId)
                     NavigationLink(destination: ProductDetailView(item: item, product: product ?? ProductPlaceholder(id: item.productId), warehouseId: warehouseId)) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .center, spacing: 12) {
+                            Image(systemName: "shippingbox.fill")
+                                .font(.title3)
+                                .foregroundColor(item.quantity <= item.reorderLevel ? .orange : .blue)
+                                .opacity(0.8)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text(product?.productName ?? "Unknown Product")
-                                    .font(.body)
+                                    .font(.headline)
                                     .foregroundColor(.primary)
+                                    .lineLimit(1)
                                 
                                 if let sku = product?.sku {
-                                    Text("SKU: \(sku)")
-                                        .font(.footnote)
+                                    Text("SKU: \(sku) • \(item.quantity) units")
+                                        .font(.subheadline)
                                         .foregroundColor(.secondary)
+                                        .lineLimit(1)
+                                } else {
+                                    Text("\(item.quantity) units")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(1)
                                 }
                             }
                             
                             Spacer()
                             
                             if item.quantity <= item.reorderLevel {
-                                Text("Low Stock")
-                                    .font(.caption2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.red.opacity(0.1))
-                                    .cornerRadius(4)
+                                Label("Low Stock", systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.orange)
                             }
                         }
                         .padding(.vertical, 4)
+                        .listRowBackground(
+                            Color(.secondarySystemGroupedBackground)
+                                .opacity(0.6)
+                                .background(.ultraThinMaterial)
+                        )
                     }
                 }
                 .listStyle(.insetGrouped)

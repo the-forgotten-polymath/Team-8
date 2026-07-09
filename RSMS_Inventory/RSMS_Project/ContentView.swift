@@ -148,20 +148,12 @@ struct ContentView: View {
             .tag(1)
             
             NavigationStack {
-                ShipmentListView(warehouseId: wId, userId: uId)
+                OperationsView(warehouseId: wId, userId: uId)
             }
             .tabItem {
-                Label("Shipments", systemImage: "truck.box.fill")
+                Label("Operations", systemImage: "arrow.left.arrow.right.circle.fill")
             }
             .tag(2)
-            
-            NavigationStack {
-                StockRequestView(warehouseId: wId, userId: uId)
-            }
-            .tabItem {
-                Label("Requests", systemImage: "doc.text.fill")
-            }
-            .tag(3)
             
             NavigationStack {
                 MoreOperationsView(warehouseId: wId, userId: uId, onLogout: {
@@ -174,7 +166,7 @@ struct ContentView: View {
             .tabItem {
                 Label("More", systemImage: "ellipsis.circle.fill")
             }
-            .tag(4)
+            .tag(3)
         }
         .tint(.blue)
         .environmentObject(notificationStore)

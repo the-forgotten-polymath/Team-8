@@ -59,14 +59,6 @@ struct StockRequestDetailView: View {
                                 Text(store?.storeName ?? "Loading...")
                             }
                             
-                            HStack {
-                                Text("Priority:")
-                                    .fontWeight(.bold)
-                                Spacer()
-                                Text(groupedRequest.priority.uppercased())
-                                    .foregroundColor(groupedRequest.priority.lowercased() == "high" ? .red : .primary)
-                            }
-                            
                             if let remarks = groupedRequest.remarks, !remarks.isEmpty {
                                 HStack {
                                     Text("Remarks:")
@@ -104,7 +96,9 @@ struct StockRequestDetailView: View {
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                 StatusChip(status: getDisplayStatus(item.status))
+                                if getDisplayStatus(item.status) != "delivered" {
+                                    StatusChip(status: getDisplayStatus(item.status))
+                                }
                             }
                             
                             Divider()
@@ -116,29 +110,43 @@ struct StockRequestDetailView: View {
                                         .foregroundColor(.secondary)
                                     Text("\(item.requestedQuantity) units")
                                         .font(.subheadline)
-                                        .fontWeight(.bold)
+                                        .fontWeight(.semibold)
                                 }
                                 Spacer()
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text("Warehouse Available")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                    Text("\(whStock) units")
-                                        .font(.subheadline)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(isSufficient ? .green : .red)
+                                if getDisplayStatus(item.status) == "fulfilled" || getDisplayStatus(item.status) == "delivered" {
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text("Allocated Qty")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                        Text("\(item.requestedQuantity) units")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.green)
+                                    }
+                                } else {
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text("Warehouse Available")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                        Text("\(whStock) units")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(isSufficient ? .green : .red)
+                                    }
                                 }
                             }
                             
-                            HStack {
-                                Text("Stock Status:")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text(isSufficient ? "Available" : "Insufficient Stock")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(isSufficient ? .green : .red)
-                                Spacer()
+                            if getDisplayStatus(item.status) != "fulfilled" && getDisplayStatus(item.status) != "delivered" {
+                                HStack {
+                                    Text("Stock Status:")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text(isSufficient ? "Available" : "Insufficient Stock")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(isSufficient ? .green : .red)
+                                    Spacer()
+                                }
                             }
                         }
                         .padding()

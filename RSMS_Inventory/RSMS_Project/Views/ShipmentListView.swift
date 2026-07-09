@@ -16,22 +16,36 @@ struct ShipmentListView: View {
     @State private var searchText: String = ""
 
     // The two allowed statuses (UI only — backend data is untouched)
-    private let allowedStatuses: [String] = ["pending", "arrived"]
+    private let allowedStatuses: [String] = ["pending", "arrived", "verified"]
     private let filterLabels: [(label: String, key: String)] = [
         ("All",        "all"),
         ("Pending",    "pending"),
         ("Arrived",    "arrived")
     ]
 
+    private func displayStatus(for shipment: Shipment) -> String {
+        let lower = shipment.status.lowercased()
+        if lower == "verified" || lower == "arrived" {
+            return "arrived"
+        }
+        return lower
+    }
+
     /// First strip any statuses not in the allowed list, then apply status filter and search.
     var filteredShipments: [Shipment] {
-        let visible = viewModel.shipments.filter { allowedStatuses.contains($0.status.lowercased()) }
+        let visible = viewModel.shipments.filter {
+            let status = displayStatus(for: $0)
+            return allowedStatuses.contains(status)
+        }
 
         let byStatus: [Shipment]
         if selectedStatus == "all" {
             byStatus = visible
         } else {
-            byStatus = visible.filter { $0.status.lowercased() == selectedStatus }
+            byStatus = visible.filter {
+                let status = displayStatus(for: $0)
+                return status == selectedStatus
+            }
         }
 
         let sortedList = byStatus.sorted(by: { $0.createdAt > $1.createdAt })
@@ -130,63 +144,62 @@ struct ShipmentListView: View {
                                 warehouseId: warehouseId,
                                 userId: userId
                             )) {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    HStack(alignment: .top) {
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            // Big bold ASN Number
-                                            Text(shipment.asnNumber ?? "No ASN")
-                                                .font(.system(size: 18, weight: .bold))
-                                                .foregroundColor(.primary)
+                                VStack(alignment: .leading, spacing: 10) {
+                                    HStack(alignment: .center) {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "shippingbox.fill")
+                                                .font(.title3)
+                                                .foregroundColor(.blue)
+                                                .padding(8)
+                                                .background(Color.blue.opacity(0.1))
+                                                .clipShape(Circle())
                                             
-                                            // Subtitle matching bullet point style
-                                            Text("• \(shipment.shipmentType.capitalized)")
-                                                .font(.system(size: 14))
-                                                .foregroundColor(.secondary)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(shipment.asnNumber ?? "No ASN")
+                                                    .font(.system(.headline, design: .rounded))
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(.primary)
+                                                
+                                                Text(shipment.shipmentType.capitalized)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.secondary)
+                                            }
                                         }
                                         
                                         Spacer()
                                         
-                                        // Status Chip matching reference position
-                                        StatusChip(status: shipment.status)
+                                        StatusChip(status: displayStatus(for: shipment))
                                     }
                                     
                                     Divider()
+                                        .background(Color.secondary.opacity(0.2))
                                     
                                     HStack {
-                                        // Route with icon
-                                        HStack(spacing: 8) {
-                                            Image(systemName: "shippingbox.fill")
-                                                .foregroundColor(.secondary)
-                                                .font(.system(size: 16))
-                                            Text("\(shipment.source) ➔ \(shipment.destination)")
-                                                .font(.subheadline)
-                                                .foregroundColor(.secondary)
-                                                .multilineTextAlignment(.leading)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        // Right-aligned reference / tracking details
                                         if let ref = shipment.trackingReference, !ref.isEmpty {
-                                            Text("Ref: \(ref)")
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.primary)
+                                            Label(ref, systemImage: "number.square")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        } else {
+                                            Label("Direct Delivery", systemImage: "arrow.down.right.and.arrow.up.left")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
                                         }
-                                    }
-                                    
-                                    HStack {
+                                        
                                         Spacer()
-                                        Text(formatShipmentDate(shipment.createdAt))
-                                            .font(.caption2)
+                                        
+                                        Label(formatShipmentDate(shipment.createdAt), systemImage: "calendar")
+                                            .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
                                 }
                                 .padding()
                                 .background(Color(UIColor.secondarySystemGroupedBackground))
                                 .cornerRadius(16)
-                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.appleBorder, lineWidth: 1))
-                                .shadow(color: Color.black.opacity(0.02), radius: 5, y: 2)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.appleBorder, lineWidth: 1)
+                                )
+                                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
                             }
                             .buttonStyle(.plain)
                         }

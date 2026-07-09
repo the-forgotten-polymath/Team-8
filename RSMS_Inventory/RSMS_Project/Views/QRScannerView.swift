@@ -7,6 +7,7 @@ struct QRScannerView: View {
     
     // Callback invoked when a code is scanned. Returns the result (Success, Wrong Product, or Unrecognized).
     var onScan: (String) -> QRScanResult
+    var onVerifySuccess: ((String) -> Void)? = nil
     
     @State private var manualInput = ""
     @State private var lastScannedCode = ""
@@ -304,6 +305,9 @@ struct QRScannerView: View {
             case .success(let productName, let expected, let received):
                 bannerState = .success(productName, expected: expected, received: received)
                 triggerHapticFeedback(.success)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    onVerifySuccess?(code)
+                }
             case .wrongProduct:
                 bannerState = .wrongProduct
                 triggerHapticFeedback(.error)

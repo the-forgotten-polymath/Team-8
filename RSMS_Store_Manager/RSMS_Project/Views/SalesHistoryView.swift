@@ -16,8 +16,11 @@ final class SalesHistoryViewModel: ObservableObject {
     @Published var averageOrderValue: Double = 0
     
     private var cancellables = Set<AnyCancellable>()
+    private let filterUserId: UUID?
     
-    init() {
+    init(filterUserId: UUID? = nil) {
+        self.filterUserId = filterUserId
+        
         NotificationCenter.default.publisher(for: NSNotification.Name("InventoryDidUpdate"))
             .sink { [weak self] _ in
                 Swift.Task { @MainActor [weak self] in
@@ -58,38 +61,61 @@ final class SalesHistoryViewModel: ObservableObject {
         }
         
         do {
-            let client = SupabaseManager.shared.client
-            let response = try await client
+            let client = SupabaseClient(
+                supabaseURL: URL(string: "https://yldspqgtzyrbdnoromgv.supabase.co")!,
+                supabaseKey: "sb_publishable_6hcPNWOppBItrHk7_F7LoQ_0eGNXAL5"
+            )
+            var query = client
                 .from("sales")
                 .select()
                 .eq("store_id", value: storeId.uuidString)
+                
+            if let userId = filterUserId {
+                query = query.eq("user_id", value: userId.uuidString)
+            }
+            
+            struct SHSale: Decodable, Identifiable {
+                let id: UUID
+                let invoiceNumber: String?
+                let totalAmount: Double
+                let saleDate: Date
+                let customerId: UUID?
+                let userId: UUID?
+                enum CodingKeys: String, CodingKey {
+                    case id, invoiceNumber = "invoice_number", totalAmount = "total_amount", saleDate = "sale_date", customerId = "customer_id", userId = "user_id"
+                }
+            }
+            
+            let allSales: [SHSale] = try await query
                 .order("sale_date", ascending: false)
                 .execute()
-            
-            let allSales = try JSONDecoder.supabaseDecoder.decodeSupabase([Sale].self, from: response.data)
+                .value
             
             var summaries: [SaleSummary] = []
             
             if !allSales.isEmpty {
-                // Fetch items for product counts (we'll fetch all items for this store for simplicity)
-                // In production, we might fetch only relevant items or paginate
-                let itemsResponse = try? await client.from("sale_items").select().execute()
-                let allItems = (try? JSONDecoder.supabaseDecoder.decodeSupabase([SaleItem].self, from: itemsResponse?.data ?? Data())) ?? []
+                struct SHSaleItem: Decodable {
+                    let saleId: UUID
+                    let productId: UUID
+                    let quantity: Int
+                    enum CodingKeys: String, CodingKey {
+                        case saleId = "sale_id", productId = "product_id", quantity
+                    }
+                }
+                let allItems: [SHSaleItem] = try await client.from("sale_items").select().execute().value
                 
-                let customersResponse = try? await client.from("customers").select("id, first_name, last_name").eq("store_id", value: storeId.uuidString).execute()
-                struct MiniCustomer: Decodable { let id: UUID; let first_name: String; let last_name: String }
-                let customers = (try? JSONDecoder.supabaseDecoder.decodeSupabase([MiniCustomer].self, from: customersResponse?.data ?? Data())) ?? []
+                struct MiniCustomer: Decodable { let id: UUID; let name: String }
+                let customers: [MiniCustomer] = try await client.from("customers").select("id, name").eq("assigned_store_id", value: storeId.uuidString).execute().value
                 var customerMap: [UUID: String] = [:]
-                for c in customers { customerMap[c.id] = "\(c.first_name) \(c.last_name)" }
+                for c in customers { customerMap[c.id] = c.name }
                 
-                let usersResponse = try? await client.from("users").select("id, first_name, last_name").eq("store_id", value: storeId.uuidString).execute()
-                struct MiniUser: Decodable { let id: UUID; let first_name: String; let last_name: String }
-                let users = (try? JSONDecoder.supabaseDecoder.decodeSupabase([MiniUser].self, from: usersResponse?.data ?? Data())) ?? []
+                struct MiniUser: Decodable { let id: UUID; let fullName: String; enum CodingKeys: String, CodingKey { case id, fullName = "full_name" } }
+                let users: [MiniUser] = try await client.from("users").select("id, full_name").eq("store_id", value: storeId.uuidString).execute().value
                 var userMap: [UUID: String] = [:]
-                for u in users { userMap[u.id] = "\(u.first_name) \(u.last_name)" }
+                for u in users { userMap[u.id] = u.fullName }
                 
                 // Group items by sale
-                var saleItemsMap: [UUID: [SaleItem]] = [:]
+                var saleItemsMap: [UUID: [SHSaleItem]] = [:]
                 for item in allItems {
                     saleItemsMap[item.saleId, default: []].append(item)
                 }
@@ -100,7 +126,7 @@ final class SalesHistoryViewModel: ObservableObject {
                     let productCount = Set(items.map { $0.productId }).count
                     
                     let cName = sale.customerId != nil ? (customerMap[sale.customerId!] ?? "Walk-in") : "Walk-in"
-                    let aName = userMap[sale.userId] ?? "Unknown Associate"
+                    let aName = sale.userId != nil ? (userMap[sale.userId!] ?? "Unknown Associate") : "Unknown Associate"
                     
                     summaries.append(SaleSummary(
                         id: sale.id,
@@ -144,20 +170,21 @@ final class SalesHistoryViewModel: ObservableObject {
                     let firstDayString = formatter.string(from: firstDayOfMonth)
                     let lastDayString = formatter.string(from: lastDayOfMonth)
                     
-                    let targetResponse = try await client
+                    struct StoreTargetPartial: Decodable {
+                        let revenueTarget: Double
+                        enum CodingKeys: String, CodingKey { case revenueTarget = "revenue_target" }
+                    }
+                    
+                    let targets: [StoreTargetPartial] = try await client
                         .from("store_targets")
                         .select("revenue_target")
                         .eq("store_id", value: storeId.uuidString)
                         .gte("target_month", value: firstDayString)
                         .lte("target_month", value: lastDayString)
                         .execute()
-                    
-                    struct StoreTargetPartial: Decodable {
-                        let revenue_target: Double
-                    }
-                    
-                    let targets = try JSONDecoder.supabaseDecoder.decodeSupabase([StoreTargetPartial].self, from: targetResponse.data)
-                    self.monthlyTarget = targets.first?.revenue_target ?? 0
+                        .value
+                        
+                    self.monthlyTarget = targets.first?.revenueTarget ?? 0
                 }
             } catch {
                 print("Failed to fetch store targets: \(error)")
@@ -165,18 +192,24 @@ final class SalesHistoryViewModel: ObservableObject {
             }
             
         } catch {
-            errorMessage = error.localizedDescription
-            print("Failed to load sales history: \(error)")
+            self.errorMessage = "\(error.localizedDescription)\n\(String(describing: error))"
+            self.isLoading = false
         }
         
         isLoading = false
     }
 }
 
-struct SalesHistoryView: View {
-    @StateObject private var viewModel = SalesHistoryViewModel()
+public struct SalesHistoryView: View {
+    @StateObject private var viewModel: SalesHistoryViewModel
+    private let isEmbedded: Bool
     
-    var body: some View {
+    public init(filterUserId: UUID? = nil) {
+        _viewModel = StateObject(wrappedValue: SalesHistoryViewModel(filterUserId: filterUserId))
+        self.isEmbedded = filterUserId != nil
+    }
+    
+    public var body: some View {
         ZStack {
             Color(.systemGroupedBackground)
                 .ignoresSafeArea()
@@ -212,7 +245,9 @@ struct SalesHistoryView: View {
                 }
             } else {
                 ScrollView(showsIndicators: false) {
-                    SalesAnalyticsHeaderView(viewModel: viewModel)
+                    if !isEmbedded {
+                        SalesAnalyticsHeaderView(viewModel: viewModel)
+                    }
                     
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Sales History")

@@ -72,8 +72,10 @@ final class SaleDetailsViewModel: ObservableObject {
             }
             
             // Fetch associate
-            if let userResponse = try? await client.from("users").select().eq("id", value: fetchedSale.userId.uuidString).single().execute() {
-                self.user = try? JSONDecoder.supabaseDecoder.decodeSupabase(UserData.self, from: userResponse.data)
+            if let aId = fetchedSale.userId {
+                if let userResponse = try? await client.from("users").select().eq("id", value: aId.uuidString).single().execute() {
+                    self.user = try? JSONDecoder.supabaseDecoder.decodeSupabase(UserData.self, from: userResponse.data)
+                }
             }
             
             // Fetch store

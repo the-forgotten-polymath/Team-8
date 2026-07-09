@@ -10,10 +10,12 @@ import SwiftUI
 struct StockRequestView: View {
     let warehouseId: UUID
     let userId: UUID
+    @Binding var selectedSegment: LogisticsSegment
     
     @StateObject private var viewModel = StockRequestViewModel()
     @State private var filterOption = RequestFilter.all
     @State private var searchText = ""
+    @State private var hasLoaded = false
     
 
     enum RequestFilter {
@@ -202,8 +204,6 @@ struct StockRequestView: View {
                 .background(Color(UIColor.systemGroupedBackground))
             }
         }
-        .navigationTitle("Stock Allocation Requests")
-        .navigationBarTitleDisplayMode(.inline)
         .alert("Error", isPresented: Binding(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
@@ -215,8 +215,21 @@ struct StockRequestView: View {
         .refreshable {
             await viewModel.loadData(warehouseId: warehouseId)
         }
-        .task {
-            await viewModel.loadData(warehouseId: warehouseId)
+        .onAppear {
+            loadDataIfNeeded()
+        }
+        .onChange(of: selectedSegment) { newValue in
+            if newValue == .requests {
+                loadDataIfNeeded()
+            }
+        }
+    }
+
+    private func loadDataIfNeeded() {
+        if selectedSegment == .requests {
+            Swift.Task {
+                await viewModel.loadData(warehouseId: warehouseId)
+            }
         }
     }
     

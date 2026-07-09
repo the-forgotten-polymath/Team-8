@@ -12,6 +12,7 @@ struct ShipmentDetailView: View {
     let warehouseId: UUID
     let userId: UUID
     
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ShipmentVerificationViewModel()
     @State private var isShowingScanner = false
     @State private var showConfirmDialog = false
@@ -204,7 +205,7 @@ struct ShipmentDetailView: View {
         }
         .alert("Verification Complete", isPresented: $viewModel.isVerifiedSuccess) {
             Button("OK") {
-                // Dismiss details page or refresh parent
+                dismiss()
             }
         } message: {
             Text("Shipment has been successfully verified, and inventory quantities have been adjusted.")

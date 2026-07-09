@@ -40,12 +40,16 @@ final class DashboardViewModel: ObservableObject {
             // Fetch Shipments
             let shipments = try await service.fetchShipments()
             self.pendingShipmentsCount = shipments.filter { $0.status.lowercased() == "pending" }.count
-            self.recentShipments = Array(shipments.sorted(by: { $0.createdAt > $1.createdAt }).prefix(3))
+            self.recentShipments = Array(shipments.sorted(by: { 
+                let d0 = $0.receivedDate ?? $0.dispatchDate ?? $0.createdAt
+                let d1 = $1.receivedDate ?? $1.dispatchDate ?? $1.createdAt
+                return d0 > d1
+            }).prefix(3))
             
             // Fetch Requests
             let requests = try await service.fetchStockRequests()
             self.pendingStockRequestsCount = requests.filter { $0.status.lowercased() == "pending" }.count
-            self.recentStockRequests = Array(requests.sorted(by: { $0.createdAt > $1.createdAt }).prefix(3))
+            self.recentStockRequests = Array(requests.sorted(by: { $0.updatedAt > $1.updatedAt }).prefix(3))
             
             // Fetch Transfers
             let transfers = try await service.fetchTransfers()

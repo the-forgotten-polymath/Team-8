@@ -48,6 +48,7 @@
 		99404028CA1A7D3DC49B8B29 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = C40E3D475DA5046377BF4D87 /* Functions */; };
 		9A23640B65393C2F3E1BC656 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */; };
 		A0B09E54630C43BCA1FC2E22 /* GatewayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA69B4B435CD8680B7545E56 /* GatewayView.swift */; };
+		A1D18DD12FFE58F500EFC8A4 /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */; };
 		A717B24F4218501882374B34 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 98E2439AB3EF1E57ADACA310 /* PostgREST */; };
 		B3856ED720B19D47A076BCF6 /* AdminModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE8FDF16F7B414C3A03B817E /* AdminModule.framework */; };
 		B45154B6D4880D647DA801E1 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DA46FE8CAB17ACFDFB9ADC9 /* Functions */; };
@@ -117,7 +118,7 @@
 		16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Admin_RSMS.app; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		545E2F922FEC4E550027DD55 /* RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
 		8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
@@ -138,6 +139,8 @@
 		8E9289552FF566BC001C9D4C /* config.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.toml; sourceTree = "<group>"; };
 		8E9289572FF566BC001C9D4C /* test_geocoder */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test_geocoder; sourceTree = "<group>"; };
 		8E9289582FF566BC001C9D4C /* test_geocoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test_geocoder.swift; sourceTree = "<group>"; };
+		A1D18D4E2FFCFA6C00EFC8A4 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
+		A1D18DCF2FFE58B300EFC8A4 /* SalesAssociateModule-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SalesAssociateModule-Info.plist"; sourceTree = "<group>"; };
 		A1E8ADC4058A76639409B24F /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA69B4B435CD8680B7545E56 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
@@ -191,6 +194,7 @@
 			files = (
 				8E2951582FF4F6C200BC2782 /* PostgREST in Frameworks */,
 				8E2951562FF4F6C200BC2782 /* Functions in Frameworks */,
+				A1D18DD12FFE58F500EFC8A4 /* RazorpayCheckout in Frameworks */,
 				8E29515E2FF4F6C200BC2782 /* Supabase in Frameworks */,
 				8E2951542FF4F6C200BC2782 /* Auth in Frameworks */,
 				8E29515C2FF4F6C200BC2782 /* Storage in Frameworks */,
@@ -286,6 +290,7 @@
 		545E2F892FEC4E550027DD55 = {
 			isa = PBXGroup;
 			children = (
+				A1D18DCF2FFE58B300EFC8A4 /* SalesAssociateModule-Info.plist */,
 				8E13F7862FFBFFCC002D0D70 /* supabase */,
 				8E13F7872FFBFFCC002D0D70 /* test_geocoder */,
 				8E13F7882FFBFFCC002D0D70 /* test_geocoder.swift */,
@@ -307,7 +312,7 @@
 		545E2F932FEC4E550027DD55 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				545E2F922FEC4E550027DD55 /* Admin_RSMS.app */,
+				545E2F922FEC4E550027DD55 /* RSMS.app */,
 				DE8FDF16F7B414C3A03B817E /* AdminModule.framework */,
 				14A849CAC1A51C675BFEA412 /* InventoryModule.framework */,
 				D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */,
@@ -412,6 +417,13 @@
 				8E9289552FF566BC001C9D4C /* config.toml */,
 			);
 			path = supabase;
+			sourceTree = "<group>";
+		};
+		A1D18D512FFCFA6C00EFC8A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		E843FB542FFCBAB300B2BE40 /* Products */ = {
@@ -546,9 +558,10 @@
 				8E2951592FF4F6C200BC2782 /* Realtime */,
 				8E29515B2FF4F6C200BC2782 /* Storage */,
 				8E29515D2FF4F6C200BC2782 /* Supabase */,
+				A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */,
 			);
 			productName = RSMS;
-			productReference = 545E2F922FEC4E550027DD55 /* Admin_RSMS.app */;
+			productReference = 545E2F922FEC4E550027DD55 /* RSMS.app */;
 			productType = "com.apple.product-type.application";
 		};
 		8021D4579D215450A41783E2 /* StoreManagerModule */ = {
@@ -651,16 +664,24 @@
 					ProjectRef = 16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
+					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
+					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
+					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
+					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
 					ProductGroup = E8C08ABC2FFB827800BE7B39 /* Products */;
 					ProjectRef = E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 8E13F7072FFBFF78002D0D70 /* Products */;
-					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = A1D18D512FFCFA6C00EFC8A4 /* Products */;
+					ProjectRef = A1D18D4E2FFCFA6C00EFC8A4 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
-					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = 8E13F7072FFBFF78002D0D70 /* Products */;
+					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
 					ProductGroup = E843FB542FFCBAB300B2BE40 /* Products */;
@@ -669,10 +690,6 @@
 				{
 					ProductGroup = 16A6C2A32FFC086F007A7E84 /* Products */;
 					ProjectRef = 16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
-					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -806,10 +823,12 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SalesAssociateModule-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -836,10 +855,12 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SalesAssociateModule-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -867,6 +888,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -898,6 +920,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -928,6 +951,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -958,6 +982,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -989,6 +1014,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1142,9 +1168,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VACG5C2JP3;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RSMS needs microphone access to record your voice for promotion descriptions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "RSMS needs speech recognition to transcribe your voice for promotion descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1158,7 +1185,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS";
+				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS8";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -1177,9 +1204,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VACG5C2JP3;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RSMS needs microphone access to record your voice for promotion descriptions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "RSMS needs speech recognition to transcribe your voice for promotion descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1193,7 +1221,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS";
+				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS8";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -1211,6 +1239,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1446,6 +1475,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
+		};
+		A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0500A8412F5DDB9D23D86125 /* XCRemoteSwiftPackageReference "razorpay-pod" */;
+			productName = RazorpayCheckout;
 		};
 		BB50939E46963CAB435243F8 /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;

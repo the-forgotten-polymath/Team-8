@@ -1243,8 +1243,6 @@ struct ShiftDetailView: View {
     }
 
     var body: some View {
-        let metadata = ShiftMetadataStore.shared.get(id: shift.id)
-
         NavigationStack {
             List {
                 Section(header: Text("Shift Schedule")) {

@@ -146,6 +146,11 @@ struct ProfileCompletionScreen: View {
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     @State private var selectedPhotoData: Data? = nil
     
+    // Store Image properties
+    @State private var selectedStorePhotoItem: PhotosPickerItem? = nil
+    @State private var selectedStorePhotoData: Data? = nil
+    @State private var storeImageError: String? = nil
+    
     @State private var usernameError: String? = nil
     @State private var passwordError: String? = nil
     @State private var phoneError: String? = nil
@@ -153,8 +158,11 @@ struct ProfileCompletionScreen: View {
     @State private var addressError: String? = nil
     
     @State private var isLoading = false
+    @State private var isFetchingStore = false
     @State private var errorMessage: String? = nil
     @State private var showErrorAlert = false
+    
+    @State private var fetchedStoreName: String = "Fetching..."
     
     let genders = ["Male", "Female", "Other", "Prefer not to say"]
     
@@ -173,133 +181,232 @@ struct ProfileCompletionScreen: View {
         if let dobString = user.dateOfBirth, let dob = formatter.date(from: dobString) {
             self._dateOfBirth = State(initialValue: dob)
         } else {
-            // Default to 18 years ago
             self._dateOfBirth = State(initialValue: Calendar.current.date(byAdding: .year, value: -18, to: Date())!)
         }
     }
     
+
+
     private var maxDate: Date {
-        Calendar.current.date(byAdding: .year, value: -18, to: Date())!
+        var components = DateComponents()
+        components.year = 2008
+        components.month = 12
+        components.day = 31
+        return Calendar.current.date(from: components) ?? Date()
     }
     
     var body: some View {
         Form {
-            Section(header: Text("Account Information"), footer: Text("Your username is currently your email address. You may change it now or keep it as is.")) {
-                TextField("Username", text: $username)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                if let error = usernameError {
-                    Text(error).foregroundColor(.red).font(.caption)
-                }
-                
-                HStack {
-                    if showNewPassword {
-                        TextField("New Password", text: $newPassword)
-                    } else {
-                        SecureField("New Password", text: $newPassword)
-                    }
-                    Button(action: { showNewPassword.toggle() }) {
-                        Image(systemName: showNewPassword ? "eye.slash" : "eye")
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                HStack {
-                    if showConfirmPassword {
-                        TextField("Confirm Password", text: $confirmPassword)
-                    } else {
-                        SecureField("Confirm Password", text: $confirmPassword)
-                    }
-                    Button(action: { showConfirmPassword.toggle() }) {
-                        Image(systemName: showConfirmPassword ? "eye.slash" : "eye")
-                            .foregroundColor(.gray)
-                    }
-                }
-                if let error = passwordError {
-                    Text(error).foregroundColor(.red).font(.caption)
-                }
-            }
-            
             Section(header: Text("Personal Information")) {
-                HStack {
-                    Spacer()
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
-                        if let selectedPhotoData, let uiImage = UIImage(data: selectedPhotoData) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 80, height: 80)
-                                .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .onChange(of: selectedPhotoItem) { oldValue, newValue in
-                        Task {
-                            if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                                selectedPhotoData = data
+                // 1. Profile Photo
+                VStack {
+                    HStack {
+                        Spacer()
+                        PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
+                            if let selectedPhotoData, let uiImage = UIImage(data: selectedPhotoData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .foregroundColor(.gray)
                             }
                         }
+                        .onChange(of: selectedPhotoItem) { oldValue, newValue in
+                            Task {
+                                if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                    selectedPhotoData = data
+                                }
+                            }
+                        }
+                        Spacer()
                     }
-                    Spacer()
+                    Text("Change Photo").font(.caption).foregroundColor(.blue)
                 }
                 .padding(.vertical, 8)
                 
-                TextField("Phone Number", text: $phone)
-                    .keyboardType(.numberPad)
-                if let error = phoneError {
-                    Text(error).foregroundColor(.red).font(.caption)
+                // 2. Username
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("Username")
+                        Spacer()
+                        TextField("Enter Username", text: $username)
+                            .multilineTextAlignment(.trailing)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                    }
+                    if let error = usernameError {
+                        Text(error).foregroundColor(.red).font(.caption).padding(.top, 4)
+                    }
                 }
                 
+                // 3. Employee ID
+                HStack {
+                    Text("Employee Code")
+                    Spacer()
+                    Text(user.employeeCode ?? "N/A").foregroundColor(.secondary)
+                }
+                
+                // 4. Full Name
+                HStack {
+                    Text("Full Name")
+                    Spacer()
+                    Text(user.fullName).foregroundColor(.secondary)
+                }
+                
+                // 5. Email Address
+                HStack {
+                    Text("Email")
+                    Spacer()
+                    Text(user.email).foregroundColor(.secondary)
+                }
+                
+                // 6. Phone Number
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("Phone Number")
+                        Spacer()
+                        TextField("Enter Number", text: $phone)
+                            .multilineTextAlignment(.trailing)
+                            .keyboardType(.numberPad)
+                    }
+                    if let error = phoneError {
+                        Text(error).foregroundColor(.red).font(.caption).padding(.top, 4)
+                    }
+                }
+                
+                // 7. Gender
                 Picker("Gender", selection: $gender) {
                     ForEach(genders, id: \.self) { g in
                         Text(g).tag(g)
                     }
                 }
                 
-                DatePicker("Date of Birth", selection: $dateOfBirth, in: ...maxDate, displayedComponents: .date)
-                if let error = ageError {
-                    Text(error).foregroundColor(.red).font(.caption)
+                // 8. Date of Birth
+                VStack(alignment: .leading, spacing: 0) {
+                    DatePicker("Date of Birth", selection: $dateOfBirth, in: ...maxDate, displayedComponents: .date)
+                    if let error = ageError {
+                        Text(error).foregroundColor(.red).font(.caption).padding(.top, 4)
+                    }
                 }
                 
-                TextField("Address", text: $address)
-                if let error = addressError {
-                    Text(error).foregroundColor(.red).font(.caption)
+                // 9. Address
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("Address")
+                        Spacer()
+                        TextField("Enter Address", text: $address, axis: .vertical)
+                            .multilineTextAlignment(.trailing)
+                            .lineLimit(1...5)
+                    }
+                    if let error = addressError {
+                        Text(error).foregroundColor(.red).font(.caption).padding(.top, 4)
+                    }
                 }
-            }
-            
-            Section(header: Text("Company Information")) {
-                HStack {
-                    Text("Full Name")
-                    Spacer()
-                    Text(user.fullName).foregroundColor(.secondary)
-                }
-                HStack {
-                    Text("Email")
-                    Spacer()
-                    Text(user.email).foregroundColor(.secondary)
-                }
-                HStack {
-                    Text("Employee Code")
-                    Spacer()
-                    Text(user.employeeCode ?? "N/A").foregroundColor(.secondary)
-                }
+                
+                // 10. Designation
                 HStack {
                     Text("Designation")
                     Spacer()
                     Text(user.designation ?? "N/A").foregroundColor(.secondary)
                 }
+            }
+            
+            Section(header: Text("Change Password")) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("New Password")
+                        Spacer()
+                        if showNewPassword {
+                            TextField("", text: $newPassword)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            SecureField("", text: $newPassword)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        Button(action: { showNewPassword.toggle() }) {
+                            Image(systemName: showNewPassword ? "eye.slash" : "eye")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("Confirm Password")
+                        Spacer()
+                        if showConfirmPassword {
+                            TextField("", text: $confirmPassword)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            SecureField("", text: $confirmPassword)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        Button(action: { showConfirmPassword.toggle() }) {
+                            Image(systemName: showConfirmPassword ? "eye.slash" : "eye")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    if let error = passwordError {
+                        Text(error).foregroundColor(.red).font(.caption).padding(.top, 4)
+                    }
+                }
+            }
+            
+            Section(header: Text("Assigned Store")) {
                 HStack {
-                    Text("Assigned Store")
+                    Text("Store Name")
                     Spacer()
-                    Text(user.storeId?.uuidString ?? "Not Assigned").foregroundColor(.secondary)
+                    Text(fetchedStoreName).foregroundColor(.secondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
+            }
+            
+            Section(header: Text("Store Images"), footer: Text("Upload a photograph of your assigned store. Maximum size 5 MB. (JPG/PNG)")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    PhotosPicker(selection: $selectedStorePhotoItem, matching: .images, photoLibrary: .shared()) {
+                        HStack {
+                            Image(systemName: "photo.badge.plus")
+                            Text("Upload Store Image")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                    .onChange(of: selectedStorePhotoItem) { oldValue, newValue in
+                        Task {
+                            if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                if data.count > 5 * 1024 * 1024 {
+                                    storeImageError = "Image exceeds 5 MB maximum size."
+                                    selectedStorePhotoData = nil
+                                } else {
+                                    storeImageError = nil
+                                    selectedStorePhotoData = data
+                                }
+                            }
+                        }
+                    }
+                    
+                    if let error = storeImageError {
+                        Text(error).foregroundColor(.red).font(.caption)
+                    }
+                    
+                    if let storeData = selectedStorePhotoData, let uiImage = UIImage(data: storeData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 150)
+                            .frame(maxWidth: .infinity)
+                            .cornerRadius(12)
+                            .clipped()
+                            .padding(.top, 8)
+                    }
+                }
+                .padding(.vertical, 8)
             }
             
             Section {
@@ -308,7 +415,7 @@ struct ProfileCompletionScreen: View {
                         Spacer()
                         if isLoading {
                             ProgressView()
-                            Text("Uploading...")
+                            Text("Saving...")
                                 .foregroundColor(.secondary)
                                 .padding(.leading, 8)
                         } else {
@@ -318,11 +425,14 @@ struct ProfileCompletionScreen: View {
                         Spacer()
                     }
                 }
-                .disabled(isLoading)
+                .disabled(isLoading || isFetchingStore)
             }
         }
         .navigationTitle("Complete Your Profile")
         .navigationBarBackButtonHidden(isLoading)
+        .onAppear {
+            fetchStoreName()
+        }
         .alert(isPresented: $showErrorAlert) {
             Alert(
                 title: Text("Error"),
@@ -332,6 +442,43 @@ struct ProfileCompletionScreen: View {
                 }),
                 secondaryButton: .cancel()
             )
+        }
+    }
+    private func fetchStoreName() {
+        guard let storeId = user.storeId else {
+            fetchedStoreName = "Not Assigned"
+            return
+        }
+        isFetchingStore = true
+        Task {
+            let client = SupabaseClient(
+                supabaseURL: URL(string: GatewayConstants.supabaseURL)!,
+                supabaseKey: GatewayConstants.supabaseKey
+            )
+            do {
+                struct StoreResult: Decodable {
+                    let name: String
+                }
+                let stores: [StoreResult] = try await client.from("stores")
+                    .select("name")
+                    .eq("id", value: storeId.uuidString)
+                    .execute()
+                    .value
+                
+                await MainActor.run {
+                    if let store = stores.first {
+                        self.fetchedStoreName = store.name
+                    } else {
+                        self.fetchedStoreName = "Unknown Store"
+                    }
+                    self.isFetchingStore = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.fetchedStoreName = "Unknown Store"
+                    self.isFetchingStore = false
+                }
+            }
         }
     }
     
@@ -344,25 +491,24 @@ struct ProfileCompletionScreen: View {
         addressError = nil
         var hasError = false
         
-        // 1. Validation
-        let usernameRegex = "^[a-zA-Z0-9_.]{4,25}$"
+        let usernameRegex = "^[a-zA-Z0-9_.]{3,25}$"
         if username.range(of: usernameRegex, options: .regularExpression) == nil {
-            usernameError = "Username must be 4-25 characters and contain only letters, numbers, underscores, or periods."
+            usernameError = "Username must be 3-25 characters."
             hasError = true
         }
         
-        if newPassword.isEmpty || confirmPassword.isEmpty {
-            passwordError = "Please enter and confirm your password."
-            hasError = true
-        } else if newPassword != confirmPassword {
-            passwordError = "Passwords do not match."
-            hasError = true
-        } else if newPassword.count < 6 {
-            passwordError = "Password must be at least 6 characters long."
-            hasError = true
+        if !newPassword.isEmpty || !confirmPassword.isEmpty {
+            if newPassword != confirmPassword {
+                passwordError = "Passwords do not match."
+                hasError = true
+            } else if newPassword.count < 8 {
+                passwordError = "Password must be at least 8 characters long."
+                hasError = true
+            }
         }
         
-        if phone.count != 10 || Int(phone) == nil {
+        let digitsCharacters = CharacterSet(charactersIn: "0123456789")
+        if phone.count != 10 || phone.rangeOfCharacter(from: digitsCharacters.inverted) != nil {
             phoneError = "Phone number must be exactly 10 digits."
             hasError = true
         }
@@ -373,8 +519,13 @@ struct ProfileCompletionScreen: View {
             hasError = true
         }
         
-        if address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            addressError = "Address cannot be empty."
+        let trimmedAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedAddress.isEmpty {
+            addressError = "Address is required."
+            hasError = true
+        }
+        
+        if storeImageError != nil {
             hasError = true
         }
         
@@ -386,21 +537,15 @@ struct ProfileCompletionScreen: View {
         formatter.dateFormat = "yyyy-MM-dd"
         let dobString = formatter.string(from: dateOfBirth)
         
-        print("Starting onboarding save...")
-        
         Task {
             let client = SupabaseClient(
                 supabaseURL: URL(string: GatewayConstants.supabaseURL)!,
                 supabaseKey: GatewayConstants.supabaseKey
             )
             
-            // Check username uniqueness
             if username != user.username {
-                print("Checking username...")
                 do {
-                    struct UsernameCheck: Codable {
-                        let id: UUID
-                    }
+                    struct UsernameCheck: Codable { let id: UUID }
                     let existingUsers: [UsernameCheck] = try await client.from("users")
                         .select("id")
                         .eq("username", value: username)
@@ -416,18 +561,8 @@ struct ProfileCompletionScreen: View {
                         return
                     }
                 } catch {
-                    print("========== ERROR ==========")
-                    print("Error:", error)
-                    print("Localized:", error.localizedDescription)
-                    print("Reflection:", String(reflecting: error))
-                    print("===========================")
-                    if let pgError = error as? PostgrestError {
-                        print("PostgrestError:", pgError)
-                    }
-                    
                     await MainActor.run {
-                        let alertMsg = error.localizedDescription.isEmpty ? String(reflecting: error) : error.localizedDescription
-                        self.errorMessage = alertMsg
+                        self.errorMessage = error.localizedDescription
                         self.showErrorAlert = true
                         self.isLoading = false
                     }
@@ -435,33 +570,19 @@ struct ProfileCompletionScreen: View {
                 }
             }
             
-            // Upload image if selected
             var finalProfileImageURL = profileImageURL.isEmpty ? nil : profileImageURL
             if let photoData = selectedPhotoData, let uiImage = UIImage(data: photoData) {
                 if let jpegData = uiImage.jpegData(compressionQuality: 0.8) {
                     let path = "profiles/\(user.id.uuidString).jpg"
-                    print("Uploading profile image...")
                     do {
                         try await client.storage
                             .from("store-images")
                             .upload(path: path, file: jpegData, options: FileOptions(contentType: "image/jpeg", upsert: true))
-                        
                         let publicUrl = try client.storage.from("store-images").getPublicURL(path: path)
                         finalProfileImageURL = publicUrl.absoluteString
-                        print("Profile image uploaded.")
                     } catch {
-                        print("========== ERROR ==========")
-                        print("Error:", error)
-                        print("Localized:", error.localizedDescription)
-                        print("Reflection:", String(reflecting: error))
-                        print("===========================")
-                        if let pgError = error as? PostgrestError {
-                            print("PostgrestError:", pgError)
-                        }
-                        
                         await MainActor.run {
-                            let alertMsg = error.localizedDescription.isEmpty ? String(reflecting: error) : error.localizedDescription
-                            self.errorMessage = alertMsg
+                            self.errorMessage = "Profile image upload failed."
                             self.showErrorAlert = true
                             self.isLoading = false
                         }
@@ -470,10 +591,35 @@ struct ProfileCompletionScreen: View {
                 }
             }
             
-            // Perform Update
-            struct UpdatePayload: Codable {
+            if let storeData = selectedStorePhotoData, let uiImage = UIImage(data: storeData), let storeId = user.storeId {
+                if let jpegData = uiImage.jpegData(compressionQuality: 0.8) {
+                    let path = "store-images/\(storeId.uuidString)/\(UUID().uuidString).jpg"
+                    do {
+                        try await client.storage
+                            .from("store-images")
+                            .upload(path: path, file: jpegData, options: FileOptions(contentType: "image/jpeg", upsert: true))
+                        
+                        let publicUrl = try client.storage.from("store-images").getPublicURL(path: path)
+                        
+                        struct StoreUpdatePayload: Codable { let image_url: String }
+                        try await client.from("stores")
+                            .update(StoreUpdatePayload(image_url: publicUrl.absoluteString))
+                            .eq("id", value: storeId.uuidString)
+                            .execute()
+                    } catch {
+                        await MainActor.run {
+                            self.errorMessage = "Store image upload failed."
+                            self.showErrorAlert = true
+                            self.isLoading = false
+                        }
+                        return
+                    }
+                }
+            }
+            
+            struct UpdatePayload: Encodable {
                 let username: String
-                let password: String
+                let password: String?
                 let phone: String
                 let gender: String
                 let date_of_birth: String
@@ -484,7 +630,7 @@ struct ProfileCompletionScreen: View {
             
             let payload = UpdatePayload(
                 username: username,
-                password: newPassword,
+                password: newPassword.isEmpty ? nil : newPassword,
                 phone: phone,
                 gender: gender,
                 date_of_birth: dobString,
@@ -493,41 +639,20 @@ struct ProfileCompletionScreen: View {
                 profile_verified: true
             )
             
-            print("Updating users table...")
-            print("Update Payload: user_id=\(user.id.uuidString), username=\(payload.username), phone=\(payload.phone), gender=\(payload.gender), date_of_birth=\(payload.date_of_birth), address=\(payload.address), profile_photo=\(payload.profile_image_url ?? "nil"), profile_verified=\(payload.profile_verified), store_id=\(user.storeId?.uuidString ?? "nil")")
-            
             do {
-                let response = try await client.from("users")
+                try await client.from("users")
                     .update(payload)
                     .eq("id", value: user.id.uuidString)
-                    .select()
                     .execute()
                 
-                let dataString = String(data: response.data, encoding: .utf8) ?? "[]"
-                if dataString == "[]" {
-                    print("WARNING: Users table update returned zero affected rows. Row was not updated.")
-                }
-                print("Users table updated.")
             } catch {
-                print("========== ERROR ==========")
-                print("Error:", error)
-                print("Localized:", error.localizedDescription)
-                print("Reflection:", String(reflecting: error))
-                print("===========================")
-                if let pgError = error as? PostgrestError {
-                    print("PostgrestError:", pgError)
-                }
-                
                 await MainActor.run {
-                    let alertMsg = error.localizedDescription.isEmpty ? String(reflecting: error) : error.localizedDescription
-                    self.errorMessage = alertMsg
+                    self.errorMessage = error.localizedDescription
                     self.showErrorAlert = true
                     self.isLoading = false
                 }
                 return
             }
-            
-            // (No Supabase Auth update needed since the app uses the public.users table for auth)
             
             await MainActor.run {
                 self.isLoading = false
@@ -536,6 +661,7 @@ struct ProfileCompletionScreen: View {
         }
     }
 }
+
 
 struct SuccessScreen: View {
     let user: GatewayUser

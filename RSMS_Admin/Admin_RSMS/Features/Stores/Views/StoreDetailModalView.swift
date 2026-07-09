@@ -81,16 +81,16 @@ struct StoreDetailModalView: View {
                     .overlay(
                         Text(store.managerInitials.isEmpty ? "--" : store.managerInitials)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(store.managerName.isEmpty ? "Unassigned" : store.managerName)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                     Text("Manager")
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
             }
@@ -107,7 +107,7 @@ struct StoreDetailModalView: View {
             } else if employees.isEmpty {
                 Text("No employees assigned to this store.")
                     .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 8)
             } else {
@@ -120,16 +120,16 @@ struct StoreDetailModalView: View {
                                 .overlay(
                                     Text(employeeInitials(for: employee.fullName))
                                         .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(.primary)
+                                        .foregroundStyle(.primary)
                                 )
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(employee.fullName)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary)
+                                    .foregroundStyle(.primary)
                                 Text(employee.designation ?? "Employee")
                                     .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                         }
@@ -165,15 +165,15 @@ struct StoreDetailModalView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label.uppercased())
                 .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text(value)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(valueColor)
+                    .foregroundStyle(valueColor)
             }
         }
     }

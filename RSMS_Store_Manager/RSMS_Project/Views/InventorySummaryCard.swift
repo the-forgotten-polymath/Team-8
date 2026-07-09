@@ -29,6 +29,9 @@ extension View {
 struct InventorySummaryCard: View {
     let summary: InventorySummary?
     let isLoading: Bool
+    
+    var onTotalProductsTapped: (() -> Void)? = nil
+    var onPendingRequestsTapped: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -60,10 +63,16 @@ struct InventorySummaryCard: View {
             // Statistics columns
             HStack(spacing: 0) {
                 // Total Products
-                statColumn(
-                    value: isLoading ? nil : formatIndianNumber(count: summary?.totalProducts ?? 0),
-                    label: "Total Products"
-                )
+                Button(action: {
+                    onTotalProductsTapped?()
+                }) {
+                    statColumn(
+                        value: isLoading ? nil : formatIndianNumber(count: summary?.totalProducts ?? 0),
+                        label: "Total Products"
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(isLoading)
                 
                 Spacer()
                 
@@ -75,11 +84,17 @@ struct InventorySummaryCard: View {
                 
                 Spacer()
                 
-                // Avg. Value
-                statColumn(
-                    value: isLoading ? nil : formatIndianCurrency(amount: summary?.avgValue ?? 0),
-                    label: "Avg. Value"
-                )
+                // Pending Requests
+                Button(action: {
+                    onPendingRequestsTapped?()
+                }) {
+                    statColumn(
+                        value: isLoading ? nil : formatIndianNumber(count: summary?.pendingRequestsCount ?? 0),
+                        label: "Pending Requests"
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(isLoading)
             }
         }
         .padding(16)

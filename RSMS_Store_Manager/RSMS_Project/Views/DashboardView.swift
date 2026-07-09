@@ -7,14 +7,22 @@
 
 import SwiftUI
 import Supabase
+import Charts
 import Combine
 
 // MARK: - Models
+
+enum SalesTimeRange: String, CaseIterable {
+    case week = "Week"
+    case month = "Month"
+    case year = "Year"
+}
 
 struct DailySale: Identifiable, Equatable {
     var id: String { dayLabel }
     let dayLabel: String
     let amount: Double
+    var date: Date? = nil
 }
 
 struct StaffShiftDisplay: Identifiable, Equatable {
@@ -45,6 +53,17 @@ final class DashboardViewModel: ObservableObject {
     @Published var todaySalesAmount: Double = 0.0
     @Published var salesGoal: Double = 35000.0
     @Published var chartData: [DailySale] = []
+    @Published var revenueTrend: Double? = nil
+    
+    @Published var selectedTimeRange: SalesTimeRange = .week {
+        didSet { updateChartData() }
+    }
+    @Published var transactions: Int = 0
+    @Published var averageSaleValue: Double = 0.0
+    @Published var unitsSold: Int = 0
+    private var allSales: [Sale] = []
+    private var allSaleItems: [SaleItem] = []
+    
     @Published var upcomingTasks: [Task] = []
     @Published var staffShifts: [StaffShiftDisplay] = []
     
@@ -99,12 +118,12 @@ final class DashboardViewModel: ObservableObject {
             // Count items requiring attention (quantity <= reorder_level)
             self.lowStockCount = inventoryItems.filter { $0.quantity <= $0.reorderLevel }.count
             
-            // 2. Fetch Sales from last 7 days
+            // 2. Fetch Sales for the current year
             let calendar = Calendar.current
-            let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date())) ?? Date()
+            let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: calendar.startOfDay(for: Date())) ?? Date()
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            let dateString = formatter.string(from: sevenDaysAgo)
+            let dateString = formatter.string(from: oneYearAgo)
             
             let salesResponse = try await client
                 .from("sales")
@@ -112,26 +131,15 @@ final class DashboardViewModel: ObservableObject {
                 .eq("store_id", value: storeId.uuidString)
                 .gte("sale_date", value: dateString)
                 .execute()
-            let sales = try JSONDecoder.supabaseDecoder.decodeSupabase([Sale].self, from: salesResponse.data)
+            self.allSales = try JSONDecoder.supabaseDecoder.decodeSupabase([Sale].self, from: salesResponse.data)
             
-            // Group sales by the last 7 days
-            var tempChartData: [DailySale] = []
-            let weekdaySymbols = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-            
-            for i in 0..<7 {
-                let targetDate = calendar.date(byAdding: .day, value: -6 + i, to: calendar.startOfDay(for: Date())) ?? Date()
-                let weekdayIndex = calendar.component(.weekday, from: targetDate) - 1
-                let label = weekdaySymbols[weekdayIndex]
-                
-                let daySales = sales.filter { calendar.isDate($0.saleDate, inSameDayAs: targetDate) }
-                let total = daySales.reduce(0.0) { $0 + $1.totalAmount }
-                
-                tempChartData.append(DailySale(dayLabel: label, amount: total))
+            if !self.allSales.isEmpty {
+                if let itemsResponse = try? await client.from("sale_items").select().execute() {
+                    self.allSaleItems = (try? JSONDecoder.supabaseDecoder.decodeSupabase([SaleItem].self, from: itemsResponse.data)) ?? []
+                }
             }
             
-            self.chartData = tempChartData
-            // Today is the last element in tempChartData
-            self.todaySalesAmount = tempChartData.last?.amount ?? 0.0
+            updateChartData()
             
             // 3. Fetch top 5 upcoming tasks
             let tasksResponse = try await client
@@ -237,6 +245,92 @@ final class DashboardViewModel: ObservableObject {
         }
         
         isLoading = false
+    }
+    
+    func updateChartData() {
+        let calendar = Calendar.current
+        var tempChartData: [DailySale] = []
+        var filteredSales: [Sale] = []
+        let today = calendar.startOfDay(for: Date())
+        
+        switch selectedTimeRange {
+        case .week:
+            let weekdaySymbols = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+            for i in 0..<7 {
+                let targetDate = calendar.date(byAdding: .day, value: -6 + i, to: today) ?? Date()
+                let weekdayIndex = calendar.component(.weekday, from: targetDate) - 1
+                let label = weekdaySymbols[weekdayIndex]
+                
+                let daySales = allSales.filter { calendar.isDate($0.saleDate, inSameDayAs: targetDate) }
+                let total = daySales.reduce(0.0) { $0 + $1.totalAmount }
+                tempChartData.append(DailySale(dayLabel: label, amount: total, date: targetDate))
+                filteredSales.append(contentsOf: daySales)
+            }
+        case .month:
+            // Group by 4 weeks (last 28 days)
+            for i in 0..<4 {
+                let startDate = calendar.date(byAdding: .day, value: -28 + (i * 7), to: today) ?? Date()
+                let endDate = calendar.date(byAdding: .day, value: 7, to: startDate) ?? Date()
+                let label = "W\(i+1)"
+                
+                let weekSales = allSales.filter { $0.saleDate >= startDate && $0.saleDate < endDate }
+                let total = weekSales.reduce(0.0) { $0 + $1.totalAmount }
+                tempChartData.append(DailySale(dayLabel: label, amount: total, date: startDate))
+                filteredSales.append(contentsOf: weekSales)
+            }
+        case .year:
+            let monthSymbols = calendar.shortMonthSymbols
+            for i in 0..<12 {
+                let targetMonthDate = calendar.date(byAdding: .month, value: -11 + i, to: today) ?? Date()
+                let monthIndex = calendar.component(.month, from: targetMonthDate) - 1
+                let label = monthSymbols[monthIndex]
+                
+                let monthSales = allSales.filter { 
+                    calendar.component(.month, from: $0.saleDate) == monthIndex + 1 &&
+                    calendar.component(.year, from: $0.saleDate) == calendar.component(.year, from: targetMonthDate)
+                }
+                let total = monthSales.reduce(0.0) { $0 + $1.totalAmount }
+                tempChartData.append(DailySale(dayLabel: label, amount: total, date: targetMonthDate))
+                filteredSales.append(contentsOf: monthSales)
+            }
+        }
+        
+        self.chartData = tempChartData
+        self.todaySalesAmount = tempChartData.last?.amount ?? 0.0
+        
+        // Update stats
+        self.transactions = filteredSales.count
+        let totalRevenue = filteredSales.reduce(0.0) { $0 + $1.totalAmount }
+        self.averageSaleValue = self.transactions > 0 ? totalRevenue / Double(self.transactions) : 0.0
+        
+        let filteredSaleIds = Set(filteredSales.map { $0.id })
+        let relevantItems = allSaleItems.filter { filteredSaleIds.contains($0.saleId) }
+        self.unitsSold = relevantItems.reduce(0) { $0 + $1.quantity }
+        
+        // Calculate Trend
+        var previousRevenue = 0.0
+        switch selectedTimeRange {
+        case .week:
+            let lastWeekStart = calendar.date(byAdding: .day, value: -13, to: today) ?? Date()
+            let lastWeekEnd = calendar.date(byAdding: .day, value: -7, to: today) ?? Date()
+            previousRevenue = allSales.filter { $0.saleDate >= lastWeekStart && $0.saleDate <= lastWeekEnd }.reduce(0.0) { $0 + $1.totalAmount }
+        case .month:
+            let lastMonthStart = calendar.date(byAdding: .day, value: -56, to: today) ?? Date()
+            let lastMonthEnd = calendar.date(byAdding: .day, value: -28, to: today) ?? Date()
+            previousRevenue = allSales.filter { $0.saleDate >= lastMonthStart && $0.saleDate < lastMonthEnd }.reduce(0.0) { $0 + $1.totalAmount }
+        case .year:
+            let lastYearStart = calendar.date(byAdding: .month, value: -23, to: today) ?? Date()
+            let lastYearEnd = calendar.date(byAdding: .month, value: -11, to: today) ?? Date()
+            previousRevenue = allSales.filter { $0.saleDate >= lastYearStart && $0.saleDate < lastYearEnd }.reduce(0.0) { $0 + $1.totalAmount }
+        }
+        
+        if previousRevenue > 0 {
+            self.revenueTrend = ((totalRevenue - previousRevenue) / previousRevenue) * 100.0
+        } else if previousRevenue == 0 && totalRevenue > 0 {
+            self.revenueTrend = 100.0 // 100% increase if previous was 0 and now we have sales
+        } else {
+            self.revenueTrend = nil
+        }
     }
 }
 
@@ -388,8 +482,10 @@ struct DashboardView: View {
     
     // MARK: - Cards
     
+    @ViewBuilder
     private var lowStockBannerCard: some View {
-        Button {
+        if viewModel.lowStockCount > 0 {
+            Button {
             selectedStockFilter = .lowStock
             withAnimation {
                 selectedTab = 2 // Navigate to Stock Tab
@@ -433,110 +529,235 @@ struct DashboardView: View {
             .padding(.horizontal, 20)
         }
         .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    private var formattedSelectedDate: String {
+        if let selected = selectedDay, let sale = viewModel.chartData.first(where: { $0.dayLabel == selected }), let date = sale.date {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "d MMM yyyy"
+            let dateString = formatter.string(from: date)
+            return Calendar.current.isDateInToday(date) ? "Today • \(dateString)" : dateString
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM yyyy"
+        return "Today • \(formatter.string(from: Date()))"
+    }
+    
+    private var isChartEmpty: Bool {
+        viewModel.chartData.isEmpty || viewModel.chartData.allSatisfy { $0.amount == 0 }
+    }
+    
+    @ViewBuilder
+    private var headerRevenueView: some View {
+        if let day = selectedDay, let sale = viewModel.chartData.first(where: { $0.dayLabel == day }) {
+            Text(formatIndianCurrency(amount: sale.amount))
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(Color(.label))
+        } else {
+            Text(formatIndianCurrency(amount: viewModel.todaySalesAmount))
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(Color(.label))
+        }
     }
     
     private var salesProgressChartCard: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Header
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chart.bar.xaxis")
-                            .foregroundColor(Color(.label))
-                        Text(selectedDay != nil ? "SALES (\(selectedDay!.uppercased()))" : "SALES")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(.label))
-                            .textCase(.uppercase)
-                            .animation(.easeInOut, value: selectedDay)
-                    }
-                    
-                    Text(headerSubtitle)
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(selectedDay != nil ? .blue : Color(.label))
-                        .animation(.easeInOut, value: selectedDay)
-                }
-                
-                Spacer()
-            }
-            
-            // Bar Chart
-            HStack(alignment: .bottom, spacing: 0) {
-                let maxSales = max(viewModel.chartData.map { $0.amount }.max() ?? 0.0, 5000.0)
-                
-                // Y-Axis Labels
-                VStack(alignment: .trailing, spacing: 0) {
-                    ForEach((0...5).reversed(), id: \.self) { i in
-                        let value = (maxSales / 5.0) * Double(i)
-                        Text(formatK(value))
-                            .font(.caption2)
-                            .foregroundColor(Color(.secondaryLabel))
-                            .frame(maxHeight: .infinity, alignment: .bottom)
-                    }
-                }
-                .frame(height: 180)
-                .padding(.trailing, 16)
-                
-                // Bars
-                HStack(alignment: .bottom, spacing: 20) {
-                    ForEach(Array(viewModel.chartData.enumerated()), id: \.element.id) { index, day in
-                        let isCurrentDay = day.dayLabel == currentDayString
-                        let isAnySelected = selectedDay != nil
-                        let showPresentDayHighlight = isCurrentDay && !isAnySelected
-                        let isSelected = selectedDay == day.dayLabel
-                        
-                        VStack(spacing: 8) {
-                            GeometryReader { geometry in
-                                ZStack(alignment: .bottom) {
-                                    // Background track
-                                    Capsule()
-                                        .fill(Color(.secondaryLabel).opacity(0.15))
-                                        .frame(height: geometry.size.height)
+        VStack(alignment: .leading, spacing: 16) {
+                    // Header & Picker
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            NavigationLink(destination: SalesHistoryView()) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(spacing: 4) {
+                                        Text("TOTAL REVENUE")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color(.systemGray))
+                                            .textCase(.uppercase)
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color(.systemGray))
+                                    }
                                     
-                                    // Foreground track (Actual)
-                                    Capsule()
-                                        .fill(isSelected || !isAnySelected ? Color.blue : Color(.secondaryLabel).opacity(0.3))
-                                        .shadow(color: Color.blue.opacity(isSelected ? 0.6 : (showPresentDayHighlight ? 0.8 : 0.0)), radius: isSelected ? 10 : (showPresentDayHighlight ? 12 : 0), x: 0, y: isSelected ? 4 : 0)
-                                        .frame(height: showBars ? geometry.size.height * CGFloat(day.amount / maxSales) : 0)
-                                        .scaleEffect(isSelected ? 1.15 : 1.0, anchor: .bottom)
-                                        .zIndex(isSelected || showPresentDayHighlight ? 1 : 0)
-                                        .animation(.spring(response: 0.6, dampingFraction: 0.65, blendDuration: 0).delay(Double(index) * 0.1), value: showBars)
-                                        .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0), value: selectedDay)
+                                    headerRevenueView
+                                        .animation(.spring(), value: viewModel.todaySalesAmount)
                                 }
                             }
-                            .frame(width: showPresentDayHighlight ? 22 : 16, height: 180)
-                            .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0), value: selectedDay)
+                            .buttonStyle(PlainButtonStyle())
                             
-                            // X-Axis Label
-                            Text(day.dayLabel)
-                                .font(.caption2)
-                                .fontWeight(showPresentDayHighlight ? .bold : .regular)
-                                .foregroundColor(selectedDay == day.dayLabel || showPresentDayHighlight ? .blue : Color(.secondaryLabel))
-                                .animation(.easeInOut, value: selectedDay)
+                            if let trend = viewModel.revenueTrend {
+                                let isPositive = trend >= 0
+                                let trendText = String(format: "%.1f%%", abs(trend))
+                                let periodText = viewModel.selectedTimeRange == .week ? "last week" : (viewModel.selectedTimeRange == .month ? "last month" : "last year")
+                                
+                                Text("\(isPositive ? "↑" : "↓") \(trendText) vs \(periodText)")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(isPositive ? .green : .red)
+                                    .padding(.top, 2)
+                            }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            if selectedDay == day.dayLabel {
-                                selectedDay = nil
-                            } else {
-                                selectedDay = day.dayLabel
+                        
+                        Spacer()
+                        
+                        Picker("Time Range", selection: $viewModel.selectedTimeRange) {
+                            ForEach([SalesTimeRange.week, SalesTimeRange.month], id: \.self) { range in
+                                Text(range.rawValue).tag(range)
+                            }
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .frame(width: 140)
+                        .padding(.top, 16)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 8)
+                    
+                    // Line Chart
+                    ZStack {
+                        if isChartEmpty {
+                            VStack {
+                                Spacer()
+                                Text("No sales recorded for this period.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                            .frame(height: 150)
+                        }
+                        
+                        Chart {
+                            if !isChartEmpty {
+                                ForEach(viewModel.chartData) { day in
+                                    LineMark(
+                                        x: .value("Time", day.dayLabel),
+                                        y: .value("Sales", day.amount)
+                                    )
+                                    .foregroundStyle(Color.blue)
+                                    .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                                    .interpolationMethod(.catmullRom)
+                                    
+                                    AreaMark(
+                                        x: .value("Time", day.dayLabel),
+                                        y: .value("Sales", day.amount)
+                                    )
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [Color.blue.opacity(0.15), Color.blue.opacity(0.0)]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .interpolationMethod(.catmullRom)
+                                    
+                                    if let selected = selectedDay, day.dayLabel == selected {
+                                        PointMark(
+                                            x: .value("Time", day.dayLabel),
+                                            y: .value("Sales", day.amount)
+                                        )
+                                        .foregroundStyle(Color.blue)
+                                        .symbolSize(80)
+                                        .annotation(position: .top, spacing: 8) {
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(day.dayLabel)
+                                                    .font(.system(size: 10, weight: .regular))
+                                                    .foregroundColor(.white.opacity(0.9))
+                                                Text("Revenue")
+                                                    .font(.system(size: 8, weight: .regular))
+                                                    .foregroundColor(.white.opacity(0.7))
+                                                Text(formatIndianCurrency(amount: day.amount))
+                                                    .font(.system(size: 14, weight: .bold))
+                                                    .foregroundColor(.white)
+                                            }
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(Color.blue)
+                                            )
+                                            .shadow(radius: 3, y: 2)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Horizontal target line (only if not empty)
+                            if viewModel.salesGoal > 0 && !isChartEmpty {
+                                RuleMark(
+                                    y: .value("Target", viewModel.salesGoal)
+                                )
+                                .foregroundStyle(Color.green.opacity(0.5))
+                                .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+                                .annotation(position: .top, alignment: .leading) {
+                                    Text("TARGET")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundColor(.green)
+                                        .padding(.leading, 4)
+                                }
+                            }
+                            
+                            if let selected = selectedDay, !isChartEmpty {
+                                RuleMark(
+                                    x: .value("Time", selected)
+                                )
+                                .foregroundStyle(Color.blue.opacity(0.3))
+                                .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4]))
+                            }
+                        }
+                        .chartXAxis {
+                            AxisMarks { value in
+                                AxisValueLabel {
+                                    if let text = value.as(String.self) {
+                                        Text(text)
+                                            .font(.system(size: 9))
+                                            .foregroundColor(Color(.systemGray2))
+                                    }
+                                }
+                            }
+                        }
+                        .chartYAxis {
+                            AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { value in
+                                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [2]))
+                                    .foregroundStyle(Color(.systemGray5))
+                                AxisValueLabel {
+                                    if let doubleValue = value.as(Double.self) {
+                                        Text("₹\(Int(doubleValue/1000))k")
+                                            .font(.system(size: 9))
+                                            .foregroundColor(Color(.systemGray2))
+                                    }
+                                }
+                            }
+                        }
+                        .frame(height: 140)
+                        .padding(.horizontal, 8)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: viewModel.chartData)
+                        .chartOverlay { proxy in
+                            GeometryReader { geometry in
+                                Rectangle().fill(.clear).contentShape(Rectangle())
+                                    .onTapGesture { location in
+                                        if isChartEmpty { return }
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        let origin = geometry[proxy.plotAreaFrame].origin
+                                        let x = location.x - origin.x
+                                        if let dayLabel: String = proxy.value(atX: x) {
+                                            if selectedDay == dayLabel {
+                                                selectedDay = nil
+                                            } else {
+                                                selectedDay = dayLabel
+                                            }
+                                        }
+                                    }
                             }
                         }
                     }
+                    .padding(.bottom, 20)
                 }
-                .frame(maxWidth: .infinity, alignment: .center)
-            }
-        }
-        .padding(20)
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.04), radius: 15, x: 0, y: 8)
-        .padding(.horizontal)
-        .onTapGesture {
-            // Tapping background clears selection
-            selectedDay = nil
-        }
+                .background(Color(.systemBackground))
+                .cornerRadius(24)
+                .shadow(color: Color.black.opacity(0.04), radius: 15, x: 0, y: 8)
+                .padding(.horizontal)
     }
     
     private var upcomingAppointmentsCard: some View {

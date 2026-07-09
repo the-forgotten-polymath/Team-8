@@ -1,15 +1,8 @@
-//
-//  Sale.swift
-//  RSMS_Project
-//
-//  Created by Yatharth Mishra on 30/06/26.
-//
-
 import Foundation
 
 struct Sale: Codable, Identifiable {
     let id: UUID
-    let customerId: UUID
+    let customerId: UUID?
     let userId: UUID
     let storeId: UUID
     let totalAmount: Double
@@ -17,6 +10,9 @@ struct Sale: Codable, Identifiable {
     let saleStatus: String
     let saleDate: Date
     let createdAt: Date
+    let invoiceNumber: String?
+    let discountAmount: Double?
+    let taxAmount: Double?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -28,5 +24,8 @@ struct Sale: Codable, Identifiable {
         case saleStatus = "sale_status"
         case saleDate = "sale_date"
         case createdAt = "created_at"
+        case invoiceNumber = "invoice_number"
+        case discountAmount = "discount_amount"
+        case taxAmount = "tax_amount"
     }
 }

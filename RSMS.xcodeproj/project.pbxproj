@@ -116,10 +116,12 @@
 		0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		0FCFA8BFB531C5BC9AAE708A /* StoreManagerOnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreManagerOnboardingView.swift; sourceTree = "<group>"; };
 		14A849CAC1A51C675BFEA412 /* InventoryModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = InventoryModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		164F2D562FFE724200297C87 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
+		29195C662FFF8AE700928825 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Admin_RSMS.app; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoStoreAssignedView.swift; sourceTree = "<group>"; };
@@ -153,29 +155,21 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		797D58228E55F2F0075D559C /* RSMS_Inventory/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = RSMS_Inventory/RSMS_Project;
 			sourceTree = "<group>";
 		};
 		8BE72A006B95AE61498906AD /* RSMS_Sales_Associate/sales_associate_rsms */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = RSMS_Sales_Associate/sales_associate_rsms;
 			sourceTree = "<group>";
 		};
 		B55720CBE8D14CF708411C64 /* RSMS_Admin/Admin_RSMS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = RSMS_Admin/Admin_RSMS;
 			sourceTree = "<group>";
 		};
 		CD0F86B3C36DE94DE31B24AA /* RSMS_Store_Manager/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = RSMS_Store_Manager/RSMS_Project;
 			sourceTree = "<group>";
 		};
@@ -266,6 +260,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		164F2D592FFE724200297C87 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		16A6A9382FFB6360007A7E84 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -288,6 +289,13 @@
 			sourceTree = "<group>";
 		};
 		16A6C5AF2FFC16EE007A7E84 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29195C692FFF8AE700928825 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -657,6 +665,14 @@
 					ProjectRef = 16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
+					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
+					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
+					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
+					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
+				},
+				{
 					ProductGroup = E8C08ABC2FFB827800BE7B39 /* Products */;
 					ProjectRef = E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */;
 				},
@@ -665,16 +681,16 @@
 					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
-					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = 164F2D592FFE724200297C87 /* Products */;
+					ProjectRef = 164F2D562FFE724200297C87 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
 					ProductGroup = 16A6C2A32FFC086F007A7E84 /* Products */;
 					ProjectRef = 16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
-					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = 29195C692FFF8AE700928825 /* Products */;
+					ProjectRef = 29195C662FFF8AE700928825 /* sales_associate_rsms.xcodeproj */;
 				},
 			);
 			projectRoot = "";

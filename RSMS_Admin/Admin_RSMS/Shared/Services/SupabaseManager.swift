@@ -28,6 +28,9 @@ final class SupabaseManager {
             options: SupabaseClientOptions(
                 db: SupabaseClientOptions.DatabaseOptions(
                     decoder: decoder
+                ),
+                auth: SupabaseClientOptions.AuthOptions(
+                    emitLocalSessionAsInitialSession: true
                 )
             )
         )

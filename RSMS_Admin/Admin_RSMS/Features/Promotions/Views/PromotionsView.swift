@@ -60,17 +60,14 @@ struct PromotionsView: View {
         }
         .navigationTitle("Promotions")
         .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $searchText, prompt: "Search promotions...")
+        .searchable(text: $searchText, prompt: "Search by promotions")
         .task { await service.fetchPromotions() }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showingAddPromotion = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.accentColor)
-                }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add Promotion", systemImage: "plus", action: { showingAddPromotion = true })
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .labelStyle(.iconOnly)
             }
         }
         .sheet(isPresented: $showingAddPromotion) {

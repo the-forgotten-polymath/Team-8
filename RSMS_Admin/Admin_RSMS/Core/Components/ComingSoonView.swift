@@ -35,7 +35,7 @@ struct ComingSoonView: View {
                 Button(action: {}) {
                     Text("Notify Me")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 40)
                         .padding(.vertical, 12)
                         .background(Color.blue)

@@ -79,25 +79,25 @@ struct ManagerDetailModalView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     detailRow(
                         label: "Phone Number",
-                        value: userProfile?.phone?.isEmpty == false ? (userProfile?.phone ?? "Not Provided") : "Not Provided",
+                        value: userProfile?.phone?.isEmpty == false ? (userProfile?.phone ?? "-") : "-",
                         icon: "phone.fill"
                     )
                     
                     detailRow(
                         label: "Gender",
-                        value: userProfile?.gender?.isEmpty == false ? (userProfile?.gender ?? "Not Provided") : "Not Provided",
+                        value: userProfile?.gender?.isEmpty == false ? (userProfile?.gender ?? "-") : "-",
                         icon: "person.fill.viewfinder"
                     )
                     
                     detailRow(
                         label: "Date of Birth",
-                        value: userProfile?.dateOfBirth?.isEmpty == false ? (userProfile?.dateOfBirth ?? "Not Provided") : "Not Provided",
+                        value: userProfile?.dateOfBirth?.isEmpty == false ? (userProfile?.dateOfBirth ?? "-") : "-",
                         icon: "calendar"
                     )
                     
                     detailRow(
                         label: "Address",
-                        value: userProfile?.address?.isEmpty == false ? (userProfile?.address ?? "Not Provided") : "Not Provided",
+                        value: userProfile?.address?.isEmpty == false ? (userProfile?.address ?? "-") : "-",
                         icon: "mappin.circle.fill"
                     )
                 }
@@ -126,15 +126,15 @@ struct ManagerDetailModalView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label.uppercased())
                 .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text(value)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(valueColor)
+                    .foregroundStyle(valueColor)
             }
         }
     }

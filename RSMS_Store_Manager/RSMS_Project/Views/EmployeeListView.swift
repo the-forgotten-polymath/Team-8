@@ -272,7 +272,7 @@ struct EmployeeListView: View {
             let rName = roleName(for: employee.roleId).lowercased()
             return employee.fullName.localizedCaseInsensitiveContains(searchText) ||
                    employee.username.localizedCaseInsensitiveContains(searchText) ||
-                   (employee.email ?? "").localizedCaseInsensitiveContains(searchText) ||
+                   employee.email.localizedCaseInsensitiveContains(searchText) ||
                    rName.contains(searchText.lowercased())
         }
     }
@@ -414,7 +414,7 @@ struct OverviewCard: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(Color(.label))
                  +
-                 Text("/" + parts[1].trimmingCharacters(in: .whitespaces))
+                 Text("/\\(parts[1].trimmingCharacters(in: .whitespaces))")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color(.secondaryLabel))
                 )

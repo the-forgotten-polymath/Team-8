@@ -145,6 +145,7 @@
 		8E9289552FF566BC001C9D4C /* config.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.toml; sourceTree = "<group>"; };
 		8E9289572FF566BC001C9D4C /* test_geocoder */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test_geocoder; sourceTree = "<group>"; };
 		8E9289582FF566BC001C9D4C /* test_geocoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test_geocoder.swift; sourceTree = "<group>"; };
+		A1D196A92FFF9E9400EFC8A4 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		A1E8ADC4058A76639409B24F /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA69B4B435CD8680B7545E56 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
@@ -437,6 +438,13 @@
 			path = supabase;
 			sourceTree = "<group>";
 		};
+		A1D196AC2FFF9E9400EFC8A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		E8C08ABC2FFB827800BE7B39 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -669,12 +677,12 @@
 					ProjectRef = 16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
-					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = A1D196AC2FFF9E9400EFC8A4 /* Products */;
+					ProjectRef = A1D196A92FFF9E9400EFC8A4 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
-					ProductGroup = 8458DE922FFF685C00B465EA /* Products */;
-					ProjectRef = 8458DE8F2FFF685C00B465EA /* sales_associate_rsms.xcodeproj */;
+					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
+					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
 				},
 				{
 					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;

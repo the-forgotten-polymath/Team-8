@@ -39,6 +39,7 @@ struct User: Codable, Identifiable {
     let employeeStatus: String?
 
     let profileImageURL: String?
+    let isProfileCompleted: Bool?
 
     // Audit
     let createdBy: UUID?
@@ -72,6 +73,7 @@ struct User: Codable, Identifiable {
         case employeeStatus = "employee_status"
 
         case profileImageURL = "profile_image_url"
+        case isProfileCompleted = "profile_verified"
 
         case createdBy = "created_by"
         case createdAt = "created_at"

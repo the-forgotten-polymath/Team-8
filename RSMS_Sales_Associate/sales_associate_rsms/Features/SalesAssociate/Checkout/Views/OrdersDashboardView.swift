@@ -773,7 +773,7 @@ struct BillInvoiceTab: View {
                         Text("Customer ID:")
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(order.customerId.uuidString.prefix(8).description)
+                        Text(order.customerId?.uuidString.prefix(8).description ?? "Guest")
                     }
                 }
                 .font(.subheadline)

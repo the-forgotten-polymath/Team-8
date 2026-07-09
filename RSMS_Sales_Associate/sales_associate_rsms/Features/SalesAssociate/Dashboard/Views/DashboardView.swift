@@ -12,35 +12,19 @@ struct DashboardView: View {
     @EnvironmentObject private var authVM: AuthViewModel
     @EnvironmentObject var checkoutEnv: CheckoutEnvironment
     @StateObject private var viewModel = DashboardViewModel()
-    @State private var selectedRole: DashboardRole = .advisor
     @State private var showingProfileSheet = false
     @State private var showingLikedSheet = false
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("Role", selection: $selectedRole) {
-                    ForEach(DashboardRole.allCases, id: \.self) { role in
-                        Text(role.rawValue).tag(role)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                
-
-                
                 if viewModel.isLoading {
                     Spacer()
                     ProgressView("Loading Intelligence Data...")
                     Spacer()
                 } else {
-                    if selectedRole == .advisor {
-                        AdvisorDashboardView()
-                            .environmentObject(viewModel)
-                    } else {
-                        ManagerDashboardView()
-                            .environmentObject(viewModel)
-                    }
+                    AdvisorDashboardView()
+                        .environmentObject(viewModel)
                 }
             }
             .navigationTitle("Home")
@@ -52,11 +36,12 @@ struct DashboardView: View {
                         }) {
                             Image(systemName: "heart.fill")
                                 .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.red)
+                                .foregroundColor(checkoutEnv.likedProducts.isEmpty ? .gray : .red)
                                 .frame(width: 36, height: 36)
-                                .background(Color.red.opacity(0.1))
+                                .background(checkoutEnv.likedProducts.isEmpty ? Color.gray.opacity(0.1) : Color.red.opacity(0.1))
                                 .clipShape(Circle())
                         }
+                        .disabled(checkoutEnv.likedProducts.isEmpty)
                         
                         Button(action: {
                             showingProfileSheet = true

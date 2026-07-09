@@ -38,38 +38,52 @@ public enum StaffRole: String, Codable, CaseIterable {
 // MARK: - Customer Tier
 
 enum CustomerTier: String, Codable, CaseIterable {
+    case regular  = "regular"
     case standard = "standard"
     case vip      = "vip"
-    case vvip     = "vvip"
 
     var displayName: String {
         switch self {
+        case .regular:  return "Regular"
         case .standard: return "Standard"
         case .vip:      return "VIP"
-        case .vvip:     return "VVIP"
         }
     }
 
     var badgeColor: String {
         switch self {
-        case .standard: return "tierStandard"
-        case .vip:      return "tierVIP"
-        case .vvip:     return "tierVVIP"
+        case .regular:  return "tierStandard"
+        case .standard: return "tierVIP"
+        case .vip:      return "tierVVIP"
         }
     }
 
     var icon: String {
         switch self {
-        case .standard: return "person.circle"
-        case .vip:      return "star.circle.fill"
-        case .vvip:     return "crown.fill"
+        case .regular:  return "person.circle"
+        case .standard: return "star.circle.fill"
+        case .vip:      return "crown.fill"
         }
     }
 
     static func compute(from lifetimeSpend: Decimal) -> CustomerTier {
-        if lifetimeSpend >= AppConstants.ClientTier.vvipThreshold { return .vvip }
-        if lifetimeSpend >= AppConstants.ClientTier.vipThreshold  { return .vip }
-        return .standard
+        if lifetimeSpend >= 200000 {
+            return .vip
+        } else if lifetimeSpend >= 100000 {
+            return .standard
+        } else {
+            return .regular
+        }
+    }
+
+    static func compute(spend: Decimal, purchasesPerMonth: Int) -> CustomerTier {
+        if spend >= 200000 || purchasesPerMonth >= 6 {
+            return .vip
+        } else if spend >= 100000 || (purchasesPerMonth >= 3 && purchasesPerMonth <= 5) {
+            return .standard
+        } else {
+            return .regular
+        }
     }
 }
 

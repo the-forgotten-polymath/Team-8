@@ -7,6 +7,7 @@ struct ClientHubView: View {
     var isEmbedded: Bool = false
     @StateObject private var viewModel = ClientHubViewModel()
     @State private var showingAddClient = false
+    @EnvironmentObject private var authVM: AuthViewModel
 
     var body: some View {
         if isEmbedded {
@@ -122,10 +123,12 @@ struct ClientHubView: View {
             }
         }
         .onAppear {
+            viewModel.associateId = authVM.currentUser?.id
             viewModel.searchClients()
         }
         .sheet(isPresented: $showingAddClient) {
             AddClientView()
+                .environmentObject(authVM)
         }
     }
 }

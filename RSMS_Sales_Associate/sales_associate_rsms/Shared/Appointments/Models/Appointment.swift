@@ -17,8 +17,10 @@ struct Appointment: Identifiable, Codable {
     
     // UI convenience
     var clientName: String?
+    var customerTier: String?
+    var isVip: Bool?
     
-    init(id: UUID = UUID(), clientId: UUID, associateId: UUID, date: Date, type: AppointmentType, notes: String? = nil, status: AppointmentStatus = .scheduled, curatedCartId: UUID? = nil, clientName: String? = nil) {
+    init(id: UUID = UUID(), clientId: UUID, associateId: UUID, date: Date, type: AppointmentType, notes: String? = nil, status: AppointmentStatus = .scheduled, curatedCartId: UUID? = nil, clientName: String? = nil, customerTier: String? = nil, isVip: Bool? = nil) {
         self.id = id
         self.clientId = clientId
         self.associateId = associateId
@@ -28,5 +30,7 @@ struct Appointment: Identifiable, Codable {
         self.status = status
         self.curatedCartId = curatedCartId
         self.clientName = clientName
+        self.customerTier = customerTier
+        self.isVip = isVip
     }
 }

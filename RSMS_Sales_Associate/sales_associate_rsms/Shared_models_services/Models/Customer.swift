@@ -21,6 +21,7 @@ struct Customer: Codable, Identifiable {
     let dateOfBirth: Date?
     let anniversaryDate: Date?
     let lastVisitDate: Date?
+    let joiningDate: Date?
 
     // Clienteling & Preferences
     let preferredBrand: String?
@@ -59,6 +60,7 @@ struct Customer: Codable, Identifiable {
         case dateOfBirth = "date_of_birth"
         case anniversaryDate = "anniversary_date"
         case lastVisitDate = "last_visit_date"
+        case joiningDate = "joining_date"
 
         case preferredBrand = "preferred_brand"
         case preferredCategory = "preferred_category"

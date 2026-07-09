@@ -45,19 +45,7 @@ struct AppointmentsView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Appointments")
         .toolbar(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingCreateAppointment = true
-                }) {
-                    Image(systemName: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showingCreateAppointment) {
-            // Need to pass viewModel.appointments as binding, but better to fetch after
-            CreateAppointmentView(appointments: $viewModel.appointments)
-        }
+
         .task {
             await viewModel.fetchAppointments(userId: authVM.currentUser?.id)
         }

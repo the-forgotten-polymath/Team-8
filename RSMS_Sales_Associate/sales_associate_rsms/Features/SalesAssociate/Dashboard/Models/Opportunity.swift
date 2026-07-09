@@ -11,6 +11,7 @@ enum OpportunityType: String, Codable, CaseIterable {
     case retentionRisk = "Retention Risk"
     case vipEventInvitation = "VIP Event Invitation"
     case birthday = "Birthday"
+    case membershipAnniversary = "Membership Anniversary"
 }
 
 
@@ -27,4 +28,15 @@ struct Opportunity: Codable, Identifiable {
     
     // For UI convenience
     var clientName: String?
+    
+    // Fields for personalized recommended product & offer
+    var eventDate: Date?
+    var customerTier: String?
+    var personalizedOffer: String?
+    var recommendedProductID: UUID?
+    var recommendedProductName: String?
+    var recommendedProductCategory: String?
+    var recommendedProductPrice: Double?
+    var recommendedProductDiscountedPrice: Double?
+    var recommendedProductImageURL: String?
 }

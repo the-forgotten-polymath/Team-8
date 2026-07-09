@@ -6,7 +6,6 @@ import SwiftUI
 struct OmnichannelView: View {
     var isEmbedded: Bool = false
     @StateObject private var viewModel = OmnichannelViewModel()
-    @State private var orderSearchQuery: String = ""
     
     var body: some View {
         if isEmbedded {
@@ -69,49 +68,42 @@ struct OmnichannelView: View {
                 }
             }
             
-            Section(header: Text("Track Product Order")) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.secondary)
-                        TextField("Enter Order Number (e.g. 1001, 1002)...", text: $orderSearchQuery)
-                            .keyboardType(.numberPad)
-                    }
-                    .padding(.vertical, 6)
-                    
-                    if !orderSearchQuery.isEmpty {
-                        if matchedOrders.isEmpty {
-                            Text("No order found matching '\(orderSearchQuery)'")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        } else {
-                            ForEach(matchedOrders) { order in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Divider()
-                                        .padding(.vertical, 4)
-                                    
-                                    HStack {
-                                        Text("Order #\(order.orderNumber)")
-                                            .font(.headline)
-                                        Spacer()
-                                        Text(order.status.rawValue.uppercased())
-                                            .font(.caption.bold())
-                                            .foregroundColor(order.status == .pickedUp || order.status == .completed || order.status == .readyForPickup ? .green : .orange)
-                                    }
-                                    
-                                    Text("Fulfillment Type: \(order.type == .bopis ? "BOPIS (In-Store Pickup)" : "SFS (Ship From Store)")")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    
-                                    if let carrier = order.carrier, let tracking = order.trackingNumber {
-                                        Text("Carrier: \(carrier) | Tracking: \(tracking)")
-                                            .font(.caption)
-                                            .foregroundColor(.blue)
-                                    }
-                                }
-                                .padding(.vertical, 4)
+            Section(header: Text("Track Order")) {
+                let combined = viewModel.bopisOrders + viewModel.sfsOrders
+                if combined.isEmpty {
+                    Text("No recent orders.")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 14))
+                        .padding(.vertical, 4)
+                } else {
+                    ForEach(combined.sorted(by: { $0.orderDate > $1.orderDate })) { order in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Order #\(order.orderNumber)")
+                                    .font(.system(size: 15, weight: .bold))
+                                
+                                Text(getCustomerName(for: order.clientID))
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 6) {
+                                Text(order.status.rawValue.uppercased())
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(statusColor(order.status))
+                                
+                                Text(order.type == .bopis ? "Pickup" : "Delivery")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(order.type == .bopis ? Color.blue : Color.orange)
+                                    .cornerRadius(8)
                             }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             }
@@ -128,9 +120,20 @@ struct OmnichannelView: View {
         }
     }
     
-    private var matchedOrders: [FulfillmentOrder] {
-        guard !orderSearchQuery.isEmpty else { return [] }
-        return MockData.fulfillmentOrders.filter { $0.orderNumber.contains(orderSearchQuery) }
+    private func statusColor(_ status: FulfillmentStatus) -> Color {
+        switch status {
+        case .pending, .processing: return .orange
+        case .readyForPickup, .shipping: return .blue
+        case .completed, .pickedUp: return .green
+        case .cancelled: return .red
+        }
+    }
+    
+    private func getCustomerName(for clientID: UUID) -> String {
+        if let client = MockData.clients.first(where: { $0.id == clientID }) {
+            return "\(client.firstName) \(client.lastName)"
+        }
+        return "Emma Watson"
     }
 }
 

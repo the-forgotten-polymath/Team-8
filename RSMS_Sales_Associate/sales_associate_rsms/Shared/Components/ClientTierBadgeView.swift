@@ -19,11 +19,11 @@ struct ClientTierBadgeView: View {
     
     private var tierColor: Color {
         switch tier {
-        case .standard:
+        case .regular:
             return .gray
-        case .vip:
+        case .standard:
             return .blue
-        case .vvip:
+        case .vip:
             return .purple
         }
     }
@@ -31,9 +31,9 @@ struct ClientTierBadgeView: View {
 
 #Preview {
     HStack {
+        ClientTierBadgeView(tier: .regular)
         ClientTierBadgeView(tier: .standard)
         ClientTierBadgeView(tier: .vip)
-        ClientTierBadgeView(tier: .vvip)
     }
     .padding()
 }

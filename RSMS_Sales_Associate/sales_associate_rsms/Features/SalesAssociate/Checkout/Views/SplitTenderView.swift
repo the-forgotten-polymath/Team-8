@@ -18,13 +18,13 @@ struct SplitTenderView: View {
                     HStack {
                         Text("Subtotal")
                         Spacer()
-                        Text(cart.subtotal, format: .currency(code: "USD"))
+                        Text(cart.subtotal, format: .currency(code: AppConstants.App.currencyCode))
                     }
                     if let discount = cart.orderLevelDiscountPercent {
                         HStack {
                             Text("Discount (\(discount, format: .number)%)")
                             Spacer()
-                            Text("-\(cart.subtotal - cart.discountedSubtotal, format: .currency(code: "USD"))")
+                            Text("-\(cart.subtotal - cart.discountedSubtotal, format: .currency(code: AppConstants.App.currencyCode))")
                                 .foregroundColor(.green)
                         }
                     }
@@ -39,13 +39,13 @@ struct SplitTenderView: View {
                     HStack {
                         Text("Tax (8.875%)")
                         Spacer()
-                        Text(cart.tax, format: .currency(code: "USD"))
+                        Text(cart.tax, format: .currency(code: AppConstants.App.currencyCode))
                     }
                     Divider()
                     HStack {
                         Text("Total Due").bold()
                         Spacer()
-                        Text(cart.total, format: .currency(code: "USD")).bold()
+                        Text(cart.total, format: .currency(code: AppConstants.App.currencyCode)).bold()
                     }
                 }
                 
@@ -54,7 +54,7 @@ struct SplitTenderView: View {
                         HStack {
                             Text(tender.method.rawValue.capitalized)
                             Spacer()
-                            Text("-\(tender.amount, format: .currency(code: "USD"))")
+                            Text("-\(tender.amount, format: .currency(code: AppConstants.App.currencyCode))")
                         }
                         .foregroundColor(.secondary)
                     }
@@ -62,7 +62,7 @@ struct SplitTenderView: View {
                     HStack {
                         Text("Remaining Balance").bold()
                         Spacer()
-                        Text(cart.remainingBalance, format: .currency(code: "USD")).bold()
+                        Text(cart.remainingBalance, format: .currency(code: AppConstants.App.currencyCode)).bold()
                     }
                 }
                 
@@ -176,7 +176,7 @@ struct RazorpayPaymentSheetMockView: View {
                 Text("Razorpay Sandbox")
                     .font(.largeTitle.bold())
                 
-                Text("Paying: \(amount, format: .currency(code: "USD"))")
+                Text("Paying: \(amount, format: .currency(code: AppConstants.App.currencyCode))")
                     .font(.title2)
                 
                 // In a real app, we'd use Razorpay's Checkout UI here.

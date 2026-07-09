@@ -51,14 +51,12 @@ struct DashboardHeaderView: View {
              Spacer(minLength: 8).frame(maxWidth: 20)
             
             // Avatar
-            Circle()
-                .fill(Color.orange)
+            Text("AM")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(.white)
                 .frame(width: 40, height: 40)
-                .overlay(
-                    Text("AM")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                )
+                .background(Color.orange)
+                .clipShape(Circle())
         }
         .padding(.vertical, 8)
     }

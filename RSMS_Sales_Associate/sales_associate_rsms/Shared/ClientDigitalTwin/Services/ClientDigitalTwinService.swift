@@ -231,8 +231,22 @@ final class ClientDigitalTwinService: Sendable {
         let loyaltyPts = customer.loyaltyPoints ?? 0
         let lifetimeSpend = Decimal(loyaltyPts) * 500
 
+        var addressValue: String? = nil
+        var notesValue: String? = customer.notes
+        if let notesText = customer.notes, notesText.hasPrefix("Address: ") {
+            let lines = notesText.split(separator: "\n", maxSplits: 1)
+            if let firstLine = lines.first {
+                addressValue = String(firstLine.dropFirst(9))
+            }
+            if lines.count > 1 {
+                notesValue = String(lines[1])
+            } else {
+                notesValue = ""
+            }
+        }
+
         // Build preferences from available fields
-        let prefs: ClientPreferences? = (customer.preferredBrand != nil || customer.notes != nil) ?
+        let prefs: ClientPreferences? = (customer.preferredBrand != nil || notesValue != nil || customer.preferredContactMethod != nil || customer.anniversaryDate != nil) ?
             ClientPreferences(
                 clientID: customer.id,
                 preferredBrands: customer.preferredBrand.map { [$0] } ?? [],
@@ -244,7 +258,7 @@ final class ClientDigitalTwinService: Sendable {
                 shoppingOccasions: [],
                 anniversaryDate: customer.anniversaryDate,
                 birthdayDate: customer.dateOfBirth,
-                notes: customer.notes,
+                notes: notesValue,
                 sizes: nil
             ) : nil
 
@@ -280,6 +294,9 @@ final class ClientDigitalTwinService: Sendable {
             email: customer.email,
             phone: customer.phone,
             dateOfBirth: customer.dateOfBirth,
+            gender: customer.gender,
+            anniversaryDate: customer.anniversaryDate,
+            address: addressValue,
             tier: tier,
             lifetimeSpend: lifetimeSpend,
             preferredStore: customer.assignedStoreId,
@@ -299,9 +316,11 @@ final class ClientDigitalTwinService: Sendable {
 
     private func mapTier(_ tier: String?) -> CustomerTier {
         switch tier?.lowercased() {
-        case "vip":    return .vip
-        case "vvip":   return .vvip
-        default:       return .standard
+        case "vip":      return .vip
+        case "vvip":     return .vip
+        case "standard": return .standard
+        case "regular":  return .regular
+        default:         return .regular
         }
     }
 
@@ -325,6 +344,13 @@ struct CustomerInsertPayload: Encodable {
     let phone: String?
     let gender: String?
     let dateOfBirth: String?
+    let anniversaryDate: String?
+    let preferredBrand: String?
+    let preferredCategory: String?
+    let preferredContactMethod: String?
+    let notes: String?
+    let assignedSalesAssociateId: UUID?
+    let assignedStoreId: UUID?
     let customerTier: String
     let customerStatus: String
     let isVip: Bool
@@ -333,34 +359,76 @@ struct CustomerInsertPayload: Encodable {
     let loyaltyPoints: Int
 
     enum CodingKeys: String, CodingKey {
-        case name, email, phone, gender
-        case dateOfBirth        = "date_of_birth"
-        case customerTier       = "customer_tier"
-        case customerStatus     = "customer_status"
-        case isVip              = "is_vip"
-        case isActive           = "is_active"
-        case privacyConsent     = "privacy_consent"
-        case loyaltyPoints      = "loyalty_points"
+        case name, email, phone, gender, notes
+        case dateOfBirth             = "date_of_birth"
+        case anniversaryDate         = "anniversary_date"
+        case preferredBrand          = "preferred_brand"
+        case preferredCategory       = "preferred_category"
+        case preferredContactMethod  = "preferred_contact_method"
+        case assignedSalesAssociateId = "assigned_sales_associate_id"
+        case assignedStoreId         = "assigned_store_id"
+        case customerTier            = "customer_tier"
+        case customerStatus          = "customer_status"
+        case isVip                   = "is_vip"
+        case isActive                = "is_active"
+        case privacyConsent          = "privacy_consent"
+        case loyaltyPoints           = "loyalty_points"
     }
 
     init(from twin: ClientDigitalTwin) {
         self.name          = twin.fullName
         self.email         = twin.email
         self.phone         = twin.phone
-        self.gender        = nil
-        // Format date as YYYY-MM-DD string for PostgreSQL DATE type
+        self.gender        = twin.gender
+        
+        let fmt = DateFormatter()
+        fmt.dateFormat = "yyyy-MM-dd"
+        
         if let dob = twin.dateOfBirth {
-            let fmt = DateFormatter()
-            fmt.dateFormat = "yyyy-MM-dd"
             self.dateOfBirth = fmt.string(from: dob)
         } else {
             self.dateOfBirth = nil
         }
-        self.customerTier   = twin.tier.rawValue.capitalized
+        
+        if let anniv = twin.anniversaryDate {
+            self.anniversaryDate = fmt.string(from: anniv)
+        } else {
+            self.anniversaryDate = nil
+        }
+        
+        self.preferredBrand         = twin.preferences?.preferredBrands.first
+        self.preferredCategory      = twin.preferences?.preferredCategories.first?.rawValue
+        
+        switch twin.preferences?.communicationChannel {
+        case .sms:      self.preferredContactMethod = "SMS"
+        case .email:    self.preferredContactMethod = "Email"
+        case .whatsapp: self.preferredContactMethod = "WhatsApp"
+        case .push:     self.preferredContactMethod = "Push"
+        case .inApp:    self.preferredContactMethod = "Push"
+        case .none:     self.preferredContactMethod = "Email"
+        }
+        
+        if let addr = twin.address {
+            self.notes = "Address: \(addr)\n\(twin.preferences?.notes ?? "")"
+        } else {
+            self.notes = twin.preferences?.notes
+        }
+        
+        self.assignedSalesAssociateId = twin.preferredAdvisor
+        self.assignedStoreId         = twin.preferredStore
+        
+        switch twin.tier {
+        case .regular:  self.customerTier = "Regular"
+        case .standard: self.customerTier = "Standard"
+        case .vip:      self.customerTier = "VIP"
+        }
+        
         self.customerStatus = "Active"
-        self.isVip          = twin.tier == .vvip
+        self.isVip          = twin.tier == .vip
         self.isActive       = true
         self.privacyConsent = twin.consentStatus?.dataProcessing ?? true
-        self.loyaltyPoints  = 0
+        
+        let spendDouble = (twin.lifetimeSpend as NSDecimalNumber).doubleValue
+        self.loyaltyPoints  = Int(spendDouble / 500.0)
     }
 }

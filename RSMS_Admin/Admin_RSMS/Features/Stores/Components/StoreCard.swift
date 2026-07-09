@@ -7,6 +7,18 @@ struct StoreCard: View {
     var onDelete: () -> Void
     var onRestore: (() -> Void)? = nil
     
+    private var isVacant: Bool {
+        store.managerName.trimmingCharacters(in: .whitespaces).isEmpty || store.managerName.lowercased() == "vacant"
+    }
+    
+    private var displayInitials: String {
+        isVacant ? "-" : (store.managerInitials.isEmpty ? "-" : store.managerInitials)
+    }
+    
+    private var displayName: String {
+        isVacant ? "-" : store.managerName
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             // Hero Image Section
@@ -108,7 +120,7 @@ struct StoreCard: View {
                         .fill(Color(uiColor: .systemGray5))
                         .frame(width: 24, height: 24)
                         .overlay(
-                            Text(store.managerInitials)
+                            Text(displayInitials)
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(.primary)
                         )
@@ -117,7 +129,7 @@ struct StoreCard: View {
                         Text("MANAGER")
                             .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(.secondary)
-                        Text(store.managerName)
+                        Text(displayName)
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(.primary)
                     }

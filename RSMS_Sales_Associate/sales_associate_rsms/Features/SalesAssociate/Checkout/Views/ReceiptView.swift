@@ -5,6 +5,7 @@ import SwiftUI
 
 struct ReceiptView: View {
     @EnvironmentObject var checkoutEnv: CheckoutEnvironment
+    @EnvironmentObject var authVM: AuthViewModel
     @Environment(\.dismiss) var dismiss
     
     @State private var emailSent = false
@@ -47,7 +48,7 @@ struct ReceiptView: View {
                             Text("Total Paid")
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text(cart.totalPaid, format: .currency(code: "USD"))
+                            Text(cart.totalPaid, format: .currency(code: AppConstants.App.currencyCode))
                                 .font(.headline.bold())
                                 .foregroundColor(.primary)
                         }
@@ -63,41 +64,33 @@ struct ReceiptView: View {
                 }
                 
                 // Action Options List
-                VStack(spacing: 12) {
-                    // Download Receipt
-                    Button(action: {
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.impactOccurred()
-                        downloaded = true
-                    }) {
-                        HStack {
-                            Image(systemName: "arrow.down.circle")
-                            Text(downloaded ? "Receipt Saved to Files" : "Download Receipt")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(downloaded ? Color.green.opacity(0.12) : Color.blue.opacity(0.08))
-                        .foregroundColor(downloaded ? .green : .blue)
-                        .cornerRadius(12)
-                    }
-                    .disabled(downloaded)
-                    
-                    // Share Receipt using native ShareLink
-                    if let cart = checkoutEnv.activeCart {
-                        ShareLink(item: "Receipt summary:\nOrder Reference: \(String(cart.clientId.uuidString.prefix(8)))\nTotal Paid: \(cart.totalPaid.formatted(.currency(code: "USD")))\nThank you for shopping with us!") {
-                            HStack {
-                                Image(systemName: "square.and.arrow.up")
-                                Text("Share Receipt")
+                if finalized {
+                    VStack(spacing: 12) {
+                        // Share Receipt using native ShareLink
+                        if let cart = checkoutEnv.activeCart {
+                            ShareLink(item: "Receipt summary:\nOrder Reference: \(String(cart.clientId.uuidString.prefix(8)))\nTotal Paid: \(cart.totalPaid.formatted(.currency(code: AppConstants.App.currencyCode)))\nThank you for shopping with us!") {
+                                HStack {
+                                    Image(systemName: "square.and.arrow.up")
+                                    Text("Share Receipt")
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue.opacity(0.08))
+                                .foregroundColor(.blue)
+                                .cornerRadius(12)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue.opacity(0.08))
-                            .foregroundColor(.blue)
-                            .cornerRadius(12)
                         }
                     }
+                    .padding(.horizontal)
+                } else {
+                    VStack(spacing: 10) {
+                        ProgressView()
+                        Text("Placing order and generating receipt...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
                 }
-                .padding(.horizontal)
                 
                 // Recommendations: Recently Visited Items
                 if !checkoutEnv.recentlyVisitedProducts.isEmpty {
@@ -123,11 +116,12 @@ struct ReceiptView: View {
                 }
                 
                 // Complete Done Button
-                Button("Done") {
+                Button("Go Back to Home") {
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.success)
                     
-                    checkoutEnv.selectedTab = 1 // Route back to Catalog tab (Tab 1)
+                    checkoutEnv.catalogNavigationStackID = UUID() // Reset Catalog navigation stack to root!
+                    checkoutEnv.selectedTab = 0 // Route back to Home tab (Tab 0)
                     checkoutEnv.isCheckoutFlowActive = false
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -148,7 +142,9 @@ struct ReceiptView: View {
         .onAppear {
             if !finalized {
                 Task {
-                    await checkoutEnv.finalizeTransaction()
+                    await checkoutEnv.finalizeTransaction(
+                        userId: authVM.currentUser?.id
+                    )
                     finalized = true
                 }
             }

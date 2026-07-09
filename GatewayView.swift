@@ -1185,7 +1185,9 @@ struct GatewayView: View {
 
                         isActive: true,
 
-                        createdAt: Date()
+                        createdAt: Date(),
+
+                        isProfileCompleted: user.isProfileCompleted ?? false
                     )
 
 

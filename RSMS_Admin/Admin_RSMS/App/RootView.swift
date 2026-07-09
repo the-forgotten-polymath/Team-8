@@ -48,41 +48,46 @@ struct ContentView: View {
     @ToolbarContentBuilder
     private var profileToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                if let user = AuthManager.shared.currentUser {
-                    Section {
-                        Text("Signed in as:")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Text(user.fullName)
-                            .font(.headline)
-                        Text(user.email)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+            // Wrapping in an HStack intercepts the system ToolbarItem which wraps native Menus in horizontal capsules
+            HStack(spacing: 0) {
+                Menu {
+                    if let user = AuthManager.shared.currentUser {
+                        Section {
+                            Text("Signed in as:")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Text(user.fullName)
+                                .font(.headline)
+                            Text(user.email)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        Section {
+                            Text("Offline Admin Mode")
+                                .font(.headline)
+                        }
                     }
-                } else {
-                    Section {
-                        Text("Offline Admin Mode")
-                            .font(.headline)
+                    
+                    Divider()
+                    
+                    Button(role: .destructive, action: {
+                        AuthManager.shared.signOut()
+                    }) {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                     }
-                }
-                
-                Divider()
-                
-                Button(role: .destructive, action: {
-                    AuthManager.shared.signOut()
-                }) {
-                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                }
-            } label: {
-                Circle()
-                    .fill(Color.orange)
-                    .frame(width: 36, height: 36)
-                    .overlay(
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color.orange)
+                            .frame(width: 34, height: 34)
+                        
                         Text("AM")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(.white)
-                    )
+                    }
+                }
+                .contentShape(Circle())
             }
         }
     }

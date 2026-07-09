@@ -370,17 +370,21 @@ struct StoresView: View {
                             ))
                             
                             // Manager Card
+                            let isVacant = store.managerName.trimmingCharacters(in: .whitespaces).isEmpty || store.managerName.lowercased() == "vacant"
+                            let displayInitials = isVacant ? "-" : (store.managerInitials.isEmpty ? "-" : store.managerInitials)
+                            let displayName = isVacant ? "-" : store.managerName
+                            
                             infoCard(title: "STORE MANAGER", icon: "person.crop.circle.fill", content: AnyView(
                                 HStack(spacing: 12) {
                                     Circle()
                                         .fill(Color(uiColor: .systemGray4))
                                         .frame(width: 36, height: 36)
                                         .overlay(
-                                            Text(store.managerInitials)
+                                            Text(displayInitials)
                                                 .font(.system(size: 12, weight: .bold))
                                                 .foregroundStyle(.primary)
                                         )
-                                    Text(store.managerName)
+                                    Text(displayName)
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundStyle(.primary)
                                  }

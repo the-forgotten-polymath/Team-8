@@ -559,6 +559,20 @@ struct AppointmentDetailView: View {
                             }
                         }
                     }
+                    
+                    if !isEditing {
+                        Section {
+                            Button(action: { deleteAppointment() }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Delete Appointment")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.red)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .navigationTitle(isEditing ? "Edit Appointment" : "Appointment Details")
@@ -589,6 +603,24 @@ struct AppointmentDetailView: View {
         }
     }
 
+
+
+    private func deleteAppointment() {
+        isSaving = true
+        Swift.Task {
+            do {
+                try await SupabaseManager.shared.client
+                    .from("appointments")
+                    .delete()
+                    .eq("id", value: appointment.id.uuidString)
+                    .execute()
+                await MainActor.run { dismiss() }
+            } catch {
+                print("Delete failed: \(error)")
+                await MainActor.run { isSaving = false }
+            }
+        }
+    }
 
     private func updateStatus(to newStatus: String) {
         isSaving = true

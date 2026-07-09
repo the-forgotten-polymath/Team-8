@@ -70,13 +70,13 @@ struct AppointmentManagementView: View {
     @State private var selectedAppointment: Appointment?
     @State private var selectedStatusFilter = "All"
     
-    let statuses = ["All", "pending", "confirmed", "completed", "cancelled"]
+    let statuses = ["All", "pending", "attended", "missed", "cancelled"]
 
     var filteredAppointments: [Appointment] {
         if selectedStatusFilter == "All" {
             return viewModel.appointments
         }
-        return viewModel.appointments.filter { $0.status.lowercased() == selectedStatusFilter }
+        return viewModel.appointments.filter { $0.computedStatus == selectedStatusFilter }
     }
 
     var body: some View {
@@ -251,7 +251,7 @@ struct AppointmentRowView: View {
                     .foregroundColor(Color(.secondaryLabel))
                 }
                 
-                StatusBadge(status: appointment.status)
+                StatusBadge(status: appointment.computedStatus)
             }
             Spacer()
             Image(systemName: "chevron.right")
@@ -259,6 +259,7 @@ struct AppointmentRowView: View {
                 .font(.system(size: 14, weight: .bold))
         }
         .padding(.vertical, 4)
+        .opacity(appointment.computedStatus == "cancelled" ? 0.5 : 1.0)
     }
 
     private func formatMonth(_ date: Date) -> String {
@@ -289,9 +290,9 @@ struct StatusBadge: View {
     private func colorForStatus(_ status: String) -> Color {
         switch status.lowercased() {
         case "pending": return .orange
-        case "confirmed": return .blue
-        case "completed", "done": return .green
-        case "cancelled": return .red
+        case "attended": return .green
+        case "missed": return .red
+        case "cancelled": return .gray
         default: return .gray
         }
     }
@@ -491,12 +492,6 @@ struct AppointmentDetailView: View {
                         TextField("Name", text: $editedName)
                         TextField("Description", text: $editedDesc)
                         DatePicker("Date & Time", selection: $editedDate)
-                        Picker("Status", selection: $editedStatus) {
-                            Text("Pending").tag("pending")
-                            Text("Confirmed").tag("confirmed")
-                            Text("Completed").tag("completed")
-                            Text("Cancelled").tag("cancelled")
-                        }
                     }
                 } else {
                     Section {
@@ -519,7 +514,7 @@ struct AppointmentDetailView: View {
                             }
                             
                             HStack {
-                                StatusBadge(status: appointment.status)
+                                StatusBadge(status: appointment.computedStatus)
                             }
                         }
                         .padding(.vertical, 8)
@@ -535,6 +530,31 @@ struct AppointmentDetailView: View {
                                 VStack(alignment: .leading) {
                                     Text(customer.name).font(.headline)
                                     Text(customer.phone).font(.subheadline).foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    
+                    if !isEditing && (appointment.computedStatus == "pending" || appointment.computedStatus == "missed") {
+                        Section {
+                            Button(action: { updateStatus(to: "attended") }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Mark Attended")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                }
+                            }
+                            .listRowBackground(Color.green)
+                            
+                            Button(action: { updateStatus(to: "cancelled") }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Cancel Appointment")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.red)
+                                    Spacer()
                                 }
                             }
                         }
@@ -569,13 +589,34 @@ struct AppointmentDetailView: View {
         }
     }
 
+
+    private func updateStatus(to newStatus: String) {
+        isSaving = true
+        let updateData: [String: AnyJSON] = [
+            "status": .string(newStatus),
+            "updated_at": .string(Date().ISO8601Format())
+        ]
+        Swift.Task {
+            do {
+                try await SupabaseManager.shared.client
+                    .from("appointments")
+                    .update(updateData)
+                    .eq("id", value: appointment.id.uuidString)
+                    .execute()
+                await MainActor.run { dismiss() }
+            } catch {
+                print("Status update failed: \(error)")
+                await MainActor.run { isSaving = false }
+            }
+        }
+    }
+
     private func saveChanges() {
         isSaving = true
         let updateData: [String: AnyJSON] = [
             "appointment_name": .string(editedName),
             "description": .string(editedDesc),
             "appointment_datetime": .string(editedDate.ISO8601Format()),
-            "status": .string(editedStatus),
             "updated_at": .string(Date().ISO8601Format())
         ]
 

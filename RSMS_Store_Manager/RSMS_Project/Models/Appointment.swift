@@ -20,6 +20,13 @@ struct Appointment: Codable, Identifiable {
     let createdAt: Date
     let updatedAt: Date
 
+    var computedStatus: String {
+        if status.lowercased() == "pending" && appointmentDatetime < Date() {
+            return "missed"
+        }
+        return status.lowercased()
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case customerId = "customer_id"

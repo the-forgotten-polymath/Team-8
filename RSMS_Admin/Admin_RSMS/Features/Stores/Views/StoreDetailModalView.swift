@@ -1,4 +1,5 @@
 import SwiftUI
+import Supabase
 
 struct StoreDetailModalView: View {
     let store: AdminStore
@@ -6,6 +7,9 @@ struct StoreDetailModalView: View {
     
     @State private var employees: [User] = []
     @State private var isLoadingEmployees = true
+    
+    @State private var healthScore: HealthScore? = nil
+    @State private var isLoadingHealthScore = true
     
     private let userService = UserService()
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -30,6 +34,7 @@ struct StoreDetailModalView: View {
         }
         .task {
             await fetchEmployees()
+            await fetchHealthScore()
         }
     }
     
@@ -39,6 +44,7 @@ struct StoreDetailModalView: View {
         HStack(alignment: .top, spacing: 24) {
             VStack(spacing: 20) {
                 storeDetailsSection
+                healthScoreSection
             }
             .frame(maxWidth: .infinity)
             
@@ -54,6 +60,7 @@ struct StoreDetailModalView: View {
     private var compactLayout: some View {
         VStack(spacing: 20) {
             storeDetailsSection
+            healthScoreSection
             managerSection
             employeesSection
         }
@@ -72,20 +79,50 @@ struct StoreDetailModalView: View {
         }
     }
     
+    private var healthScoreSection: some View {
+        FormSectionCard(title: "Retail Health", icon: "heart.text.square") {
+            HStack {
+                Text("Overall Score")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+                
+                if isLoadingHealthScore {
+                    ProgressView()
+                } else if let score = healthScore {
+                    Text("\(Int(score.overallScore))%")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(scoreColor(for: score.overallScore))
+                } else {
+                    Text("-")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.vertical, 8)
+        }
+    }
+    
     private var managerSection: some View {
-        FormSectionCard(title: "Assigned Manager", icon: "person.fill") {
+        let isVacant = store.managerName.trimmingCharacters(in: .whitespaces).isEmpty || 
+                       store.managerName.lowercased() == "vacant"
+        let initials = isVacant ? "-" : (store.managerInitials.isEmpty ? "-" : store.managerInitials)
+        let nameToDisplay = isVacant ? "-" : store.managerName
+        
+        return FormSectionCard(title: "Assigned Manager", icon: "person.fill") {
             HStack(spacing: 16) {
                 Circle()
                     .fill(Color(uiColor: .systemGray5))
                     .frame(width: 48, height: 48)
                     .overlay(
-                        Text(store.managerInitials.isEmpty ? "--" : store.managerInitials)
+                        Text(initials)
                             .font(.system(size: 16, weight: .bold))
                             .foregroundStyle(.primary)
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(store.managerName.isEmpty ? "Unassigned" : store.managerName)
+                    Text(nameToDisplay)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.primary)
                     Text("Manager")
@@ -144,7 +181,28 @@ struct StoreDetailModalView: View {
         }
     }
     
-    // MARK: - Helpers
+    // MARK: - Handlers
+    
+    private func fetchHealthScore() async {
+        do {
+            let scores: [HealthScore] = try await SupabaseManager.shared.client
+                .from("health_scores")
+                .select()
+                .eq("store_id", value: store.id.uuidString)
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                self.healthScore = scores.first
+                self.isLoadingHealthScore = false
+            }
+        } catch {
+            print("Error fetching health score: \(error)")
+            DispatchQueue.main.async {
+                self.isLoadingHealthScore = false
+            }
+        }
+    }
     
     private func fetchEmployees() async {
         do {
@@ -184,6 +242,12 @@ struct StoreDetailModalView: View {
         case .maintenance: return .orange
         case .inventory: return .blue
         }
+    }
+    
+    private func scoreColor(for score: Double) -> Color {
+        if score >= 80 { return .green }
+        if score >= 60 { return .orange }
+        return .red
     }
     
     private func employeeInitials(for name: String) -> String {

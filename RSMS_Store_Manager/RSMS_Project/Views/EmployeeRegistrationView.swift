@@ -190,12 +190,12 @@ struct EmployeeRegistrationView: View {
 
             // Employment Details
             Section(header: Text("Employment Details")) {
-                Picker("Job Role", selection: $jobRole) {
-                    ForEach(jobRoles, id: \.self) { role in
-                        Text(role).tag(role)
-                    }
+                HStack {
+                    Text("Job Role")
+                    Spacer()
+                    Text(jobRole)
+                        .foregroundColor(Color(.secondaryLabel))
                 }
-                .pickerStyle(.menu)
 
                 if isLoading {
                     HStack {

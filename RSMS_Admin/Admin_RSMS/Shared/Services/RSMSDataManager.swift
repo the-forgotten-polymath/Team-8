@@ -121,9 +121,9 @@ class RSMSDataManager: ObservableObject {
         await fetchTargets()
     }
     
-    func updateTarget(_ target: RevenueTarget) async throws {
-        try await removeTarget(target)
-        try await addTarget(target)
+    func updateTarget(oldTarget: RevenueTarget, newTarget: RevenueTarget) async throws {
+        try await removeTarget(oldTarget)
+        try await addTarget(newTarget)
     }
     
     func removeTarget(_ target: RevenueTarget) async throws {

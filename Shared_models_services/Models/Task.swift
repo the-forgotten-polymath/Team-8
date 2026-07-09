@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Task: Codable, Identifiable {
+struct RSMSTask: Codable, Identifiable {
     let id: UUID
     let storeId: UUID
     let title: String

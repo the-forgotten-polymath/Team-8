@@ -40,6 +40,7 @@ struct ActivityCard<Content: View, TrailingContent: View>: View {
 
                 trailingContent
             }
+            .frame(height: 34) // Force uniform header height to prevent vertical shifting across cards
 
             content
             Spacer(minLength: 0) // push content to top if card gets stretched

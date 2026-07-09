@@ -188,51 +188,43 @@ struct DashboardView: View {
             subtitle: "BY VOLUME"
         ) {
             VStack(spacing: 0) {
-                ForEach(viewModel.mostSoldProducts) { product in
-                    HStack(spacing: 12) {
+                ForEach(Array(viewModel.mostSoldProducts.prefix(3))) { product in
+                    HStack(spacing: 16) {
                         Text("\(product.rank)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(product.rank <= 3 ? .primary : .secondary)
-                            .frame(width: 16, alignment: .center)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 20, alignment: .leading)
                         
-                        Circle()
-                            .fill(Color.orange.opacity(0.12))
-                            .frame(width: 36, height: 36)
-                            .overlay(
-                                Image(systemName: "shippingbox.fill")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(.orange)
-                            )
-                        
-                        VStack(alignment: .leading, spacing: 3) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(product.productName)
-                                .font(.subheadline.weight(.medium))
+                                .font(.body.weight(.medium))
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
                             
                             Text(product.subtitle)
-                                .font(.caption.weight(.medium))
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                         
                         Spacer()
                         
-                        VStack(alignment: .trailing, spacing: 3) {
+                        VStack(alignment: .trailing, spacing: 2) {
                             Text("\(product.unitsSold)")
-                                .font(.subheadline.weight(.medium).monospacedDigit())
+                                .font(.body.weight(.semibold).monospacedDigit())
                                 .foregroundStyle(.primary)
                             Text("UNITS")
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 10, weight: .semibold))
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .frame(height: 56)
+                    .frame(height: 68)
                     
-                    if product.id != viewModel.mostSoldProducts.last?.id {
-                        Divider().padding(.leading, 76)
+                    if product.id != viewModel.mostSoldProducts.prefix(3).last?.id {
+                        Divider().padding(.leading, 36)
                     }
                 }
+                Spacer(minLength: 0)
             }
         }
         
@@ -250,38 +242,31 @@ struct DashboardView: View {
             }
         ) {
             VStack(spacing: 0) {
-                ForEach(viewModel.storePerformanceList) { store in
-                    HStack(spacing: 12) {
+                ForEach(Array(viewModel.storePerformanceList.prefix(3))) { store in
+                    HStack(spacing: 16) {
                         Text("\(store.rank)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(store.rank <= 3 && viewModel.selectedStorePerformanceFilter == .highest ? .primary : .secondary)
-                            .frame(width: 16, alignment: .center)
-                        
-                        Circle()
-                            .fill(Color.blue.opacity(0.12))
-                            .frame(width: 36, height: 36)
-                            .overlay(
-                                Text(store.initials)
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.blue)
-                            )
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 20, alignment: .leading)
                         
                         Text(store.storeName)
-                            .font(.subheadline.weight(.medium))
+                            .font(.body.weight(.medium))
                             .foregroundStyle(.primary)
+                            .lineLimit(1)
                         
                         Spacer()
                         
                         Text(store.revenueText)
-                            .font(.subheadline.weight(.medium).monospacedDigit())
+                            .font(.body.weight(.semibold).monospacedDigit())
                             .foregroundStyle(.secondary)
                     }
-                    .frame(height: 56)
+                    .frame(height: 68)
                     
-                    if store.id != viewModel.storePerformanceList.last?.id {
-                        Divider().padding(.leading, 76)
+                    if store.id != viewModel.storePerformanceList.prefix(3).last?.id {
+                        Divider().padding(.leading, 36)
                     }
                 }
+                Spacer(minLength: 0)
             }
         }
         
@@ -291,38 +276,31 @@ struct DashboardView: View {
             subtitle: "BY SPEND"
         ) {
             VStack(spacing: 0) {
-                ForEach(viewModel.topCustomersList.indices, id: \.self) { index in
-                    HStack(spacing: 12) {
+                ForEach(Array(viewModel.topCustomersList.prefix(3).indices), id: \.self) { index in
+                    HStack(spacing: 16) {
                         Text("\(index + 1)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(index < 3 ? .primary : .secondary)
-                            .frame(width: 16, alignment: .center)
-                        
-                        Circle()
-                            .fill(Color.purple.opacity(0.12))
-                            .frame(width: 36, height: 36)
-                            .overlay(
-                                Text(viewModel.topCustomersList[index].initials)
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.purple)
-                            )
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 20, alignment: .leading)
                         
                         Text(viewModel.topCustomersList[index].customerName)
-                            .font(.subheadline.weight(.medium))
+                            .font(.body.weight(.medium))
                             .foregroundStyle(.primary)
+                            .lineLimit(1)
                         
                         Spacer()
                         
                         Text(viewModel.topCustomersList[index].spendText)
-                            .font(.subheadline.weight(.medium).monospacedDigit())
+                            .font(.body.weight(.semibold).monospacedDigit())
                             .foregroundStyle(.secondary)
                     }
-                    .frame(height: 56)
+                    .frame(height: 68)
                     
-                    if index != viewModel.topCustomersList.count - 1 {
-                        Divider().padding(.leading, 76)
+                    if index != viewModel.topCustomersList.prefix(3).count - 1 {
+                        Divider().padding(.leading, 36)
                     }
                 }
+                Spacer(minLength: 0)
             }
         }
     }

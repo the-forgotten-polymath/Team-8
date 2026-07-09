@@ -136,16 +136,20 @@ final class SalesHistoryViewModel: ObservableObject {
                 let calendar = Calendar.current
                 // Get the first day of the current month
                 let components = calendar.dateComponents([.year, .month], from: currentDate)
-                if let firstDayOfMonth = calendar.date(from: components) {
+                if let firstDayOfMonth = calendar.date(from: components),
+                   let lastDayOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: firstDayOfMonth) {
+                    
                     let formatter = DateFormatter()
                     formatter.dateFormat = "yyyy-MM-dd"
-                    let targetMonthString = formatter.string(from: firstDayOfMonth)
+                    let firstDayString = formatter.string(from: firstDayOfMonth)
+                    let lastDayString = formatter.string(from: lastDayOfMonth)
                     
                     let targetResponse = try await client
                         .from("store_targets")
                         .select("revenue_target")
                         .eq("store_id", value: storeId.uuidString)
-                        .eq("target_month", value: targetMonthString)
+                        .gte("target_month", value: firstDayString)
+                        .lte("target_month", value: lastDayString)
                         .execute()
                     
                     struct StoreTargetPartial: Decodable {

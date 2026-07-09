@@ -65,10 +65,10 @@ struct TargetsView: View {
                 }
             }
         }
-        .sheet(item: $targetToEdit) { target in
-            AddTargetView(editingTarget: target) { updatedTarget in
+        .sheet(item: $targetToEdit) { oldTarget in
+            AddTargetView(editingTarget: oldTarget) { updatedTarget in
                 Task {
-                    try? await dataManager.updateTarget(updatedTarget)
+                    try? await dataManager.updateTarget(oldTarget: oldTarget, newTarget: updatedTarget)
                 }
             }
         }

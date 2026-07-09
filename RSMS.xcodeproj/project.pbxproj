@@ -27,6 +27,7 @@
 		6358E7CF6E9EF51856D230D4 /* InventoryModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14A849CAC1A51C675BFEA412 /* InventoryModule.framework */; };
 		7892BADCA79439CFD688D107 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 02F10ED3825C4B8BCA9841CF /* Functions */; };
 		804151F888AA1220E3C3E21E /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = F6A348D1F1F1BB15EEFD5AD3 /* Storage */; };
+		8458DF122FFF68A500B465EA /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = 8458DF112FFF68A500B465EA /* RazorpayCheckout */; };
 		84AC0297E6D03965DD620AAF /* NoStoreAssignedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */; };
 		87E53904304A7A524F71CE6F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = BB50939E46963CAB435243F8 /* Realtime */; };
 		8BFBDD7423E937F313DC8A11 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 9B1B7A1D8DEF009939508114 /* Storage */; };
@@ -124,6 +125,7 @@
 		29195C662FFF8AE700928825 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Admin_RSMS.app; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		8458DE8F2FFF685C00B465EA /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		89BA7C48BC6FEF87A4C8059D /* NoStoreAssignedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NoStoreAssignedView.swift; sourceTree = "<group>"; };
 		8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
 		8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 		8E9289552FF566BC001C9D4C /* config.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.toml; sourceTree = "<group>"; };
 		8E9289572FF566BC001C9D4C /* test_geocoder */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test_geocoder; sourceTree = "<group>"; };
 		8E9289582FF566BC001C9D4C /* test_geocoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test_geocoder.swift; sourceTree = "<group>"; };
+		A1D196A92FFF9E9400EFC8A4 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
 		A1E8ADC4058A76639409B24F /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA69B4B435CD8680B7545E56 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
@@ -196,6 +199,7 @@
 			files = (
 				8E2951582FF4F6C200BC2782 /* PostgREST in Frameworks */,
 				8E2951562FF4F6C200BC2782 /* Functions in Frameworks */,
+				8458DF122FFF68A500B465EA /* RazorpayCheckout in Frameworks */,
 				8E29515E2FF4F6C200BC2782 /* Supabase in Frameworks */,
 				8E2951542FF4F6C200BC2782 /* Auth in Frameworks */,
 				8E29515C2FF4F6C200BC2782 /* Storage in Frameworks */,
@@ -345,6 +349,13 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
+		8458DE922FFF685C00B465EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		8E13F7072FFBFF78002D0D70 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -433,6 +444,13 @@
 				8E9289552FF566BC001C9D4C /* config.toml */,
 			);
 			path = supabase;
+			sourceTree = "<group>";
+		};
+		A1D196AC2FFF9E9400EFC8A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		E8C08ABC2FFB827800BE7B39 /* Products */ = {
@@ -547,6 +565,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8458DF0D2FFF687D00B465EA /* PBXTargetDependency */,
 				26AE090C84EDC21426A43CCE /* PBXTargetDependency */,
 				41A544B935BEB4C37F629263 /* PBXTargetDependency */,
 				F8E4719899268AA15DA8427B /* PBXTargetDependency */,
@@ -560,6 +579,7 @@
 				8E2951592FF4F6C200BC2782 /* Realtime */,
 				8E29515B2FF4F6C200BC2782 /* Storage */,
 				8E29515D2FF4F6C200BC2782 /* Supabase */,
+				8458DF112FFF68A500B465EA /* RazorpayCheckout */,
 			);
 			productName = RSMS;
 			productReference = 545E2F922FEC4E550027DD55 /* Admin_RSMS.app */;
@@ -810,6 +830,10 @@
 			name = SalesAssociateModule;
 			target = 27467149B2888AE313D57444 /* SalesAssociateModule */;
 			targetProxy = 0B7378E094D3574C3CD0D674 /* PBXContainerItemProxy */;
+		};
+		8458DF0D2FFF687D00B465EA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 8458DF0C2FFF687D00B465EA /* RazorpayCheckout */;
 		};
 		F8E4719899268AA15DA8427B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1406,6 +1430,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
+		};
+		8458DF0C2FFF687D00B465EA /* RazorpayCheckout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0500A8412F5DDB9D23D86125 /* XCRemoteSwiftPackageReference "razorpay-pod" */;
+			productName = RazorpayCheckout;
+		};
+		8458DF112FFF68A500B465EA /* RazorpayCheckout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0500A8412F5DDB9D23D86125 /* XCRemoteSwiftPackageReference "razorpay-pod" */;
+			productName = RazorpayCheckout;
 		};
 		8E2951532FF4F6C200BC2782 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;

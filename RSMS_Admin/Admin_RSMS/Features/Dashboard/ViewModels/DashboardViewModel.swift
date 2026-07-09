@@ -291,7 +291,14 @@ struct MostSoldProductItem: Identifiable {
         let productsById = Dictionary(uniqueKeysWithValues: data.products.map { ($0.id, $0) })
         let unitsByProduct = Dictionary(grouping: data.saleItems, by: \.productId)
             .mapValues { $0.reduce(0) { $0 + $1.quantity } }
-        let rankedProducts = unitsByProduct.sorted { $0.value > $1.value }.prefix(4)
+        let rankedProducts = unitsByProduct.sorted {
+            if $0.value == $1.value {
+                let name0 = productsById[$0.key]?.productName ?? ""
+                let name1 = productsById[$1.key]?.productName ?? ""
+                return name0 < name1
+            }
+            return $0.value > $1.value
+        }.prefix(4)
         
         mostSoldProducts = rankedProducts.enumerated().compactMap { index, entry -> MostSoldProductItem? in
             guard let product = productsById[entry.key] else { return nil }
@@ -308,7 +315,14 @@ struct MostSoldProductItem: Identifiable {
         let spendByCustomer = Dictionary(grouping: completedSales, by: { $0.customerId! })
             .mapValues { $0.reduce(0) { $0 + $1.totalAmount } }
         let rankedCustomers = spendByCustomer
-            .sorted { $0.value > $1.value }
+            .sorted {
+                if $0.value == $1.value {
+                    let name0 = customersById[$0.key]?.name ?? ""
+                    let name1 = customersById[$1.key]?.name ?? ""
+                    return name0 < name1
+                }
+                return $0.value > $1.value
+            }
             .prefix(4)
         let maxSpend = rankedCustomers.first?.value ?? 0
         topCustomersList = rankedCustomers.compactMap { customerId, spend -> TopCustomerItem? in
@@ -320,9 +334,14 @@ struct MostSoldProductItem: Identifiable {
         let storeNamesById = Dictionary(uniqueKeysWithValues: data.stores.map { ($0.id, $0.storeName) })
         let revenueByStore = Dictionary(grouping: completedSales, by: \.storeId)
             .mapValues { $0.reduce(0) { $0 + $1.totalAmount } }
-        let sortedStoreRevenue = selectedStorePerformanceFilter == .highest
-            ? revenueByStore.sorted { $0.value > $1.value }
-            : revenueByStore.sorted { $0.value < $1.value }
+        let sortedStoreRevenue = revenueByStore.sorted {
+            if $0.value == $1.value {
+                let name0 = storeNamesById[$0.key] ?? ""
+                let name1 = storeNamesById[$1.key] ?? ""
+                return name0 < name1
+            }
+            return selectedStorePerformanceFilter == .highest ? ($0.value > $1.value) : ($0.value < $1.value)
+        }
         storePerformanceList = sortedStoreRevenue.prefix(4).enumerated().compactMap { index, entry -> StorePerformanceItem? in
             guard let storeName = storeNamesById[entry.key] else { return nil }
             return StorePerformanceItem(rank: index + 1, storeName: storeName, revenue: entry.value)

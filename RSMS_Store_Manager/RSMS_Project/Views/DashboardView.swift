@@ -1014,7 +1014,7 @@ struct DashboardView: View {
                 HStack {
                     Image(systemName: "person.3.sequence.fill")
                         .foregroundColor(Color(.label))
-                    Text(viewModel.currentShift != nil ? "STAFF ON FLOOR" : "STAFF")
+                    Text(viewModel.currentShift != nil ? "STAFF" : "STAFF")
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(Color(.label))

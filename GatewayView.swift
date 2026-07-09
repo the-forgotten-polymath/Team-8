@@ -98,6 +98,50 @@ struct GatewayUser: Codable {
     }
 }
 
+extension GatewayUser {
+    func toStoreManagerUser() -> StoreManagerModule.User {
+        return StoreManagerModule.User(
+            id: self.id,
+            fullName: self.fullName,
+            username: self.username,
+            email: self.email,
+            isVerified: true,
+            roleId: self.roleId,
+            storeId: self.storeId,
+            employeeCode: self.employeeCode,
+            designation: self.designation,
+            phone: self.phone,
+            gender: self.gender,
+            dateOfBirth: self.dateOfBirth,
+            address: self.address,
+            profileImageURL: self.profileImageURL,
+            isProfileCompleted: self.isProfileCompleted ?? false
+        )
+    }
+}
+
+extension StoreManagerModule.User {
+    func toGatewayUser() -> GatewayUser {
+        return GatewayUser(
+            id: self.id,
+            fullName: self.fullName,
+            username: self.username,
+            email: self.email,
+            roleId: self.roleId,
+            storeId: self.storeId,
+            designation: self.designation,
+            phone: self.phone,
+            profileImageURL: self.profileImageURL,
+            isProfileCompleted: self.isProfileCompleted,
+            employeeCode: self.employeeCode,
+            gender: self.gender,
+            dateOfBirth: self.dateOfBirth,
+            address: self.address
+        )
+    }
+}
+
+
 
 // MARK: - Gateway Role
 
@@ -896,12 +940,12 @@ struct GatewayView: View {
     ) -> some View {
 
         StoreManagerOnboardingView(
-            user: user,
+            user: user.toStoreManagerUser(),
 
             onComplete: { updatedUser in
                 showManagerOnboarding = false
                 handleLoginSuccessInterceptor(
-                    updatedUser,
+                    updatedUser.toGatewayUser(),
                     "Store Manager"
                 )
             },

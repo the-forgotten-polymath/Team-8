@@ -53,29 +53,19 @@ struct OperationsView: View {
                             NavigationLink(destination: OmnichannelView(isEmbedded: true)) {
                                 OperationCard(
                                     title: "Fulfillment",
-                                    subtitle: "BOPIS & SFS",
+                                    subtitle: "BOPIS Purchases",
                                     systemImage: "shippingbox.fill",
                                     iconColor: .green
                                 )
                             }
                             
-                            // 4. Orders
+                            // 4. Purchases
                             NavigationLink(destination: OrdersDashboardView(isEmbedded: true)) {
                                 OperationCard(
-                                    title: "Orders",
+                                    title: "Purchases",
                                     subtitle: "Sales & Invoices",
                                     systemImage: "doc.text.fill",
                                     iconColor: .blue
-                                )
-                            }
-                            
-                            // 5. Attendance
-                            NavigationLink(destination: AttendanceHistoryView()) {
-                                OperationCard(
-                                    title: "Attendance",
-                                    subtitle: "Clock In & History",
-                                    systemImage: "clock.badge.checkmark.fill",
-                                    iconColor: .purple
                                 )
                             }
                         }

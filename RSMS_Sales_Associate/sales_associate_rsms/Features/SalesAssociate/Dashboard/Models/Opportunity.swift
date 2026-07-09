@@ -39,4 +39,9 @@ struct Opportunity: Codable, Identifiable {
     var recommendedProductPrice: Double?
     var recommendedProductDiscountedPrice: Double?
     var recommendedProductImageURL: String?
+    
+    // Promo code (single-use, from customers table)
+    var promoCode: String?
+    var promoCodeUsed: Bool?
+    var daysUntilEvent: Int?
 }

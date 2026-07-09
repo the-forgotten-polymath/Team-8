@@ -78,6 +78,14 @@ struct DashboardView: View {
                     storeId: authVM.userStoreID
                 )
             }
+            .onAppear {
+                Task {
+                    await viewModel.loadDashboardData(
+                        userId: authVM.currentUser?.id,
+                        storeId: authVM.userStoreID
+                    )
+                }
+            }
         }
     }
 }

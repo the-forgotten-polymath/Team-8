@@ -509,160 +509,180 @@ final class SalesAssociateService {
     // ─────────────────────────────────────────────────────────────
 
     /// Derives active opportunities from customers assigned to this associate.
-    /// Generates Birthday, Anniversary, and Wishlist opportunities.
+    /// Only surfaces Birthday and Anniversary events occurring within 7 days.
+    /// Carries the promo_code stored on the customer record (single-use).
     func fetchOpportunities(associateId: UUID, storeId: UUID?) async throws -> [Opportunity] {
         var customers = try await fetchCustomers(associateId: associateId)
         
-        // If no customers are assigned to this associate, query any active customers in the database (real live data)
+        // Fallback: if no assigned customers, pull active customers from the store or globally
         if customers.isEmpty {
-            customers = (try? await client
-                .from("customers")
-                .select()
-                .eq("is_active", value: "true")
-                .limit(10)
-                .execute()
-                .value) ?? []
+            var query = client.from("customers").select().eq("is_active", value: "true")
+            if let sid = storeId {
+                query = query.eq("assigned_store_id", value: sid.uuidString)
+            }
+            customers = (try? await query.limit(50).execute().value) ?? []
         }
         
-        let calendar  = Calendar.current
-        let today     = calendar.startOfDay(for: Date())
+        let calendar = Calendar.current
+        let today    = calendar.startOfDay(for: Date())
         var opportunities: [Opportunity] = []
         
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-
-        func isEventWithin7Days(date: Date) -> (isWithin: Bool, dateThisYear: Date) {
-            var eventComponents = calendar.dateComponents([.month, .day], from: date)
-            eventComponents.year = calendar.component(.year, from: today)
-            guard var dateThisYear = calendar.date(from: eventComponents) else { return (false, date) }
-            dateThisYear = calendar.startOfDay(for: dateThisYear)
+        // Helper: returns (isWithin7Days, eventDateThisYear, daysUntil)
+        func eventCheck(_ date: Date) -> (isWithin: Bool, eventDate: Date, daysUntil: Int) {
+            var comps = calendar.dateComponents([.month, .day], from: date)
+            comps.year = calendar.component(.year, from: today)
+            guard var thisYear = calendar.date(from: comps) else { return (false, date, -1) }
+            thisYear = calendar.startOfDay(for: thisYear)
             
-            var daysUntil = calendar.dateComponents([.day], from: today, to: dateThisYear).day ?? -1
-            
-            if daysUntil < 0 {
-                var eventNextYear = eventComponents
-                eventNextYear.year = calendar.component(.year, from: today) + 1
-                if let dateNextYear = calendar.date(from: eventNextYear) {
-                    let nextYearDate = calendar.startOfDay(for: dateNextYear)
-                    daysUntil = calendar.dateComponents([.day], from: today, to: nextYearDate).day ?? -1
-                    if daysUntil >= 0 && daysUntil <= 7 {
-                        return (true, nextYearDate)
-                    }
+            var days = calendar.dateComponents([.day], from: today, to: thisYear).day ?? -1
+            if days < 0 {
+                // Event already passed this year — check next year
+                var nextComps = comps
+                nextComps.year = (comps.year ?? 0) + 1
+                if let nextYear = calendar.date(from: nextComps) {
+                    let nextDay = calendar.startOfDay(for: nextYear)
+                    days = calendar.dateComponents([.day], from: today, to: nextDay).day ?? -1
+                    if days >= 0 && days <= 7 { return (true, nextDay, days) }
                 }
-            } else if daysUntil <= 7 {
-                return (true, dateThisYear)
+                return (false, thisYear, days)
             }
-            return (false, dateThisYear)
+            return (days <= 7, thisYear, days)
         }
 
         for customer in customers {
             let clientName = customer.name
             let tier = customer.customerTier ?? (customer.isVip == true ? "VIP" : "Regular")
-
-            // 1. Birthday Offer: birthday within 7 days
-            if let dob = customer.dateOfBirth {
-                let check = isEventWithin7Days(date: dob)
-                if check.isWithin {
-                    opportunities.append(Opportunity(
-                        id: UUID(),
-                        clientID: customer.id,
-                        associateID: associateId,
-                        type: .birthday,
-                        title: "Birthday Today",
-                        description: "\(clientName)'s birthday is on \(formatter.string(from: check.dateThisYear)).",
-                        dateGenerated: Date(),
-                        status: .new,
-                        clientName: clientName,
-                        eventDate: check.dateThisYear,
-                        customerTier: tier,
-                        personalizedOffer: "10% Offer Ready"
-                    ))
-                }
-            }
-
-            // 2. Anniversary Offer: anniversary within 7 days
-            if let anniv = customer.anniversaryDate {
-                let check = isEventWithin7Days(date: anniv)
-                if check.isWithin {
-                    opportunities.append(Opportunity(
-                        id: UUID(),
-                        clientID: customer.id,
-                        associateID: associateId,
-                        type: .anniversary,
-                        title: "Anniversary",
-                        description: "\(clientName)'s anniversary is on \(formatter.string(from: check.dateThisYear)).",
-                        dateGenerated: Date(),
-                        status: .new,
-                        clientName: clientName,
-                        eventDate: check.dateThisYear,
-                        customerTier: tier,
-                        personalizedOffer: "12% Offer Ready"
-                    ))
-                }
-            }
-        }
-
-        // Generate synthetic opportunities from live database customers to make sure the dashboard is active
-        if opportunities.isEmpty && !customers.isEmpty {
-            for (index, customer) in customers.enumerated() {
-                let clientName = customer.name
-                let tier = customer.customerTier ?? (customer.isVip == true ? "VIP" : "Regular")
-                if index % 2 == 0 {
-                    opportunities.append(Opportunity(
-                        id: UUID(),
-                        clientID: customer.id,
-                        associateID: associateId,
-                        type: .birthday,
-                        title: "Birthday Today",
-                        description: "\(clientName)'s birthday is today.",
-                        dateGenerated: today,
-                        status: .new,
-                        clientName: clientName,
-                        eventDate: today,
-                        customerTier: tier,
-                        personalizedOffer: "10% Offer Ready"
-                    ))
-                } else {
-                    opportunities.append(Opportunity(
-                        id: UUID(),
-                        clientID: customer.id,
-                        associateID: associateId,
-                        type: .anniversary,
-                        title: "Anniversary",
-                        description: "\(clientName)'s anniversary is today.",
-                        dateGenerated: today,
-                        status: .new,
-                        clientName: clientName,
-                        eventDate: today,
-                        customerTier: tier,
-                        personalizedOffer: "12% Offer Ready"
-                    ))
-                }
-            }
-        }
-
-        // Sort opportunities: Today first, then Tomorrow, then chronological
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
-        let sortedOpps = opportunities.sorted { opp1, opp2 in
-            guard let date1 = opp1.eventDate, let date2 = opp2.eventDate else { return false }
-            let day1 = calendar.startOfDay(for: date1)
-            let day2 = calendar.startOfDay(for: date2)
             
-            func priority(for date: Date) -> Int {
-                if calendar.isDate(date, inSameDayAs: today) { return 0 }
-                if calendar.isDate(date, inSameDayAs: tomorrow) { return 1 }
+            // --- Birthday within 7 days ---
+            if let dob = customer.dateOfBirth {
+                let check = eventCheck(dob)
+                if check.isWithin {
+                    // Retrieve or generate a promo code
+                    let code = try await resolvePromoCode(
+                        customer: customer,
+                        eventType: "birthday",
+                        discountPercent: 10
+                    )
+                    let titleMsg: String
+                    switch check.daysUntil {
+                    case 0:  titleMsg = "Birthday Today 🎂"
+                    case 1:  titleMsg = "Birthday Tomorrow 🎁"
+                    default: titleMsg = "Birthday in \(check.daysUntil) Days 🎂"
+                    }
+                    opportunities.append(Opportunity(
+                        id: UUID(),
+                        clientID: customer.id,
+                        associateID: associateId,
+                        type: .birthday,
+                        title: titleMsg,
+                        description: "\(clientName)'s birthday — offer 10% off. Code: \(code)",
+                        dateGenerated: Date(),
+                        status: .new,
+                        clientName: clientName,
+                        eventDate: check.eventDate,
+                        customerTier: tier,
+                        personalizedOffer: "10% Birthday Offer",
+                        promoCode: code,
+                        promoCodeUsed: customer.promoCodeUsed ?? false,
+                        daysUntilEvent: check.daysUntil
+                    ))
+                }
+            }
+            
+            // --- Anniversary within 7 days ---
+            if let anniv = customer.anniversaryDate {
+                let check = eventCheck(anniv)
+                if check.isWithin {
+                    let code = try await resolvePromoCode(
+                        customer: customer,
+                        eventType: "anniversary",
+                        discountPercent: 12
+                    )
+                    let titleMsg: String
+                    switch check.daysUntil {
+                    case 0:  titleMsg = "Anniversary Today 💍"
+                    case 1:  titleMsg = "Anniversary Tomorrow 💐"
+                    default: titleMsg = "Anniversary in \(check.daysUntil) Days 💍"
+                    }
+                    opportunities.append(Opportunity(
+                        id: UUID(),
+                        clientID: customer.id,
+                        associateID: associateId,
+                        type: .anniversary,
+                        title: titleMsg,
+                        description: "\(clientName)'s anniversary — offer 12% off. Code: \(code)",
+                        dateGenerated: Date(),
+                        status: .new,
+                        clientName: clientName,
+                        eventDate: check.eventDate,
+                        customerTier: tier,
+                        personalizedOffer: "12% Anniversary Offer",
+                        promoCode: code,
+                        promoCodeUsed: customer.promoCodeUsed ?? false,
+                        daysUntilEvent: check.daysUntil
+                    ))
+                }
+            }
+        }
+
+        // Sort: today first, then tomorrow, then chronological
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
+        return opportunities.sorted { a, b in
+            guard let d1 = a.eventDate, let d2 = b.eventDate else { return false }
+            let day1 = calendar.startOfDay(for: d1)
+            let day2 = calendar.startOfDay(for: d2)
+            func pri(_ d: Date) -> Int {
+                if calendar.isDate(d, inSameDayAs: today)    { return 0 }
+                if calendar.isDate(d, inSameDayAs: tomorrow) { return 1 }
                 return 2
             }
-            
-            let p1 = priority(for: day1)
-            let p2 = priority(for: day2)
-            if p1 != p2 {
-                return p1 < p2
-            }
-            return day1 < day2
+            let p1 = pri(day1), p2 = pri(day2)
+            return p1 != p2 ? p1 < p2 : day1 < day2
         }
-        
-        return sortedOpps
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MARK: – Promo Code Helpers
+    // ─────────────────────────────────────────────────────────────
+
+    /// Returns the existing promo_code for the customer if present (and not already used),
+    /// otherwise generates a new one, writes it to Supabase, and returns it.
+    private func resolvePromoCode(customer: Customer, eventType: String, discountPercent: Int) async throws -> String {
+        // If a fresh (unused) promo code exists on the customer record, reuse it
+        if let existing = customer.promoCode, !(customer.promoCodeUsed ?? false) {
+            return existing
+        }
+        // Generate a new deterministic code and persist it
+        let newCode = generatePromoCode(for: customer, eventType: eventType, discountPercent: discountPercent)
+        // Use a Codable struct so Swift can infer types correctly
+        struct PromoUpdate: Encodable {
+            let promo_code: String
+            let promo_code_used: Bool
+        }
+        _ = try? await client
+            .from("customers")
+            .update(PromoUpdate(promo_code: newCode, promo_code_used: false))
+            .eq("id", value: customer.id.uuidString)
+            .execute()
+        return newCode
+    }
+
+    /// Generates a deterministic 8-character alphanumeric promo code.
+    private func generatePromoCode(for customer: Customer, eventType: String, discountPercent: Int) -> String {
+        let name   = customer.name.uppercased().filter { $0.isLetter }
+        let prefix = String(name.prefix(4)).padding(toLength: 4, withPad: "X", startingAt: 0)
+        let suffix = eventType == "birthday" ? "BD\(discountPercent)" : "AN\(discountPercent)"
+        return String((prefix + suffix).prefix(8))
+    }
+
+    /// Marks a customer's promo code as used (single-use enforcement).
+    func markPromoCodeUsed(customerId: UUID) async {
+        struct UsedUpdate: Encodable { let promo_code_used: Bool }
+        _ = try? await client
+            .from("customers")
+            .update(UsedUpdate(promo_code_used: true))
+            .eq("id", value: customerId.uuidString)
+            .execute()
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -767,6 +787,35 @@ final class SalesAssociateService {
             .insert(saleItems)
             .execute()
 
+        // Update inventory in database (decrement stock)
+        for item in items {
+            struct InvRow: Decodable {
+                let id: UUID
+                let quantity: Int
+            }
+            let query = client.from("inventory")
+                .select("id, quantity")
+                .eq("product_id", value: item.productId.uuidString)
+                .eq("store_id", value: finalStoreId.uuidString)
+                .single()
+            
+            if let invRecord: InvRow = try? await query.execute().value {
+                let newQty = max(0, invRecord.quantity - item.quantity)
+                _ = try? await client
+                    .from("inventory")
+                    .update(["quantity": newQty])
+                    .eq("id", value: invRecord.id.uuidString)
+                    .execute()
+            }
+        }
+
+        // Add audit log
+        try? await AuditLogService.shared.log(
+            userId: userId,
+            module: "Sales",
+            action: "Completed sale: \(invoiceNumber) for total: \(total - discountAmount + taxAmount)"
+        )
+
         return created
     }
     
@@ -776,6 +825,18 @@ final class SalesAssociateService {
             .from("sales")
             .select()
             .eq("store_id", value: storeId.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+        
+        return sales
+    }
+
+    func fetchSalesByAssociate(associateId: UUID) async throws -> [Sale] {
+        let sales: [Sale] = try await client
+            .from("sales")
+            .select()
+            .eq("user_id", value: associateId.uuidString)
             .order("created_at", ascending: false)
             .execute()
             .value

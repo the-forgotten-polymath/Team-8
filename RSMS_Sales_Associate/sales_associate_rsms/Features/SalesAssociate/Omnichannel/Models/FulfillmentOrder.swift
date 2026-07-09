@@ -45,4 +45,8 @@ struct FulfillmentOrder: Codable, Identifiable, Equatable {
     // For BOPIS
     var signatureData: Data?
     var pickupDate: Date?
+    
+    // For live customer info from sales table
+    var clientName: String?
+    var clientPhone: String?
 }

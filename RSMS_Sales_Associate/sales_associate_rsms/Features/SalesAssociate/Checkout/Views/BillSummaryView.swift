@@ -168,7 +168,7 @@ struct BillSummaryView: View {
                     Button(action: {
                         navigateToPayment = true
                     }) {
-                        Text("Proceed to Payment")
+                        Text("Payment")
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

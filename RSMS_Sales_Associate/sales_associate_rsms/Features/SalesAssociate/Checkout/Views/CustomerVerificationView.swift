@@ -72,7 +72,42 @@ struct CustomerVerificationView: View {
                             .disabled(viewModel.phoneNumber.isEmpty || viewModel.isLoading)
                         }
                     }
-                    .padding(.horizontal)
+                    if !viewModel.recommendations.isEmpty && !viewModel.searched {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Matching Customers")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 4)
+                            
+                            ForEach(viewModel.recommendations) { suggestion in
+                                Button(action: {
+                                    viewModel.phoneNumber = suggestion.phone
+                                    Task {
+                                        await viewModel.lookupCustomer()
+                                    }
+                                }) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(suggestion.name)
+                                                .font(.system(size: 15, weight: .semibold))
+                                                .foregroundColor(.primary)
+                                            Text(suggestion.phone)
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(.blue)
+                                    }
+                                    .padding(12)
+                                    .background(Color(.secondarySystemGroupedBackground))
+                                    .cornerRadius(10)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                     
                     if viewModel.searched {
                         if let client = viewModel.customer {
@@ -236,6 +271,11 @@ struct CustomerVerificationView: View {
                 BillSummaryView(customer: client)
             }
         }
+        .onChange(of: viewModel.phoneNumber) { _ in
+            Task {
+                await viewModel.updateRecommendations()
+            }
+        }
     }
 }
 
@@ -252,6 +292,50 @@ class CustomerVerificationViewModel: ObservableObject {
     @Published var notes: String = ""
     
     @Published var errorMessage: String? = nil
+    @Published var recommendations: [CustomerSuggestion] = []
+    
+    struct CustomerSuggestion: Identifiable, Equatable {
+        let id: UUID
+        let name: String
+        let phone: String
+    }
+    
+    func updateRecommendations() async {
+        let queryText = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard queryText.count >= 3 else {
+            self.recommendations = []
+            return
+        }
+        
+        do {
+            if AppConstants.useMockData {
+                let suggestions = MockData.clients.filter {
+                    ($0.phone ?? "").contains(queryText)
+                }.map {
+                    CustomerSuggestion(id: $0.id, name: $0.fullName, phone: $0.phone ?? "")
+                }
+                self.recommendations = suggestions
+            } else {
+                struct CustomSuggestionRow: Decodable {
+                    let id: UUID
+                    let name: String
+                    let phone: String
+                }
+                let results: [CustomSuggestionRow] = (try? await supabase
+                    .from("customers")
+                    .select("id, name, phone")
+                    .ilike("phone", value: "%\(queryText)%")
+                    .limit(5)
+                    .execute()
+                    .value) ?? []
+                self.recommendations = results.map {
+                    CustomerSuggestion(id: $0.id, name: $0.name, phone: $0.phone)
+                }
+            }
+        } catch {
+            print("Failed to get recommendations: \(error)")
+        }
+    }
     
     func lookupCustomer() async {
         isLoading = true

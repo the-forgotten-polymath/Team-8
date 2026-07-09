@@ -13,10 +13,6 @@ struct AdvisorDashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Attendance Card
-                DashboardAttendanceCard()
-                    .padding(.horizontal, 4)
-                
                 // Sales Performance Analytics Header & Picker
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
@@ -74,7 +70,10 @@ struct AdvisorDashboardView: View {
                         } else {
                             VStack(spacing: 0) {
                                 ForEach(Array(viewModel.todayAppointments.enumerated()), id: \.offset) { index, appointment in
-                                    DashboardAppointmentRowView(appointment: appointment)
+                                    NavigationLink(destination: AppointmentDetailView(appointment: appointment)) {
+                                        DashboardAppointmentRowView(appointment: appointment)
+                                    }
+                                    .buttonStyle(.plain)
                                     
                                     if index < viewModel.todayAppointments.count - 1 {
                                         Divider()
@@ -110,11 +109,21 @@ struct AdvisorDashboardView: View {
                     .padding(.horizontal, 4)
                     
                     if viewModel.activeOpportunities.isEmpty {
-                        Text("No active opportunities.")
-                            .foregroundColor(.secondary)
-                            .padding(.vertical, 24)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .whiteCard()
+                        VStack(spacing: 10) {
+                            Image(systemName: "calendar.badge.clock")
+                                .font(.system(size: 36))
+                                .foregroundColor(.secondary.opacity(0.5))
+                            Text("No upcoming events")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            Text("Birthdays & anniversaries within 7 days will appear here")
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.vertical, 24)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .whiteCard()
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
@@ -351,8 +360,11 @@ struct HorizontalOpportunityCard: View {
     var onContact: () -> Void
     
     var body: some View {
-        let typeColor = colorForType(opp.type)
-        let bgColor = bgColorForType(opp.type)
+        let typeColor  = colorForType(opp.type)
+        let bgColor    = bgColorForType(opp.type)
+        let codeUsed   = opp.promoCodeUsed ?? false
+        let promoCode  = opp.promoCode ?? "—"
+        let discount   = opp.type == .birthday ? "10% OFF" : "12% OFF"
         
         VStack(spacing: 8) {
             // Icon Circle
@@ -360,27 +372,24 @@ struct HorizontalOpportunityCard: View {
                 Circle()
                     .fill(Color.white)
                     .frame(width: 44, height: 44)
-                    .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
-                
+                    .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
                 Image(systemName: iconForType(opp.type))
                     .foregroundColor(typeColor)
                     .font(.system(size: 18, weight: .semibold))
             }
             .padding(.top, 8)
             
-            // Type Title (e.g., "Birthday Today")
+            // Dynamic title from server
             Text(opp.title)
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(typeColor)
+                .multilineTextAlignment(.center)
             
-            // Countdown message
-            Text(getCountdownMessage(for: opp.eventDate))
-                .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.orange)
+            // Countdown badge
+            countdownBadge
             
-            // Client Info Row
-            HStack(spacing: 8) {
-                // Mini avatar
+            // Client avatar + name
+            HStack(spacing: 6) {
                 ZStack {
                     Circle()
                         .fill(typeColor.opacity(0.15))
@@ -389,104 +398,128 @@ struct HorizontalOpportunityCard: View {
                         .font(.system(size: 9, weight: .bold))
                         .foregroundColor(typeColor)
                 }
-                
                 Text(opp.clientName ?? "Unknown")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.primary)
                     .lineLimit(1)
             }
             
-            // Offer Display
-            Text(opp.type == .birthday ? "10% OFF" : "12% OFF")
+            // Discount label
+            Text(discount)
                 .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.primary)
-                .lineLimit(1)
             
-            // Promo Code Badge (8 alphanumeric characters)
-            Text(generatePromoCode(clientName: opp.clientName, type: opp.type))
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(typeColor)
+            // Promo code badge
+            if codeUsed {
+                HStack(spacing: 4) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(.gray)
+                    Text(promoCode)
+                        .font(.system(size: 10, weight: .bold))
+                        .strikethrough(true, color: .gray)
+                        .foregroundColor(.gray)
+                }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(typeColor.opacity(0.12))
+                .background(Color.gray.opacity(0.08))
                 .cornerRadius(8)
-            
-            // Action Text
-            HStack(spacing: 4) {
-                Text(opp.type == .birthday ? "Contact" : "Message")
-                    .font(.system(size: 12, weight: .bold))
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .bold))
+                
+                Text("Code Used")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundColor(.gray)
+            } else {
+                Text(promoCode)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(typeColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(typeColor.opacity(0.12))
+                    .cornerRadius(8)
+                
+                // Action text
+                HStack(spacing: 4) {
+                    Text("Offer Code")
+                        .font(.system(size: 11, weight: .bold))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 9, weight: .bold))
+                }
+                .foregroundColor(typeColor)
+                .padding(.top, 2)
             }
-            .foregroundColor(typeColor)
-            .padding(.top, 2)
         }
         .padding(12)
         .frame(width: 165)
-        .background(bgColor)
-        .cornerRadius(16)
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(typeColor.opacity(0.1), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray.opacity(0.12), lineWidth: 1)
         )
+        .opacity(codeUsed ? 0.65 : 1.0)
         .contentShape(Rectangle())
         .onTapGesture {
+            guard !codeUsed else { return }
             let generator = UIImpactFeedbackGenerator(style: .medium)
             generator.impactOccurred()
             onContact()
         }
     }
     
-    private func getCountdownMessage(for date: Date?) -> String {
-        guard let date = date else { return "Special Offer" }
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let target = calendar.startOfDay(for: date)
+    // MARK: – Countdown badge
+    @ViewBuilder
+    private var countdownBadge: some View {
+        let days = opp.daysUntilEvent ?? {
+            guard let d = opp.eventDate else { return -1 }
+            let cal = Calendar.current
+            return cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: d)).day ?? -1
+        }()
         
-        let components = calendar.dateComponents([.day], from: today, to: target)
-        let days = components.day ?? 0
-        
-        if days == 0 {
-            return "Today!"
-        } else if days == 1 {
-            return "1 day left"
-        } else if days < 0 {
-            return "Today!"
-        } else {
-            return "\(days) days left"
+        Group {
+            if days == 0 {
+                Text("🎉 Today!")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.orange)
+                    .cornerRadius(8)
+            } else if days == 1 {
+                Text("⏰ Tomorrow")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.orange)
+            } else if days > 1 {
+                Text("⏳ \(days) days left")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.orange)
+            } else {
+                EmptyView()
+            }
         }
-    }
-    
-    private func generatePromoCode(clientName: String?, type: OpportunityType) -> String {
-        let name = clientName?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? "CLNT"
-        let cleanName = name.filter { $0.isLetter }
-        let namePart = String(cleanName.prefix(4))
-        let suffix = type == .birthday ? "10BD" : "12AN"
-        let code = (namePart + suffix).padding(toLength: 8, withPad: "X", startingAt: 0)
-        return String(code.prefix(8))
     }
     
     private func colorForType(_ type: OpportunityType) -> Color {
         switch type {
-        case .birthday: return Color(hex: "7C4DFF")
+        case .birthday:   return Color(hex: "7C4DFF")
         case .anniversary: return Color(hex: "FF2D55")
-        default: return .blue
+        default:          return .blue
         }
     }
     
     private func bgColorForType(_ type: OpportunityType) -> Color {
         switch type {
-        case .birthday: return Color(hex: "F5F3FF")
+        case .birthday:   return Color(hex: "F5F3FF")
         case .anniversary: return Color(hex: "FFF0F2")
-        default: return Color(hex: "F0F8FF")
+        default:          return Color(hex: "F0F8FF")
         }
     }
     
     private func iconForType(_ type: OpportunityType) -> String {
         switch type {
-        case .birthday: return "birthday.cake"
+        case .birthday:   return "birthday.cake"
         case .anniversary: return "heart.fill"
-        default: return "sparkles"
+        default:          return "sparkles"
         }
     }
 }

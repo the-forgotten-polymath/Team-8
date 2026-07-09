@@ -134,7 +134,7 @@ struct OrderConfirmationView: View {
                 Button(action: {
                     checkoutEnv.catalogNavigationStackID = UUID()
                     checkoutEnv.isCheckoutFlowActive = false
-                    checkoutEnv.selectedTab = 0 // Move to Home (main screen)
+                    checkoutEnv.selectedTab = 1 // Move to Catalog (main screen)
                     checkoutEnv.activeCart = nil
                 }) {
                     Text("Continue Shopping")

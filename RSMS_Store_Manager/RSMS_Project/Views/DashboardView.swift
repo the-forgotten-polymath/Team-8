@@ -773,12 +773,6 @@ struct DashboardView: View {
                                 )
                                 .foregroundStyle(Color.green.opacity(0.5))
                                 .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-                                .annotation(position: .top, alignment: .leading) {
-                                    Text("TARGET")
-                                        .font(.system(size: 8, weight: .bold))
-                                        .foregroundColor(.green)
-                                        .padding(.leading, 4)
-                                }
                             }
                             
                             if let selected = selectedDay, !isChartEmpty {
@@ -932,60 +926,46 @@ struct DashboardView: View {
     @ViewBuilder
     private func appointmentRow(for appt: Appointment) -> some View {
         HStack(spacing: 16) {
-            // Time Badge
-            VStack(spacing: 2) {
-                Text(formatShortTime(appt.appointmentDatetime))
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.blue)
-                Text(formatAMPM(appt.appointmentDatetime))
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(Color(.secondaryLabel))
-            }
-            .frame(width: 55, height: 55)
-            .background(Color.blue.opacity(0.1))
-            .cornerRadius(12)
-            
             // Details
-            VStack(alignment: .leading, spacing: 4) {
-                Text(appt.appointmentName ?? appt.description ?? "Appointment")
-                    .font(.headline)
-                    .foregroundColor(Color(.label))
-                    .lineLimit(1)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text(appt.appointmentName ?? appt.description ?? "Appointment")
+                        .font(.headline)
+                        .foregroundColor(Color(.label))
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    StatusBadge(status: appt.computedStatus)
+                    
+
+                }
                 
-                if let customerId = appt.customerId, let customer = viewModel.customers.first(where: { $0.id == customerId }) {
+                HStack {
+                    if let customerId = appt.customerId, let customer = viewModel.customers.first(where: { $0.id == customerId }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "person.fill")
+                                .font(.caption)
+                            Text(customer.name)
+                                .font(.subheadline)
+                        }
+                        .foregroundColor(Color(.secondaryLabel))
+                    }
+                    
+                    Spacer()
+                    
                     HStack(spacing: 4) {
-                        Image(systemName: "person.fill")
+                        Image(systemName: "clock.fill")
                             .font(.caption)
-                        Text(customer.name)
+                        Text(formatTime(appt.appointmentDatetime))
                             .font(.subheadline)
+                            .fontWeight(.medium)
                     }
                     .foregroundColor(Color(.secondaryLabel))
                 }
-                
-                StatusBadge(status: appt.computedStatus)
-            }
-            Spacer()
-            if appt.computedStatus != "pending" {
-                Button(action: {
-                    var hiddenIds = hiddenAppointmentsData.components(separatedBy: ",").filter { !$0.isEmpty }
-                    hiddenIds.append(appt.id.uuidString)
-                    hiddenAppointmentsData = hiddenIds.joined(separator: ",")
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(Color(.tertiaryLabel))
-                        .font(.system(size: 22))
-                        .padding(.leading, 8)
-                }
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                Image(systemName: "chevron.right")
-                    .font(.footnote).fontWeight(.bold)
-                    .foregroundColor(Color(.tertiaryLabel))
             }
         }
-        .padding(12)
+        .padding(16)
         .background(Color(.secondaryLabel).opacity(0.05))
         .cornerRadius(16)
         .opacity(appt.computedStatus == "cancelled" ? 0.5 : 1.0)
@@ -1010,17 +990,31 @@ struct DashboardView: View {
     }
     
     private var staffOnFloorCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 24) {
             // Header
             NavigationLink(destination: ShiftManagementView()) {
                 HStack {
                     Image(systemName: "person.3.sequence.fill")
                         .foregroundColor(Color(.label))
-                    Text(viewModel.currentShift != nil ? "SHIFTS" : "SHIFTS")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundColor(Color(.label))
-                        .tracking(1)
+                    if viewModel.currentShift != nil {
+                        Text(viewModel.currentShiftHeader.uppercased())
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color(.label))
+                            .tracking(1)
+                        if viewModel.presentCount > 0 {
+                            Text(viewModel.attendanceValueText.replacingOccurrences(of: " present", with: ""))
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(viewModel.presentCount < viewModel.assignedCount ? .orange : .green)
+                        }
+                    } else {
+                        Text("SHIFTS")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color(.label))
+                            .tracking(1)
+                    }
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.footnote).fontWeight(.bold)
@@ -1033,20 +1027,6 @@ struct DashboardView: View {
             if viewModel.currentShift != nil {
                 // Active Shift Mode
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 10, height: 10)
-                        Text(viewModel.currentShiftHeader)
-                            .font(.subheadline)
-                            .foregroundColor(Color(.secondaryLabel))
-                        Spacer()
-                        Text(viewModel.attendanceValueText)
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                            .foregroundColor(viewModel.presentCount < viewModel.assignedCount ? .orange : .green)
-                    }
-                    .padding(.horizontal, 20)
                     
                     if viewModel.staffShifts.isEmpty {
                         Text("No staff scheduled.")
@@ -1092,7 +1072,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 20)
             }
         }
-        .padding(.vertical, 20)
+        .padding(.vertical, 24)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.secondarySystemGroupedBackground))
@@ -1107,21 +1087,15 @@ struct DashboardView: View {
             ZStack(alignment: .bottomTrailing) {
                 Circle()
                     .fill(Color.blue.opacity(0.1))
-                    .frame(width: 40, height: 40)
+                    .frame(width: 44, height: 44)
                     .overlay(
                         Text(String(staff.initials.prefix(2)))
-                            .font(.subheadline)
-                            .fontWeight(.medium)
+                            .font(.headline)
                             .foregroundColor(.blue)
                     )
-                
-                Circle()
-                    .fill(staff.isAbsent ? Color.red : Color.green)
-                    .frame(width: 10, height: 10)
-                    .overlay(Circle().stroke(Color(.secondarySystemGroupedBackground), lineWidth: 1.5))
             }
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(staff.name.components(separatedBy: " ").first ?? "Staff")
                     .font(.subheadline)
                     .fontWeight(.bold)
@@ -1132,10 +1106,10 @@ struct DashboardView: View {
                     .foregroundColor(Color(.secondaryLabel))
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
         .background(Color(.secondaryLabel).opacity(0.05))
-        .cornerRadius(12)
+        .cornerRadius(14)
     }
     
     // MARK: - Formatting Helpers

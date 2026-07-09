@@ -856,7 +856,7 @@ struct DashboardView: View {
                 HStack {
                     Image(systemName: "calendar")
                         .foregroundColor(Color(.label))
-                    Text("TODAY'S APPOINTMENTS")
+                    Text("APPOINTMENTS")
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(Color(.label))
@@ -878,11 +878,11 @@ struct DashboardView: View {
                         .padding(.bottom, 4)
                     Text("All clear for today")
                         .font(.headline)
-                        .foregroundColor(Color(.label))
+                        .foregroundColor(Color(.secondaryLabel))
                     if let nextDate = viewModel.nextAppointmentDate {
                         Text("Next: \(nextDateLabel(nextDate)) · \(viewModel.nextAppointmentCount) appointment\(viewModel.nextAppointmentCount == 1 ? "" : "s")")
                             .font(.subheadline)
-                            .foregroundColor(Color(.secondaryLabel))
+                            .foregroundColor(Color(.label))
                     } else {
                         Text("No upcoming appointments")
                             .font(.subheadline)
@@ -1014,7 +1014,7 @@ struct DashboardView: View {
                 HStack {
                     Image(systemName: "person.3.sequence.fill")
                         .foregroundColor(Color(.label))
-                    Text(viewModel.currentShift != nil ? "STAFF" : "STAFF")
+                    Text(viewModel.currentShift != nil ? "SHIFTS" : "SHIFTS")
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(Color(.label))
@@ -1071,7 +1071,7 @@ struct DashboardView: View {
                         .padding(.bottom, 4)
                     Text("Store Closed / Off Shift")
                         .font(.headline)
-                        .foregroundColor(Color(.label))
+                        .foregroundColor(Color(.secondaryLabel))
                     
                     if let nextName = viewModel.nextShiftName, let nextTime = viewModel.nextShiftTimeRange {
                         Text("Next: \(nextName) (\(nextTime)) · \(viewModel.nextShiftStaffCount) staff")

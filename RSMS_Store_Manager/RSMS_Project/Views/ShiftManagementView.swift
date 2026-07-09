@@ -911,114 +911,7 @@ struct AddShiftView: View {
                     .cornerRadius(22)
                     .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 4)
                     
-                    // SECTION 2 — Assign Staff Section
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(selectedEmployeeIds.isEmpty ? "Assigned Staff" : "Assigned Staff (\(selectedEmployeeIds.count))")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(.primary)
-                            .padding(.top, 8)
-                        
-                        // Custom Search Bar
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.secondary)
-                            TextField("Search employee", text: $employeeSearchText)
-                                .font(.system(size: 16))
-                                .disableAutocorrection(true)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .background(Color(.secondarySystemGroupedBackground))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(.systemGray5), lineWidth: 1)
-                        )
-                        .padding(.bottom, 4)
-                        
-                        // Employee List (Show only unassigned employees)
-                        let unassignedEmployees = employees.filter { $0.shiftId == nil }
-                        
-                        let filteredEmployees = unassignedEmployees.filter { emp in
-                            if employeeSearchText.isEmpty { return true }
-                            let query = employeeSearchText.lowercased()
-                            let localProfile = EmployeeProfileStore.shared.get(id: emp.id)
-                            let roleName = emp.designation ?? localProfile?.jobRole ?? "Staff"
-                            return emp.fullName.lowercased().contains(query) || roleName.lowercased().contains(query)
-                        }
-                        
-                        if unassignedEmployees.isEmpty {
-                            Text("No unassigned employees available.")
-                                .foregroundColor(.secondary)
-                                .font(.system(size: 14))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.vertical, 20)
-                        } else if filteredEmployees.isEmpty {
-                            Text("No employees found")
-                                .foregroundColor(.secondary)
-                                .font(.system(size: 14))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.vertical, 20)
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(filteredEmployees) { emp in
-                                    let isSelected = selectedEmployeeIds.contains(emp.id)
-                                    let localProfile = EmployeeProfileStore.shared.get(id: emp.id)
-                                    
-                                    Button {
-                                        if isSelected {
-                                            selectedEmployeeIds.remove(emp.id)
-                                        } else {
-                                            selectedEmployeeIds.insert(emp.id)
-                                        }
-                                    } label: {
-                                        HStack(spacing: 12) {
-                                            // Left: Avatar
-                                            if let photoData = localProfile?.profilePhotoData, let uiImage = UIImage(data: photoData) {
-                                                Image(uiImage: uiImage)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 44, height: 44)
-                                                    .clipShape(Circle())
-                                            } else {
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(avatarPalette[abs(emp.fullName.hashValue) % avatarPalette.count])
-                                                        .frame(width: 44, height: 44)
-                                                    Text(initials(for: emp.fullName))
-                                                        .font(.system(size: 14, weight: .bold))
-                                                        .foregroundColor(.white)
-                                                }
-                                            }
-                                            
-                                            // Center: Name & Role
-                                            VStack(alignment: .leading, spacing: 3) {
-                                                Text(emp.fullName)
-                                                    .font(.system(size: 17, weight: .semibold))
-                                                    .foregroundColor(.primary)
-                                                Text(emp.designation ?? localProfile?.jobRole ?? "Staff")
-                                                    .font(.system(size: 13))
-                                                    .foregroundColor(.secondary)
-                                            }
-                                            
-                                            Spacer()
-                                            
-                                            // Right: Selection indicator
-                                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                .font(.system(size: 22))
-                                                .foregroundColor(isSelected ? Color(.systemBlue) : Color(.systemGray4))
-                                        }
-                                        .padding(.horizontal, 16)
-                                        .frame(height: 76)
-                                        .background(Color(.secondarySystemGroupedBackground))
-                                        .cornerRadius(18)
-                                        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                }
-                            }
-                        }
-                    }
+                    assignStaffSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -1061,6 +954,8 @@ struct AddShiftView: View {
             Button("OK") { if isShowingSuccess { dismiss() } }
         } message: {
             Text(alertMessage)
+
+
         }
         .onChange(of: startTime) { _, newValue in
             let corrected = clampToBusinessHours(newValue)
@@ -1086,6 +981,61 @@ struct AddShiftView: View {
                 startTime = clampToBusinessHours(newStart)
             }
         }
+    }
+
+    private var assignStaffSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            NavigationLink {
+                MultiSelectionListView(
+                    title: "Assign Employees",
+                    items: employees.filter { $0.shiftId == nil },
+                    selections: $selectedEmployeeIds
+                ) { emp in
+                    let localProfile = EmployeeProfileStore.shared.get(id: emp.id)
+                    return HStack(spacing: 12) {
+                        if let photoData = localProfile?.profilePhotoData, let uiImage = UIImage(data: photoData) {
+                            Image(uiImage: uiImage)
+                                .resizable().scaledToFill()
+                                .frame(width: 38, height: 38).clipShape(Circle())
+                        } else {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(.systemBlue))
+                                    .frame(width: 38, height: 38)
+                                Text(String(emp.fullName.prefix(2)).uppercased())
+                                    .font(.system(size: 12, weight: .bold)).foregroundColor(.white)
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(emp.fullName).font(.system(size: 15, weight: .semibold))
+                            Text(emp.designation ?? localProfile?.jobRole ?? "Staff")
+                                .font(.system(size: 12)).foregroundColor(Color(.secondaryLabel))
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    Text("Assign Staff")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text(selectedEmployeeIds.isEmpty ? "None Selected" : "\(selectedEmployeeIds.count) Selected")
+                        .font(.system(size: 15))
+                        .foregroundColor(.secondary)
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(Color(.systemGray3))
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .padding()
+                .background(Color(.secondarySystemGroupedBackground))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.systemGray5), lineWidth: 1)
+                )
+            }
+        }
+        .padding(.horizontal, 20)
     }
 
     private func saveShift() {
@@ -1550,47 +1500,37 @@ struct AssignEmployeeView: View {
                     .font(.system(size: 14))
             } else {
                 ForEach(candidates) { candidate in
+                    let isAssigned = candidate.shiftId == shiftId
                     let localProfile = EmployeeProfileStore.shared.get(id: candidate.id)
-                    HStack {
-                        if let photoData = localProfile?.profilePhotoData, let uiImage = UIImage(data: photoData) {
-                            Image(uiImage: uiImage)
-                                .resizable().scaledToFill()
-                                .frame(width: 38, height: 38).clipShape(Circle())
-                        } else {
-                            Text(initials(for: candidate.fullName))
-                                .font(.system(size: 12, weight: .bold)).foregroundColor(.white)
-                                .frame(width: 38, height: 38)
-                                .background(Color(.systemBlue)).clipShape(Circle())
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(candidate.fullName).font(.system(size: 15, weight: .semibold))
-                            HStack(spacing: 6) {
-                                Text(candidate.designation ?? localProfile?.jobRole ?? "Staff")
-                                    .font(.system(size: 12)).foregroundColor(Color(.secondaryLabel))
-                                Text("•").font(.system(size: 10)).foregroundColor(Color(.tertiaryLabel))
-                                Text(candidate.shiftId == nil ? "Not Assigned" : "Assigned to this Shift")
-                                    .font(.system(size: 12)).foregroundColor(Color(.secondaryLabel))
+                    Button(action: {
+                        onAssign(candidate)
+                    }) {
+                        HStack {
+                            if let photoData = localProfile?.profilePhotoData, let uiImage = UIImage(data: photoData) {
+                                Image(uiImage: uiImage)
+                                    .resizable().scaledToFill()
+                                    .frame(width: 38, height: 38).clipShape(Circle())
+                            } else {
+                                Text(initials(for: candidate.fullName))
+                                    .font(.system(size: 12, weight: .bold)).foregroundColor(.white)
+                                    .frame(width: 38, height: 38)
+                                    .background(Color(.systemBlue)).clipShape(Circle())
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(candidate.fullName).font(.system(size: 15, weight: .semibold))
+                                HStack(spacing: 6) {
+                                    Text(candidate.designation ?? localProfile?.jobRole ?? "Staff")
+                                        .font(.system(size: 12)).foregroundColor(Color(.secondaryLabel))
+                                }
+                            }
+                            .padding(.leading, 4)
+                            Spacer()
+                            if isAssigned {
+                                Image(systemName: "checkmark").foregroundColor(.blue)
                             }
                         }
-                        .padding(.leading, 4)
-                        Spacer()
-                        if candidate.shiftId == shiftId {
-                            Button("Unassign") { onAssign(candidate) }
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.red)
-                                .padding(.horizontal, 12).padding(.vertical, 6)
-                                .background(Color(.systemRed).opacity(0.1))
-                                .cornerRadius(8)
-                        } else {
-                            Button("Assign") { onAssign(candidate) }
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 12).padding(.vertical, 6)
-                                .background(Color(.systemBlue))
-                                .cornerRadius(8)
-                        }
                     }
-                    .padding(.vertical, 2)
+                    .foregroundColor(.primary)
                 }
             }
         }
@@ -1636,4 +1576,56 @@ private func formatTimeHelper(_ timeStr: String) -> String {
         return f.string(from: d)
     }
     return timeStr
+}
+
+// MARK: - Multi Selection List View Component
+struct MultiSelectionListView<T: Identifiable, Content: View>: View {
+    let title: String
+    let items: [T]
+    @Binding var selections: Set<T.ID>
+    let rowContent: (T) -> Content
+
+    @State private var searchText = ""
+
+    var filteredItems: [T] {
+        if searchText.isEmpty { return items }
+        return items.filter { item in
+            if let user = item as? User {
+                return user.fullName.localizedCaseInsensitiveContains(searchText)
+            }
+            return true
+        }
+    }
+
+    var body: some View {
+        List {
+            if filteredItems.isEmpty {
+                Text("No available employees found.")
+                    .foregroundColor(Color(.secondaryLabel))
+                    .font(.system(size: 14))
+            } else {
+                ForEach(filteredItems) { item in
+                    Button(action: {
+                        if selections.contains(item.id) {
+                            selections.remove(item.id)
+                        } else {
+                            selections.insert(item.id)
+                        }
+                    }) {
+                        HStack {
+                            rowContent(item)
+                            Spacer()
+                            if selections.contains(item.id) {
+                                Image(systemName: "checkmark").foregroundColor(.blue)
+                            }
+                        }
+                    }
+                    .foregroundColor(.primary)
+                }
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search...")
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
 }

@@ -955,6 +955,8 @@ struct DashboardView: View {
                     }
                     .foregroundColor(Color(.secondaryLabel))
                 }
+                
+                StatusBadge(status: appt.computedStatus)
             }
             Spacer()
             Image(systemName: "chevron.right")
@@ -964,6 +966,7 @@ struct DashboardView: View {
         .padding(12)
         .background(Color(.secondaryLabel).opacity(0.05))
         .cornerRadius(16)
+        .opacity(appt.computedStatus == "cancelled" ? 0.5 : 1.0)
     }
 
     private func nextDateLabel(_ date: Date) -> String {

@@ -298,6 +298,54 @@ struct StatusBadge: View {
 }
 
 // MARK: - Add Appointment Sheet
+
+// MARK: - Generic Selection List View
+struct SelectionListView<T: Identifiable, Content: View>: View {
+    let title: String
+    let items: [T]
+    @Binding var selection: T.ID?
+    let rowContent: (T) -> Content
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            Button(action: {
+                selection = nil
+                dismiss()
+            }) {
+                HStack {
+                    Text("None")
+                    Spacer()
+                    if selection == nil {
+                        Image(systemName: "checkmark").foregroundColor(.blue)
+                    }
+                }
+            }
+            .foregroundColor(.primary)
+
+            ForEach(items) { item in
+                Button(action: {
+                    selection = item.id
+                    dismiss()
+                }) {
+                    HStack {
+                        rowContent(item)
+                        Spacer()
+                        if selection == item.id {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+                .foregroundColor(.primary)
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct AddAppointmentSheet: View {
     @Environment(\.dismiss) private var dismiss
     let customers: [Customer]
@@ -308,6 +356,7 @@ struct AddAppointmentSheet: View {
     @State private var descriptionText = ""
     @State private var selectedDate = Date()
     @State private var selectedCustomerId: UUID?
+    @State private var selectedEmployeeId: UUID?
     @State private var isSaving = false
     @State private var errorMessage: String?
 
@@ -320,11 +369,36 @@ struct AddAppointmentSheet: View {
                     DatePicker("Date & Time", selection: $selectedDate)
                 }
 
-                Section(header: Text("Customer")) {
-                    Picker("Select Customer", selection: $selectedCustomerId) {
-                        Text("None").tag(UUID?.none)
-                        ForEach(customers) { customer in
-                            Text(customer.name).tag(Optional(customer.id))
+                Section(header: Text("Assignments")) {
+                    NavigationLink {
+                        SelectionListView(title: "Select Customer", items: customers, selection: $selectedCustomerId) { customer in
+                            Text(customer.name)
+                        }
+                    } label: {
+                        HStack {
+                            Text("Customer")
+                            Spacer()
+                            if let id = selectedCustomerId, let cust = customers.first(where: { $0.id == id }) {
+                                Text(cust.name).foregroundColor(.secondary)
+                            } else {
+                                Text("None").foregroundColor(.secondary)
+                            }
+                        }
+                    }
+
+                    NavigationLink {
+                        SelectionListView(title: "Select Employee", items: users, selection: $selectedEmployeeId) { user in
+                            Text(user.fullName)
+                        }
+                    } label: {
+                        HStack {
+                            Text("Assigned Employee")
+                            Spacer()
+                            if let id = selectedEmployeeId, let emp = users.first(where: { $0.id == id }) {
+                                Text(emp.fullName).foregroundColor(.secondary)
+                            } else {
+                                Text("None").foregroundColor(.secondary)
+                            }
                         }
                     }
                 }
@@ -362,7 +436,7 @@ struct AddAppointmentSheet: View {
             id: UUID(),
             customerId: selectedCustomerId,
             storeId: storeId,
-            salesAssociateId: nil,
+            salesAssociateId: selectedEmployeeId,
             appointmentDatetime: selectedDate,
             appointmentName: appointmentName.isEmpty ? nil : appointmentName,
             description: descriptionText.isEmpty ? nil : descriptionText,

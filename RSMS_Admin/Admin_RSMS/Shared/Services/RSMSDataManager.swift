@@ -159,7 +159,10 @@ class RSMSDataManager: ObservableObject {
         async let m = fetchManager()
         async let p = fetchProducts()
         async let t = fetchTargets()
-        _ = await (s, m, p, t)
+        async let c = fetchCategories()
+        async let i = fetchInventory()
+        _ = await (s, m, p, t, c, i)
+        calculateStoreCategoryQuantities()
         isLoading = false
     }
 

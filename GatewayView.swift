@@ -134,7 +134,7 @@ struct LoginView: View {
             Spacer()
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Welcome Back")
+                Text("Rsms")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.black)

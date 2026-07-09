@@ -17,11 +17,7 @@ struct ShipmentListView: View {
     @State private var searchText: String = ""
     @State private var hasLoaded = false
 
-<<<<<<< HEAD
-    // The two allowed statuses (UI only — backend data is untouched)
-=======
     // The allowed statuses (UI only — backend data is untouched)
->>>>>>> inventory
     private let allowedStatuses: [String] = ["pending", "arrived", "verified"]
     private let filterLabels: [(label: String, key: String)] = [
         ("All",        "all"),
@@ -180,12 +176,7 @@ struct ShipmentListView: View {
                                         
                                         Spacer()
                                         
-<<<<<<< HEAD
                                         StatusChip(status: displayStatus(for: shipment))
-=======
-                                        // Status Chip matching reference position
-                                        StatusChip(status: shipment.status.lowercased() == "verified" ? "arrived" : shipment.status)
->>>>>>> inventory
                                     }
                                     
                                     Divider()
@@ -204,22 +195,6 @@ struct ShipmentListView: View {
                                         
                                         Spacer()
                                         
-<<<<<<< HEAD
-                                        Label(formatShipmentDate(shipment.createdAt), systemImage: "calendar")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-=======
-                                        // Right-aligned reference / tracking details
-                                        if let ref = shipment.trackingReference, !ref.isEmpty {
-                                            Text("Ref: \(ref)")
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.primary)
-                                        }
-                                    }
-                                    
-                                    HStack {
-                                        Spacer()
                                         if let receivedDate = shipment.receivedDate {
                                             Text("Arrived: \(formatShipmentDate(receivedDate))")
                                                 .font(.caption2)
@@ -233,7 +208,6 @@ struct ShipmentListView: View {
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
                                         }
->>>>>>> inventory
                                     }
                                 }
                                 .padding()

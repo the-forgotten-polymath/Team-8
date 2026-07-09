@@ -53,8 +53,8 @@ struct DashboardView: View {
                         MetricCard(title: "Warehouse Stock", value: "\(viewModel.warehouseStockCount)", iconName: "shippingbox.fill", iconColor: .blue)
                         MetricCard(title: "Pending Shipments", value: "\(viewModel.pendingShipmentsCount)", iconName: "truck.box.fill", iconColor: .orange)
                         MetricCard(title: "Stock Requests", value: "\(viewModel.pendingStockRequestsCount)", iconName: "doc.text.fill", iconColor: .green)
-                        MetricCard(title: "Store Transfers", value: "\(viewModel.pendingTransfersCount)", iconName: "arrow.left.arrow.right", iconColor: .purple)
                         MetricCard(title: "Low Stock Alerts", value: "\(viewModel.lowStockAlertsCount)", iconName: "exclamationmark.triangle.fill", iconColor: .red)
+                        MetricCard(title: "Pending Cycles", value: "\(viewModel.pendingCycleCountsCount)", iconName: "calendar.badge.exclamationmark", iconColor: .orange)
                         MetricCard(title: "Scheduled Cycles", value: "\(viewModel.scheduledCycleCountsCount)", iconName: "calendar.badge.clock", iconColor: .teal)
                     }
                 }

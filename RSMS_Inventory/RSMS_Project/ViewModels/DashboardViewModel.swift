@@ -17,6 +17,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var pendingTransfersCount = 0
     @Published var lowStockAlertsCount = 0
     @Published var scheduledCycleCountsCount = 0
+    @Published var pendingCycleCountsCount = 0
     
     @Published var recentShipments: [Shipment] = []
     @Published var recentTransfers: [Transfer] = []
@@ -59,6 +60,10 @@ final class DashboardViewModel: ObservableObject {
             // Fetch Cycle Counts
             let cycleCounts = try await service.fetchCycleCounts()
             self.scheduledCycleCountsCount = cycleCounts.filter { $0.status.lowercased() == "scheduled" }.count
+            self.pendingCycleCountsCount = cycleCounts.filter {
+                $0.status.lowercased() == "scheduled" &&
+                Calendar.current.isDateInToday($0.scheduledDate)
+            }.count
             
         } catch {
             self.errorMessage = error.localizedDescription

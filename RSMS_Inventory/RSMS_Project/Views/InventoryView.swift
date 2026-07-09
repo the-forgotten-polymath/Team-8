@@ -126,33 +126,6 @@ struct InventoryView: View {
                     iconName: "shippingbox"
                 )
             } else {
-<<<<<<< HEAD
-                List(viewModel.filteredInventory) { item in
-                    let product = viewModel.getProduct(for: item.productId)
-                    NavigationLink(destination: ProductDetailView(item: item, product: product ?? ProductPlaceholder(id: item.productId), warehouseId: warehouseId)) {
-                        HStack(alignment: .center, spacing: 12) {
-                            Image(systemName: "shippingbox.fill")
-                                .font(.title3)
-                                .foregroundColor(item.quantity <= item.reorderLevel ? .orange : .blue)
-                                .opacity(0.8)
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(product?.productName ?? "Unknown Product")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(1)
-                                
-                                if let sku = product?.sku {
-                                    Text("SKU: \(sku) • \(item.quantity) units")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(1)
-                                } else {
-                                    Text("\(item.quantity) units")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(1)
-=======
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.filteredInventory) { item in
@@ -212,7 +185,6 @@ struct InventoryView: View {
                                                 .foregroundColor(item.quantity <= item.reorderLevel ? .red : .primary)
                                         }
                                     }
->>>>>>> inventory
                                 }
                                 .padding()
                                 .background(Color(UIColor.secondarySystemGroupedBackground))
@@ -220,27 +192,8 @@ struct InventoryView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.appleBorder, lineWidth: 1))
                                 .shadow(color: Color.black.opacity(0.02), radius: 5, y: 2)
                             }
-<<<<<<< HEAD
-                            
-                            Spacer()
-                            
-                            if item.quantity <= item.reorderLevel {
-                                Label("Low Stock", systemImage: "exclamationmark.triangle.fill")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.orange)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                        .listRowBackground(
-                            Color(.secondarySystemGroupedBackground)
-                                .opacity(0.6)
-                                .background(.ultraThinMaterial)
-                        )
-=======
                             .buttonStyle(.plain)
                         }
->>>>>>> inventory
                     }
                     .padding()
                 }

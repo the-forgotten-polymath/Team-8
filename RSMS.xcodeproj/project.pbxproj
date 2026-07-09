@@ -7,119 +7,96 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		014C05AC09F65AC20BAB93FC /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 2417F80FB36D720886DB95F2 /* Functions */; };
-		055B6D309DD1ECB9598EEC21 /* SalesAssociateModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 71384627F6C952CFDACF1A7E /* SalesAssociateModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		056BA2FE325514E354E4D72E /* AdminModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 701D07852E1D7511EB0936AC /* AdminModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0AC02E39988EBAE6BE8823F7 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = D14BB10C79D3442F7E137530 /* Functions */; };
-		0B29166274E0E9687C3804A2 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 45DA124249AF7211B6A05A52 /* Functions */; };
-		117888FFCE24E8B4731D57CC /* SalesAssociateModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71384627F6C952CFDACF1A7E /* SalesAssociateModule.framework */; };
-		13AC31DAE44E66EAFBD45525 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 0D71A5B976D526FED964B5FF /* Realtime */; };
-		177001629338D550FB2D9009 /* StoreManagerModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B734A861C7E2A0C3E0929A0A /* StoreManagerModule.framework */; };
-		191AD76ACB18D653704484B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5BA707BDC04B7B8EBB6873F /* Foundation.framework */; };
-		19D08D1E1DC003D0317BFDF5 /* GatewayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0A846D6F13544B6C1748FB /* GatewayView.swift */; };
-		1DDB5539BBBD812EA884AE85 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C40D4BE7A6A4F685A8308A52 /* Assets.xcassets */; };
-		1EAA499E487205706609BFF3 /* InventoryModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E678089B58133A08AA2EA6C /* InventoryModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		209EFD388EDFB5FE1CC47CDA /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 8499803AAB95A44A50364AD3 /* Auth */; };
-		2AA016F9DBBC609EE36EC52A /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 359801B555A172F6C9E3F780 /* PostgREST */; };
-		37A1E393004BD4E099C2B06F /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = EA46A0CBC5DD008F4D386286 /* Storage */; };
-		44BA157F785589CD7B2DC8F8 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 2DA3FA9DBC2D091AF055D0CC /* Storage */; };
-		4CD2A16A7C27FEB83DD69B19 /* InventoryModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E678089B58133A08AA2EA6C /* InventoryModule.framework */; };
-		50536527E39792805465C756 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 0F13A1C2BF83C17741D65526 /* PostgREST */; };
-		5153964B6A7531DD54010347 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 27BE1D9885B71518B62E1EF0 /* Auth */; };
-		57523E29739C131AD407770F /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 722A9CBDC94EFA9F715A7A61 /* PostgREST */; };
-		5DBB972033106411E0A75003 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 99E4A566B43DA54C66733A03 /* Storage */; };
-		5DBE81D5AE62742767B41CC5 /* AdminModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 701D07852E1D7511EB0936AC /* AdminModule.framework */; };
-		5EC6747E245C97CA2D2FA711 /* StoreManagerModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B734A861C7E2A0C3E0929A0A /* StoreManagerModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6E5EC1056A129FC81A0F8397 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AC0FC10E6920F1EC740F3231 /* Supabase */; };
-		7090A1593FD06A6894B825D2 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 773DFA0D6F0DA2FD2AFAC78B /* Supabase */; };
-		839248273DECD2C8BB614A31 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 08387E1A760E34145B8A003B /* Supabase */; };
-		8651CC05E03137B82A0D849F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = D4CA5B97AE43988403F6B38A /* Realtime */; };
-		869671BBD6387E1FEC576482 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 9D70F35F1C1BB5A003815A4C /* Auth */; };
+		00368C3441F60737D3A84066 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 0EA55DD5B6D6017E96CE079F /* Supabase */; };
+		026B4797CC9BD045D26F94FD /* AdminModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 947EEBF99944866D85855995 /* AdminModule.framework */; };
+		04F45FB88393067B86114264 /* SalesAssociateModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C50BB4B0E44A9074A594FBA5 /* SalesAssociateModule.framework */; };
+		1BEC7CA99D03CF6381475D12 /* InventoryModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FCD46FC60B24F30AC7B2815 /* InventoryModule.framework */; };
+		2436218B18B7C6AC89A9922C /* GatewayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FE78F9E9099C6714CC4B92 /* GatewayView.swift */; };
+		2C841D483DA016D32E9EED16 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = E6CE66F2BEDF949CFFB8D65B /* Realtime */; };
+		33C384DABDCCF8FB80482324 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E8829CC4215A42893BD7F97 /* Foundation.framework */; };
+		3996D0A856344BA9C146CC10 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E8829CC4215A42893BD7F97 /* Foundation.framework */; };
+		44E6F4084081EFBEAAEA720C /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 6B36ED4C852F570317DEE05E /* Realtime */; };
+		48CEA8D110BC969E2FFB5A6F /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 7A37BFDB342AE8C99491CECB /* Realtime */; };
+		53E085B31440EF1702422D96 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = C232492CC80D3156D18515E5 /* Functions */; };
+		562901F517DD8F97EC3AE699 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 15A9CDBB557999C623764201 /* Realtime */; };
+		66DDA412B4AE5232D9A46FC5 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = F2CC569503868A1C3282216C /* Storage */; };
+		6A91FFDC85A32CCDAE5B951A /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = A4A754D75C9638260645F229 /* RazorpayCheckout */; };
+		713C0C1B0C5DBD5BB0EBE006 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 5853855F290322F066B41F4A /* Supabase */; };
+		75882D5C2C3AC118E94FA321 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 3627CAD2FC13A10F321C3A7D /* Storage */; };
+		787B79936488AE98473B1BF0 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = D89341B830C04767DE56BAF8 /* Functions */; };
+		849F01D0037D22DCA42363B7 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = A0F940E743AC6428C5CDB4E3 /* Storage */; };
+		86724F492E9B9D2B0949D06C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E8829CC4215A42893BD7F97 /* Foundation.framework */; };
+		8A8D55B5FA05D9592F57EE81 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 1A87EC1BF8A6C62F18D911B8 /* Auth */; };
+		8B93755924FA4DD52303D930 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = C96E0401165D3D71C4CD8BD0 /* Supabase */; };
+		8D3118A09068A845EA9FEB6F /* AdminModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 947EEBF99944866D85855995 /* AdminModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8E2951542FF4F6C200BC2782 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2951532FF4F6C200BC2782 /* Auth */; };
 		8E2951562FF4F6C200BC2782 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2951552FF4F6C200BC2782 /* Functions */; };
 		8E2951582FF4F6C200BC2782 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2951572FF4F6C200BC2782 /* PostgREST */; };
 		8E29515A2FF4F6C200BC2782 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2951592FF4F6C200BC2782 /* Realtime */; };
 		8E29515C2FF4F6C200BC2782 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 8E29515B2FF4F6C200BC2782 /* Storage */; };
 		8E29515E2FF4F6C200BC2782 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 8E29515D2FF4F6C200BC2782 /* Supabase */; };
-<<<<<<< HEAD
-		8F1975663F6928D1CF5C205B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 42802BE9AFE63E569CA41D2C /* Supabase */; };
-		94DD96790E3BC4DB017BAB2C /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = D7B146B0A352E23F08B9DEF9 /* Storage */; };
-		9C7A69EFA61953D739B61403 /* RSMSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF37099F9037E0BCFCEC76CE /* RSMSApp.swift */; };
-		A4270BAFCA636C518F913FD5 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = D6B4750CBF1C586DAEE560F8 /* PostgREST */; };
-		A85E1C145B8A1DD0E7582B42 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = F9D0CB2910F0CD7D2CBE9FE0 /* Realtime */; };
-		C537307F62F7568407495414 /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = 2FBA351F3A6CED2CCC8D9F04 /* RazorpayCheckout */; };
-		CA7B8F8E4ED7E1F4DA9060D5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5BA707BDC04B7B8EBB6873F /* Foundation.framework */; };
-		CE3FDF3A24D25638C807E079 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = B53787DDC34302D1152544CF /* Realtime */; };
-		CE8566C1705740B13C4E6D65 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = D8B1634B38C373217F0C47A3 /* Auth */; };
-		D8CBD7780624440E387B187A /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = A053F76B6F13D0947553A47E /* Functions */; };
-		E8B07C612FFE535800A1CA81 /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = E8B07C602FFE535800A1CA81 /* RazorpayCheckout */; };
-		ED105E3546067C150679877D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5BA707BDC04B7B8EBB6873F /* Foundation.framework */; };
-		F3F723214A2B3595476852BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5BA707BDC04B7B8EBB6873F /* Foundation.framework */; };
-=======
-		8FE89D915D704C04E4F430F0 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 5394E262DECD0E03989D92DD /* Realtime */; };
-		907C2829A2A21F907FDE8DCE /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = C18105AAF5F33A7AB0497B9A /* Auth */; };
-		993D7D9375BF3DA01DF59F3C /* RSMSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */; };
-		99404028CA1A7D3DC49B8B29 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = C40E3D475DA5046377BF4D87 /* Functions */; };
-		9A23640B65393C2F3E1BC656 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */; };
-		A0B09E54630C43BCA1FC2E22 /* GatewayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA69B4B435CD8680B7545E56 /* GatewayView.swift */; };
-		A1D18DD12FFE58F500EFC8A4 /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */; };
-		A717B24F4218501882374B34 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 98E2439AB3EF1E57ADACA310 /* PostgREST */; };
-		B3856ED720B19D47A076BCF6 /* AdminModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE8FDF16F7B414C3A03B817E /* AdminModule.framework */; };
-		B45154B6D4880D647DA801E1 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DA46FE8CAB17ACFDFB9ADC9 /* Functions */; };
-		BB441FE7C665BBD11BE2DAA1 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 26E87761D56F4E6E5E936F02 /* Storage */; };
-		C491CBC7FCAC18D7B9464F57 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9B0F70E4FD43A54CB3039D31 /* Functions */; };
-		C701F9F8E6D94FBED2870DD3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 4D0B6C3EDD6B494E722B050E /* Supabase */; };
-		C794D1A9494A92E9F5BF4379 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 01B2BD95E332608E977F55B2 /* Storage */; };
-		CB63571D91CD178B54515674 /* StoreManagerModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */; };
-		D54B4EDECEC5BE38B203A861 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 0235962DE1D0BE49C10801F6 /* Auth */; };
-		DAA1C8E251847C8EB940EF76 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1E8ADC4058A76639409B24F /* Assets.xcassets */; };
-		F5FFDC6583AD4D5A789FAF7F /* RazorpayCheckout in Frameworks */ = {isa = PBXBuildFile; productRef = 622F59C5963C2DD935E9296F /* RazorpayCheckout */; };
-		F836ECBBC7F436BD83738B00 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 0181FB83BDA827F3419DBAE6 /* Supabase */; };
->>>>>>> inventory
+		9276696E3B114EF94A9406B9 /* InventoryModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8FCD46FC60B24F30AC7B2815 /* InventoryModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A2DF6482F40C268423A3E4E5 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 588F9233D62B4D9BD79C7521 /* Storage */; };
+		A4DB3023CD5B68DAB0408688 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 05E54592D6ABA7A3535AAC46 /* PostgREST */; };
+		B38909F9849B98F0C7C7C6ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86798DA273881ECECDF4DCE5 /* Assets.xcassets */; };
+		BA9E0322DDB5248E32D5AF32 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 323F4898AE416E4C7937561D /* PostgREST */; };
+		BEF34E378BB1247DFEEA5A10 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 2422B3549608E0B19FEAA23A /* Auth */; };
+		D15E87BA54BC72012ABEA5F3 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = E1F0840A9309CA3CE5080F27 /* Auth */; };
+		DE8AE39F5A5B59E986D6C47E /* SalesAssociateModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C50BB4B0E44A9074A594FBA5 /* SalesAssociateModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E538B2A7D9C519E6CA19CDC7 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 58AA9E6250EE5C007F43CECB /* Functions */; };
+		E8F14D400B9DD0344BEC6466 /* StoreManagerModule.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9B6CC576161273DEC3AAFC4E /* StoreManagerModule.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EAB3A1CF2AA3442116B07396 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = C566E1E76BA9BEBF148B4ED0 /* Functions */; };
+		ECA24F75EBE5FD605FC73285 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = FDA208A94672E3207E5A1A48 /* Supabase */; };
+		ED7BD8FBB11A634C722D123B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E8829CC4215A42893BD7F97 /* Foundation.framework */; };
+		F1EB2FEB7F63FE7BCAC3EAA6 /* StoreManagerModule.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B6CC576161273DEC3AAFC4E /* StoreManagerModule.framework */; };
+		F2474B71FFDB6939EB8CC602 /* RSMSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED92532233BC3BD983136B4C /* RSMSApp.swift */; };
+		F2614841168B4F05DA82E482 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = EF6B62C98A6D63C93EAEE65C /* PostgREST */; };
+		F4D177382E4FEAC4110F84EC /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 04D5FC83B69C03E255E5340F /* Auth */; };
+		F68434F61B0544039EEA9FB1 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 032EE05EC878E2196C92097D /* PostgREST */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		44C49614796D1B75E04A9EB7 /* PBXContainerItemProxy */ = {
+		4FB08764B3CE025119298B1C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 545E2F8A2FEC4E550027DD55 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 25496C27B6AFAE32174E694E;
+			remoteGlobalIDString = 9B97FE8E0F87A927A3C3E90E;
+			remoteInfo = AdminModule;
+		};
+		B6ECE007699A6B5E95B883E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 545E2F8A2FEC4E550027DD55 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 037EDFFDC1E627101CEA06D5;
 			remoteInfo = StoreManagerModule;
 		};
-		A671CCFF58A3D8596A084573 /* PBXContainerItemProxy */ = {
+		C84665C61B25DBCEDF3529D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 545E2F8A2FEC4E550027DD55 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = A1D7C541CAF87267C2BBE3AB;
-			remoteInfo = SalesAssociateModule;
-		};
-		B581AFB5D67B14F7D7FA1532 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 545E2F8A2FEC4E550027DD55 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 81BDF411ED60737B096883F7;
+			remoteGlobalIDString = 3EDB136A59FE2ED6411FDA08;
 			remoteInfo = InventoryModule;
 		};
-		F7534B610E2552346BBD70F4 /* PBXContainerItemProxy */ = {
+		C88EDFCCF02B51BF5B752470 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 545E2F8A2FEC4E550027DD55 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3430259DD4405FD631FB5774;
-			remoteInfo = AdminModule;
+			remoteGlobalIDString = 0D4F0EFFA35C9FD3767A309F;
+			remoteInfo = SalesAssociateModule;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4AC01E96CD6E9EB2F9DFFAF2 /* Embed Frameworks */ = {
+		D972C00222D4A247FA01C81E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				056BA2FE325514E354E4D72E /* AdminModule.framework in Embed Frameworks */,
-				1EAA499E487205706609BFF3 /* InventoryModule.framework in Embed Frameworks */,
-				5EC6747E245C97CA2D2FA711 /* StoreManagerModule.framework in Embed Frameworks */,
-				055B6D309DD1ECB9598EEC21 /* SalesAssociateModule.framework in Embed Frameworks */,
+				8D3118A09068A845EA9FEB6F /* AdminModule.framework in Embed Frameworks */,
+				9276696E3B114EF94A9406B9 /* InventoryModule.framework in Embed Frameworks */,
+				E8F14D400B9DD0344BEC6466 /* StoreManagerModule.framework in Embed Frameworks */,
+				DE8AE39F5A5B59E986D6C47E /* SalesAssociateModule.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -127,33 +104,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-<<<<<<< HEAD
-		545E2F922FEC4E550027DD55 /* RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		701D07852E1D7511EB0936AC /* AdminModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AdminModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		71384627F6C952CFDACF1A7E /* SalesAssociateModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SalesAssociateModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8A0A846D6F13544B6C1748FB /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
-		8E92894A2FF566BC001C9D4C /* schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
-=======
-		0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		14A849CAC1A51C675BFEA412 /* InventoryModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = InventoryModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		545E2F922FEC4E550027DD55 /* RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		8B59DD9A6A9DCCACB17DF19E /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
-		8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		8E13F77D2FFBFFCC002D0D70 /* .npmrc */ = {isa = PBXFileReference; lastKnownFileType = text; path = .npmrc; sourceTree = "<group>"; };
-		8E13F77E2FFBFFCC002D0D70 /* deno.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deno.json; sourceTree = "<group>"; };
-		8E13F77F2FFBFFCC002D0D70 /* index.ts */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.typescript; path = index.ts; sourceTree = "<group>"; };
-		8E13F7812FFBFFCC002D0D70 /* index.ts */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.typescript; path = index.ts; sourceTree = "<group>"; };
-		8E13F7842FFBFFCC002D0D70 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		8E13F7852FFBFFCC002D0D70 /* config.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.toml; sourceTree = "<group>"; };
-		8E13F7872FFBFFCC002D0D70 /* test_geocoder */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test_geocoder; sourceTree = "<group>"; };
-		8E13F7882FFBFFCC002D0D70 /* test_geocoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test_geocoder.swift; sourceTree = "<group>"; };
-		8E13F7922FFBFFE3002D0D70 /* schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
->>>>>>> inventory
+		545E2F922FEC4E550027DD55 /* Admin_RSMS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Admin_RSMS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86798DA273881ECECDF4DCE5 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E92894D2FF566BC001C9D4C /* .npmrc */ = {isa = PBXFileReference; lastKnownFileType = text; path = .npmrc; sourceTree = "<group>"; };
 		8E92894E2FF566BC001C9D4C /* deno.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deno.json; sourceTree = "<group>"; };
 		8E92894F2FF566BC001C9D4C /* index.ts */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.typescript; path = index.ts; sourceTree = "<group>"; };
@@ -162,131 +114,118 @@
 		8E9289552FF566BC001C9D4C /* config.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.toml; sourceTree = "<group>"; };
 		8E9289572FF566BC001C9D4C /* test_geocoder */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test_geocoder; sourceTree = "<group>"; };
 		8E9289582FF566BC001C9D4C /* test_geocoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test_geocoder.swift; sourceTree = "<group>"; };
-<<<<<<< HEAD
-		9E678089B58133A08AA2EA6C /* InventoryModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = InventoryModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF37099F9037E0BCFCEC76CE /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
-		B734A861C7E2A0C3E0929A0A /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C40D4BE7A6A4F685A8308A52 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D5BA707BDC04B7B8EBB6873F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		E8B07BE12FFE50AC00A1CA81 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-=======
-		A1D18D4E2FFCFA6C00EFC8A4 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		A1D18DCF2FFE58B300EFC8A4 /* SalesAssociateModule-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SalesAssociateModule-Info.plist"; sourceTree = "<group>"; };
-		A1E8ADC4058A76639409B24F /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA69B4B435CD8680B7545E56 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
-		DE8FDF16F7B414C3A03B817E /* AdminModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AdminModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E843FB512FFCBAB300B2BE40 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = sales_associate_rsms.xcodeproj; sourceTree = "<group>"; };
-		F972ED49FB8A1B86121E896B /* SalesAssociateModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SalesAssociateModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
->>>>>>> inventory
+		8FCD46FC60B24F30AC7B2815 /* InventoryModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = InventoryModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		947EEBF99944866D85855995 /* AdminModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AdminModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B6CC576161273DEC3AAFC4E /* StoreManagerModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StoreManagerModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E8829CC4215A42893BD7F97 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		C50BB4B0E44A9074A594FBA5 /* SalesAssociateModule.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SalesAssociateModule.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED92532233BC3BD983136B4C /* RSMSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RSMSApp.swift; sourceTree = "<group>"; };
+		F3FE78F9E9099C6714CC4B92 /* GatewayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GatewayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4EED2DF19100CF4E025BF67F /* RSMS_Sales_Associate/sales_associate_rsms */ = {
+		14C741898CE5C40EFDC1A88B /* RSMS_Admin/Admin_RSMS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RSMS_Sales_Associate/sales_associate_rsms;
-			sourceTree = "<group>";
-		};
-		523E00514209F5690396A0E6 /* RSMS_Store_Manager/RSMS_Project */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RSMS_Store_Manager/RSMS_Project;
-			sourceTree = "<group>";
-		};
-		545E2F942FEC4E550027DD55 /* Admin_RSMS */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Admin_RSMS;
-			sourceTree = "<group>";
-		};
-		84F12EE5A4DF2979F4450C54 /* RSMS_Admin/Admin_RSMS */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Admin/Admin_RSMS;
 			sourceTree = "<group>";
 		};
-		91FDF29A26DEAE7B334CC5CC /* RSMS_Inventory/RSMS_Project */ = {
+		2B494EAD693B3645B82DF372 /* RSMS_Store_Manager/RSMS_Project */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = RSMS_Store_Manager/RSMS_Project;
+			sourceTree = "<group>";
+		};
+		39FC6C7FE621A6C80316E959 /* RSMS_Sales_Associate/sales_associate_rsms */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = RSMS_Sales_Associate/sales_associate_rsms;
+			sourceTree = "<group>";
+		};
+		96A17C437D568E2A0FC8E08D /* RSMS_Inventory/RSMS_Project */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RSMS_Inventory/RSMS_Project;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0F62BD183D58CA4DCCB01E72 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3996D0A856344BA9C146CC10 /* Foundation.framework in Frameworks */,
+				8A8D55B5FA05D9592F57EE81 /* Auth in Frameworks */,
+				787B79936488AE98473B1BF0 /* Functions in Frameworks */,
+				F2614841168B4F05DA82E482 /* PostgREST in Frameworks */,
+				44E6F4084081EFBEAAEA720C /* Realtime in Frameworks */,
+				849F01D0037D22DCA42363B7 /* Storage in Frameworks */,
+				713C0C1B0C5DBD5BB0EBE006 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1AFF61E508E17B49D2681CB4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33C384DABDCCF8FB80482324 /* Foundation.framework in Frameworks */,
+				D15E87BA54BC72012ABEA5F3 /* Auth in Frameworks */,
+				E538B2A7D9C519E6CA19CDC7 /* Functions in Frameworks */,
+				BA9E0322DDB5248E32D5AF32 /* PostgREST in Frameworks */,
+				48CEA8D110BC969E2FFB5A6F /* Realtime in Frameworks */,
+				75882D5C2C3AC118E94FA321 /* Storage in Frameworks */,
+				ECA24F75EBE5FD605FC73285 /* Supabase in Frameworks */,
+				6A91FFDC85A32CCDAE5B951A /* RazorpayCheckout in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		545E2F8F2FEC4E550027DD55 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				8E2951582FF4F6C200BC2782 /* PostgREST in Frameworks */,
 				8E2951562FF4F6C200BC2782 /* Functions in Frameworks */,
-<<<<<<< HEAD
-				E8B07C612FFE535800A1CA81 /* RazorpayCheckout in Frameworks */,
-=======
-				A1D18DD12FFE58F500EFC8A4 /* RazorpayCheckout in Frameworks */,
->>>>>>> inventory
 				8E29515E2FF4F6C200BC2782 /* Supabase in Frameworks */,
 				8E2951542FF4F6C200BC2782 /* Auth in Frameworks */,
 				8E29515C2FF4F6C200BC2782 /* Storage in Frameworks */,
 				8E29515A2FF4F6C200BC2782 /* Realtime in Frameworks */,
-				5DBE81D5AE62742767B41CC5 /* AdminModule.framework in Frameworks */,
-				4CD2A16A7C27FEB83DD69B19 /* InventoryModule.framework in Frameworks */,
-				177001629338D550FB2D9009 /* StoreManagerModule.framework in Frameworks */,
-				117888FFCE24E8B4731D57CC /* SalesAssociateModule.framework in Frameworks */,
+				026B4797CC9BD045D26F94FD /* AdminModule.framework in Frameworks */,
+				1BEC7CA99D03CF6381475D12 /* InventoryModule.framework in Frameworks */,
+				F1EB2FEB7F63FE7BCAC3EAA6 /* StoreManagerModule.framework in Frameworks */,
+				04F45FB88393067B86114264 /* SalesAssociateModule.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A39DF0581B1261A679CD1034 /* Frameworks */ = {
+		92A698F6D8DA05C5AE92646C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				191AD76ACB18D653704484B5 /* Foundation.framework in Frameworks */,
-				5153964B6A7531DD54010347 /* Auth in Frameworks */,
-				0AC02E39988EBAE6BE8823F7 /* Functions in Frameworks */,
-				50536527E39792805465C756 /* PostgREST in Frameworks */,
-				8651CC05E03137B82A0D849F /* Realtime in Frameworks */,
-				44BA157F785589CD7B2DC8F8 /* Storage in Frameworks */,
-				8F1975663F6928D1CF5C205B /* Supabase in Frameworks */,
+				ED7BD8FBB11A634C722D123B /* Foundation.framework in Frameworks */,
+				F4D177382E4FEAC4110F84EC /* Auth in Frameworks */,
+				EAB3A1CF2AA3442116B07396 /* Functions in Frameworks */,
+				F68434F61B0544039EEA9FB1 /* PostgREST in Frameworks */,
+				2C841D483DA016D32E9EED16 /* Realtime in Frameworks */,
+				66DDA412B4AE5232D9A46FC5 /* Storage in Frameworks */,
+				00368C3441F60737D3A84066 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B9C5421ABF7E9FD560506FA6 /* Frameworks */ = {
+		D665C2E72F045484D1B64FB4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CA7B8F8E4ED7E1F4DA9060D5 /* Foundation.framework in Frameworks */,
-				209EFD388EDFB5FE1CC47CDA /* Auth in Frameworks */,
-				D8CBD7780624440E387B187A /* Functions in Frameworks */,
-				57523E29739C131AD407770F /* PostgREST in Frameworks */,
-				13AC31DAE44E66EAFBD45525 /* Realtime in Frameworks */,
-				5DBB972033106411E0A75003 /* Storage in Frameworks */,
-				6E5EC1056A129FC81A0F8397 /* Supabase in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D4ECDA9C7F1820795C23517F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F3F723214A2B3595476852BA /* Foundation.framework in Frameworks */,
-				869671BBD6387E1FEC576482 /* Auth in Frameworks */,
-				0B29166274E0E9687C3804A2 /* Functions in Frameworks */,
-				A4270BAFCA636C518F913FD5 /* PostgREST in Frameworks */,
-				A85E1C145B8A1DD0E7582B42 /* Realtime in Frameworks */,
-				94DD96790E3BC4DB017BAB2C /* Storage in Frameworks */,
-				839248273DECD2C8BB614A31 /* Supabase in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E48005C81E1914E18B25723E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				ED105E3546067C150679877D /* Foundation.framework in Frameworks */,
-				CE8566C1705740B13C4E6D65 /* Auth in Frameworks */,
-				014C05AC09F65AC20BAB93FC /* Functions in Frameworks */,
-				2AA016F9DBBC609EE36EC52A /* PostgREST in Frameworks */,
-				CE3FDF3A24D25638C807E079 /* Realtime in Frameworks */,
-				37A1E393004BD4E099C2B06F /* Storage in Frameworks */,
-				7090A1593FD06A6894B825D2 /* Supabase in Frameworks */,
-				C537307F62F7568407495414 /* RazorpayCheckout in Frameworks */,
+				86724F492E9B9D2B0949D06C /* Foundation.framework in Frameworks */,
+				BEF34E378BB1247DFEEA5A10 /* Auth in Frameworks */,
+				53E085B31440EF1702422D96 /* Functions in Frameworks */,
+				A4DB3023CD5B68DAB0408688 /* PostgREST in Frameworks */,
+				562901F517DD8F97EC3AE699 /* Realtime in Frameworks */,
+				A2DF6482F40C268423A3E4E5 /* Storage in Frameworks */,
+				8B93755924FA4DD52303D930 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,60 +235,29 @@
 		545E2F892FEC4E550027DD55 = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
-				8E92894A2FF566BC001C9D4C /* schema.json */,
-=======
-				A1D18DCF2FFE58B300EFC8A4 /* SalesAssociateModule-Info.plist */,
-				8E13F7862FFBFFCC002D0D70 /* supabase */,
-				8E13F7872FFBFFCC002D0D70 /* test_geocoder */,
-				8E13F7882FFBFFCC002D0D70 /* test_geocoder.swift */,
->>>>>>> inventory
 				8E9289562FF566BC001C9D4C /* supabase */,
 				8E9289572FF566BC001C9D4C /* test_geocoder */,
 				8E9289582FF566BC001C9D4C /* test_geocoder.swift */,
-				545E2F942FEC4E550027DD55 /* Admin_RSMS */,
 				8E2951522FF4F6C200BC2782 /* Frameworks */,
 				545E2F932FEC4E550027DD55 /* Products */,
-				AF37099F9037E0BCFCEC76CE /* RSMSApp.swift */,
-				8A0A846D6F13544B6C1748FB /* GatewayView.swift */,
-				C40D4BE7A6A4F685A8308A52 /* Assets.xcassets */,
-				84F12EE5A4DF2979F4450C54 /* RSMS_Admin/Admin_RSMS */,
-				91FDF29A26DEAE7B334CC5CC /* RSMS_Inventory/RSMS_Project */,
-				523E00514209F5690396A0E6 /* RSMS_Store_Manager/RSMS_Project */,
-				4EED2DF19100CF4E025BF67F /* RSMS_Sales_Associate/sales_associate_rsms */,
+				ED92532233BC3BD983136B4C /* RSMSApp.swift */,
+				F3FE78F9E9099C6714CC4B92 /* GatewayView.swift */,
+				86798DA273881ECECDF4DCE5 /* Assets.xcassets */,
+				14C741898CE5C40EFDC1A88B /* RSMS_Admin/Admin_RSMS */,
+				96A17C437D568E2A0FC8E08D /* RSMS_Inventory/RSMS_Project */,
+				2B494EAD693B3645B82DF372 /* RSMS_Store_Manager/RSMS_Project */,
+				39FC6C7FE621A6C80316E959 /* RSMS_Sales_Associate/sales_associate_rsms */,
 			);
 			sourceTree = "<group>";
 		};
 		545E2F932FEC4E550027DD55 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				545E2F922FEC4E550027DD55 /* RSMS.app */,
-<<<<<<< HEAD
-				701D07852E1D7511EB0936AC /* AdminModule.framework */,
-				9E678089B58133A08AA2EA6C /* InventoryModule.framework */,
-				B734A861C7E2A0C3E0929A0A /* StoreManagerModule.framework */,
-				71384627F6C952CFDACF1A7E /* SalesAssociateModule.framework */,
-=======
-				DE8FDF16F7B414C3A03B817E /* AdminModule.framework */,
-				14A849CAC1A51C675BFEA412 /* InventoryModule.framework */,
-				D664F1CCBF48A4C13A0D525B /* StoreManagerModule.framework */,
-				F972ED49FB8A1B86121E896B /* SalesAssociateModule.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		68E2505A6FFEE83398FA10D6 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				71B8C0EB3B84B12F9ABE47C4 /* Foundation.framework */,
-			);
-			name = iOS;
-			sourceTree = "<group>";
-		};
-		8E13F7072FFBFF78002D0D70 /* Products */ = {
-			isa = PBXGroup;
-			children = (
->>>>>>> inventory
+				545E2F922FEC4E550027DD55 /* Admin_RSMS.app */,
+				947EEBF99944866D85855995 /* AdminModule.framework */,
+				8FCD46FC60B24F30AC7B2815 /* InventoryModule.framework */,
+				9B6CC576161273DEC3AAFC4E /* StoreManagerModule.framework */,
+				C50BB4B0E44A9074A594FBA5 /* SalesAssociateModule.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -357,7 +265,7 @@
 		8E2951522FF4F6C200BC2782 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D4E864A17095E0242A7FB9C5 /* iOS */,
+				B2AAD11BDD8E95348722ECD6 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -399,57 +307,39 @@
 			path = supabase;
 			sourceTree = "<group>";
 		};
-<<<<<<< HEAD
-		D4E864A17095E0242A7FB9C5 /* iOS */ = {
-=======
-		A1D18D512FFCFA6C00EFC8A4 /* Products */ = {
+		B2AAD11BDD8E95348722ECD6 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		E843FB542FFCBAB300B2BE40 /* Products */ = {
->>>>>>> inventory
-			isa = PBXGroup;
-			children = (
-				D5BA707BDC04B7B8EBB6873F /* Foundation.framework */,
+				9E8829CC4215A42893BD7F97 /* Foundation.framework */,
 			);
 			name = iOS;
-			sourceTree = "<group>";
-		};
-		E8B07BE42FFE50AC00A1CA81 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		0EDD08E2F980C914E57E28FD /* Headers */ = {
+		48DB1A0050847037AEE8B68A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		27D411879968AED860EAC6E9 /* Headers */ = {
+		6B758CE905077DA297CBC20B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		570B5545BD024B97F982947B /* Headers */ = {
+		B50A8AEFE7F9467060F739F1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		70D063AF956E30972A9509CF /* Headers */ = {
+		BAB4709A437F4F613EC71F7F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -459,62 +349,92 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		25496C27B6AFAE32174E694E /* StoreManagerModule */ = {
+		037EDFFDC1E627101CEA06D5 /* StoreManagerModule */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 103F858B242B7E6F4B0D571C /* Build configuration list for PBXNativeTarget "StoreManagerModule" */;
+			buildConfigurationList = E38C7F5A249A21EC433CA382 /* Build configuration list for PBXNativeTarget "StoreManagerModule" */;
 			buildPhases = (
-				27D411879968AED860EAC6E9 /* Headers */,
-				5B076973D0BD874AE678C749 /* Sources */,
-				D4ECDA9C7F1820795C23517F /* Frameworks */,
-				6E1850AC4172BA78DB7F855D /* Resources */,
+				6B758CE905077DA297CBC20B /* Headers */,
+				2C9506F71812375A1369FC9A /* Sources */,
+				0F62BD183D58CA4DCCB01E72 /* Frameworks */,
+				8CB733C52134E8A322FA9EA5 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				523E00514209F5690396A0E6 /* RSMS_Store_Manager/RSMS_Project */,
+				2B494EAD693B3645B82DF372 /* RSMS_Store_Manager/RSMS_Project */,
 			);
 			name = StoreManagerModule;
 			packageProductDependencies = (
-				9D70F35F1C1BB5A003815A4C /* Auth */,
-				45DA124249AF7211B6A05A52 /* Functions */,
-				D6B4750CBF1C586DAEE560F8 /* PostgREST */,
-				F9D0CB2910F0CD7D2CBE9FE0 /* Realtime */,
-				D7B146B0A352E23F08B9DEF9 /* Storage */,
-				08387E1A760E34145B8A003B /* Supabase */,
+				1A87EC1BF8A6C62F18D911B8 /* Auth */,
+				D89341B830C04767DE56BAF8 /* Functions */,
+				EF6B62C98A6D63C93EAEE65C /* PostgREST */,
+				6B36ED4C852F570317DEE05E /* Realtime */,
+				A0F940E743AC6428C5CDB4E3 /* Storage */,
+				5853855F290322F066B41F4A /* Supabase */,
 			);
 			productName = StoreManagerModule;
-			productReference = B734A861C7E2A0C3E0929A0A /* StoreManagerModule.framework */;
+			productReference = 9B6CC576161273DEC3AAFC4E /* StoreManagerModule.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		3430259DD4405FD631FB5774 /* AdminModule */ = {
+		0D4F0EFFA35C9FD3767A309F /* SalesAssociateModule */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B00F0243AE642BEC68537589 /* Build configuration list for PBXNativeTarget "AdminModule" */;
+			buildConfigurationList = 4F99B8F5E13770DA6420F8FD /* Build configuration list for PBXNativeTarget "SalesAssociateModule" */;
 			buildPhases = (
-				0EDD08E2F980C914E57E28FD /* Headers */,
-				9426678E48BB551AC9EC52E4 /* Sources */,
-				B9C5421ABF7E9FD560506FA6 /* Frameworks */,
-				ACED3362995C8F907E9E9D96 /* Resources */,
+				B50A8AEFE7F9467060F739F1 /* Headers */,
+				BC7626FD8E7F4697E4761D51 /* Sources */,
+				1AFF61E508E17B49D2681CB4 /* Frameworks */,
+				658DA4816E1C108D5AEE7C20 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				84F12EE5A4DF2979F4450C54 /* RSMS_Admin/Admin_RSMS */,
+				39FC6C7FE621A6C80316E959 /* RSMS_Sales_Associate/sales_associate_rsms */,
 			);
-			name = AdminModule;
+			name = SalesAssociateModule;
 			packageProductDependencies = (
-				8499803AAB95A44A50364AD3 /* Auth */,
-				A053F76B6F13D0947553A47E /* Functions */,
-				722A9CBDC94EFA9F715A7A61 /* PostgREST */,
-				0D71A5B976D526FED964B5FF /* Realtime */,
-				99E4A566B43DA54C66733A03 /* Storage */,
-				AC0FC10E6920F1EC740F3231 /* Supabase */,
+				E1F0840A9309CA3CE5080F27 /* Auth */,
+				58AA9E6250EE5C007F43CECB /* Functions */,
+				323F4898AE416E4C7937561D /* PostgREST */,
+				7A37BFDB342AE8C99491CECB /* Realtime */,
+				3627CAD2FC13A10F321C3A7D /* Storage */,
+				FDA208A94672E3207E5A1A48 /* Supabase */,
+				A4A754D75C9638260645F229 /* RazorpayCheckout */,
 			);
-			productName = AdminModule;
-			productReference = 701D07852E1D7511EB0936AC /* AdminModule.framework */;
+			productName = SalesAssociateModule;
+			productReference = C50BB4B0E44A9074A594FBA5 /* SalesAssociateModule.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		3EDB136A59FE2ED6411FDA08 /* InventoryModule */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 276D188B35B59C09EA55F4CA /* Build configuration list for PBXNativeTarget "InventoryModule" */;
+			buildPhases = (
+				BAB4709A437F4F613EC71F7F /* Headers */,
+				46F13382FC05021707DE9D8F /* Sources */,
+				92A698F6D8DA05C5AE92646C /* Frameworks */,
+				DFE98DBFAC64063B68637117 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				96A17C437D568E2A0FC8E08D /* RSMS_Inventory/RSMS_Project */,
+			);
+			name = InventoryModule;
+			packageProductDependencies = (
+				04D5FC83B69C03E255E5340F /* Auth */,
+				C566E1E76BA9BEBF148B4ED0 /* Functions */,
+				032EE05EC878E2196C92097D /* PostgREST */,
+				E6CE66F2BEDF949CFFB8D65B /* Realtime */,
+				F2CC569503868A1C3282216C /* Storage */,
+				0EA55DD5B6D6017E96CE079F /* Supabase */,
+			);
+			productName = InventoryModule;
+			productReference = 8FCD46FC60B24F30AC7B2815 /* InventoryModule.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		545E2F912FEC4E550027DD55 /* RSMS */ = {
@@ -524,15 +444,15 @@
 				545E2F8E2FEC4E550027DD55 /* Sources */,
 				545E2F8F2FEC4E550027DD55 /* Frameworks */,
 				545E2F902FEC4E550027DD55 /* Resources */,
-				4AC01E96CD6E9EB2F9DFFAF2 /* Embed Frameworks */,
+				D972C00222D4A247FA01C81E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				B846B02D9144028D6018DE63 /* PBXTargetDependency */,
-				536F5AE98829109E307E6672 /* PBXTargetDependency */,
-				746F19BF0CCC74A42D6CF826 /* PBXTargetDependency */,
-				52FCB197FD5F19B3A8DA6196 /* PBXTargetDependency */,
+				5B17C39D4815024DD36DCF3E /* PBXTargetDependency */,
+				4AC00DACA49CDA6F3CEC193B /* PBXTargetDependency */,
+				E67ADFF75F3961F055B21B32 /* PBXTargetDependency */,
+				A80E78C5D5CDDEC719891694 /* PBXTargetDependency */,
 			);
 			name = RSMS;
 			packageProductDependencies = (
@@ -542,73 +462,38 @@
 				8E2951592FF4F6C200BC2782 /* Realtime */,
 				8E29515B2FF4F6C200BC2782 /* Storage */,
 				8E29515D2FF4F6C200BC2782 /* Supabase */,
-<<<<<<< HEAD
-				E8B07C602FFE535800A1CA81 /* RazorpayCheckout */,
-=======
-				A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */,
->>>>>>> inventory
 			);
 			productName = RSMS;
-			productReference = 545E2F922FEC4E550027DD55 /* RSMS.app */;
+			productReference = 545E2F922FEC4E550027DD55 /* Admin_RSMS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		81BDF411ED60737B096883F7 /* InventoryModule */ = {
+		9B97FE8E0F87A927A3C3E90E /* AdminModule */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5F3BA93604FF447F6EFFDEF6 /* Build configuration list for PBXNativeTarget "InventoryModule" */;
+			buildConfigurationList = 7F8FB508014B756B2DA65F21 /* Build configuration list for PBXNativeTarget "AdminModule" */;
 			buildPhases = (
-				70D063AF956E30972A9509CF /* Headers */,
-				9F4BF7A5B5DCD287C93D2700 /* Sources */,
-				A39DF0581B1261A679CD1034 /* Frameworks */,
-				FB0F879EBA9167B1F1FB6667 /* Resources */,
+				48DB1A0050847037AEE8B68A /* Headers */,
+				4D4FCA02AC9A2BCCBF3D8279 /* Sources */,
+				D665C2E72F045484D1B64FB4 /* Frameworks */,
+				9F6B8AF5F9C7B8BFF066E3D4 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				91FDF29A26DEAE7B334CC5CC /* RSMS_Inventory/RSMS_Project */,
+				14C741898CE5C40EFDC1A88B /* RSMS_Admin/Admin_RSMS */,
 			);
-			name = InventoryModule;
+			name = AdminModule;
 			packageProductDependencies = (
-				27BE1D9885B71518B62E1EF0 /* Auth */,
-				D14BB10C79D3442F7E137530 /* Functions */,
-				0F13A1C2BF83C17741D65526 /* PostgREST */,
-				D4CA5B97AE43988403F6B38A /* Realtime */,
-				2DA3FA9DBC2D091AF055D0CC /* Storage */,
-				42802BE9AFE63E569CA41D2C /* Supabase */,
+				2422B3549608E0B19FEAA23A /* Auth */,
+				C232492CC80D3156D18515E5 /* Functions */,
+				05E54592D6ABA7A3535AAC46 /* PostgREST */,
+				15A9CDBB557999C623764201 /* Realtime */,
+				588F9233D62B4D9BD79C7521 /* Storage */,
+				C96E0401165D3D71C4CD8BD0 /* Supabase */,
 			);
-			productName = InventoryModule;
-			productReference = 9E678089B58133A08AA2EA6C /* InventoryModule.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		A1D7C541CAF87267C2BBE3AB /* SalesAssociateModule */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D97F11AF2182CB3BE0460E47 /* Build configuration list for PBXNativeTarget "SalesAssociateModule" */;
-			buildPhases = (
-				570B5545BD024B97F982947B /* Headers */,
-				A6631F3D7B494EAD4862786B /* Sources */,
-				E48005C81E1914E18B25723E /* Frameworks */,
-				F337D2D01F6C4ADE25B994BD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				4EED2DF19100CF4E025BF67F /* RSMS_Sales_Associate/sales_associate_rsms */,
-			);
-			name = SalesAssociateModule;
-			packageProductDependencies = (
-				D8B1634B38C373217F0C47A3 /* Auth */,
-				2417F80FB36D720886DB95F2 /* Functions */,
-				359801B555A172F6C9E3F780 /* PostgREST */,
-				B53787DDC34302D1152544CF /* Realtime */,
-				EA46A0CBC5DD008F4D386286 /* Storage */,
-				773DFA0D6F0DA2FD2AFAC78B /* Supabase */,
-				2FBA351F3A6CED2CCC8D9F04 /* RazorpayCheckout */,
-			);
-			productName = SalesAssociateModule;
-			productReference = 71384627F6C952CFDACF1A7E /* SalesAssociateModule.framework */;
+			productName = AdminModule;
+			productReference = 947EEBF99944866D85855995 /* AdminModule.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -637,62 +522,19 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				4FABAC9D9EEC59EC6F512DAD /* XCRemoteSwiftPackageReference "razorpay-pod" */,
+				5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				823B3A15DB28FD629C43476D /* XCRemoteSwiftPackageReference "razorpay-pod" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 545E2F932FEC4E550027DD55 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-<<<<<<< HEAD
-					ProductGroup = E8B07BE42FFE50AC00A1CA81 /* Products */;
-					ProjectRef = E8B07BE12FFE50AC00A1CA81 /* sales_associate_rsms.xcodeproj */;
-=======
-					ProductGroup = 16A6AFCA2FFB6928007A7E84 /* Products */;
-					ProjectRef = 16A6AFC72FFB6928007A7E84 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 16A6C5AF2FFC16EE007A7E84 /* Products */;
-					ProjectRef = 16A6C5AC2FFC16EE007A7E84 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 16A6A9382FFB6360007A7E84 /* Products */;
-					ProjectRef = 16A6A9352FFB6360007A7E84 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 0B5F587D2FFAE3D200034E31 /* Products */;
-					ProjectRef = 0B5F587A2FFAE3D200034E31 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = E8C08ABC2FFB827800BE7B39 /* Products */;
-					ProjectRef = E8C08AB92FFB827800BE7B39 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = A1D18D512FFCFA6C00EFC8A4 /* Products */;
-					ProjectRef = A1D18D4E2FFCFA6C00EFC8A4 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 8E13F7072FFBFF78002D0D70 /* Products */;
-					ProjectRef = 8E13F7042FFBFF78002D0D70 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = E843FB542FFCBAB300B2BE40 /* Products */;
-					ProjectRef = E843FB512FFCBAB300B2BE40 /* sales_associate_rsms.xcodeproj */;
-				},
-				{
-					ProductGroup = 16A6C2A32FFC086F007A7E84 /* Products */;
-					ProjectRef = 16A6C2A02FFC086F007A7E84 /* sales_associate_rsms.xcodeproj */;
->>>>>>> inventory
-				},
-			);
 			projectRoot = "";
 			targets = (
 				545E2F912FEC4E550027DD55 /* RSMS */,
-				3430259DD4405FD631FB5774 /* AdminModule */,
-				81BDF411ED60737B096883F7 /* InventoryModule */,
-				25496C27B6AFAE32174E694E /* StoreManagerModule */,
-				A1D7C541CAF87267C2BBE3AB /* SalesAssociateModule */,
+				9B97FE8E0F87A927A3C3E90E /* AdminModule */,
+				3EDB136A59FE2ED6411FDA08 /* InventoryModule */,
+				037EDFFDC1E627101CEA06D5 /* StoreManagerModule */,
+				0D4F0EFFA35C9FD3767A309F /* SalesAssociateModule */,
 			);
 		};
 /* End PBXProject section */
@@ -702,32 +544,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DDB5539BBBD812EA884AE85 /* Assets.xcassets in Resources */,
+				B38909F9849B98F0C7C7C6ED /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6E1850AC4172BA78DB7F855D /* Resources */ = {
+		658DA4816E1C108D5AEE7C20 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		ACED3362995C8F907E9E9D96 /* Resources */ = {
+		8CB733C52134E8A322FA9EA5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F337D2D01F6C4ADE25B994BD /* Resources */ = {
+		9F6B8AF5F9C7B8BFF066E3D4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FB0F879EBA9167B1F1FB6667 /* Resources */ = {
+		DFE98DBFAC64063B68637117 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -737,37 +579,37 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2C9506F71812375A1369FC9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		46F13382FC05021707DE9D8F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D4FCA02AC9A2BCCBF3D8279 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		545E2F8E2FEC4E550027DD55 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C7A69EFA61953D739B61403 /* RSMSApp.swift in Sources */,
-				19D08D1E1DC003D0317BFDF5 /* GatewayView.swift in Sources */,
+				F2474B71FFDB6939EB8CC602 /* RSMSApp.swift in Sources */,
+				2436218B18B7C6AC89A9922C /* GatewayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5B076973D0BD874AE678C749 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9426678E48BB551AC9EC52E4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9F4BF7A5B5DCD287C93D2700 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A6631F3D7B494EAD4862786B /* Sources */ = {
+		BC7626FD8E7F4697E4761D51 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -777,179 +619,39 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		52FCB197FD5F19B3A8DA6196 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SalesAssociateModule;
-			target = A1D7C541CAF87267C2BBE3AB /* SalesAssociateModule */;
-			targetProxy = A671CCFF58A3D8596A084573 /* PBXContainerItemProxy */;
-		};
-		536F5AE98829109E307E6672 /* PBXTargetDependency */ = {
+		4AC00DACA49CDA6F3CEC193B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = InventoryModule;
-			target = 81BDF411ED60737B096883F7 /* InventoryModule */;
-			targetProxy = B581AFB5D67B14F7D7FA1532 /* PBXContainerItemProxy */;
+			target = 3EDB136A59FE2ED6411FDA08 /* InventoryModule */;
+			targetProxy = C84665C61B25DBCEDF3529D9 /* PBXContainerItemProxy */;
 		};
-		746F19BF0CCC74A42D6CF826 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = StoreManagerModule;
-			target = 25496C27B6AFAE32174E694E /* StoreManagerModule */;
-			targetProxy = 44C49614796D1B75E04A9EB7 /* PBXContainerItemProxy */;
-		};
-		B846B02D9144028D6018DE63 /* PBXTargetDependency */ = {
+		5B17C39D4815024DD36DCF3E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = AdminModule;
-			target = 3430259DD4405FD631FB5774 /* AdminModule */;
-			targetProxy = F7534B610E2552346BBD70F4 /* PBXContainerItemProxy */;
+			target = 9B97FE8E0F87A927A3C3E90E /* AdminModule */;
+			targetProxy = 4FB08764B3CE025119298B1C /* PBXContainerItemProxy */;
+		};
+		A80E78C5D5CDDEC719891694 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SalesAssociateModule;
+			target = 0D4F0EFFA35C9FD3767A309F /* SalesAssociateModule */;
+			targetProxy = C88EDFCCF02B51BF5B752470 /* PBXContainerItemProxy */;
+		};
+		E67ADFF75F3961F055B21B32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = StoreManagerModule;
+			target = 037EDFFDC1E627101CEA06D5 /* StoreManagerModule */;
+			targetProxy = B6ECE007699A6B5E95B883E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-<<<<<<< HEAD
-		044E9504DA388EB2C919AF35 /* Release */ = {
-=======
-		0271256D3084E229879F3723 /* Debug */ = {
+		004D88F61BCC9C91BE52D875 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "SalesAssociateModule-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.SalesAssociateModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		16778B9AE216F4568DBC2C58 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "SalesAssociateModule-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.SalesAssociateModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		1D224CF98844F624DB17D708 /* Release */ = {
->>>>>>> inventory
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-=======
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
->>>>>>> inventory
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.StoreManagerModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-<<<<<<< HEAD
-		3D7473F0DA3454192E59852A /* Release */ = {
-=======
-		29B0D67E463221C1CC1EF984 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.StoreManagerModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		4194F1DCAFC0F5D2A5E127F4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -974,13 +676,12 @@
 			};
 			name = Debug;
 		};
-		4FC8E7CA400288FEFEE5A404 /* Release */ = {
+		419A6DB9C4D4ADD8F01210DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -994,54 +695,16 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.InventoryModule;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.SalesAssociateModule;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
-		};
-		53A91467F252F3E9D133CAB6 /* Release */ = {
->>>>>>> inventory
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-=======
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
->>>>>>> inventory
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.AdminModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
+			name = Debug;
 		};
 		545E2F9B2FEC4E560027DD55 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1171,17 +834,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = Q95UXSW82J;
+				DEVELOPMENT_TEAM = VACG5C2JP3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "for scanning the products";
-=======
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
->>>>>>> inventory
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RSMS needs microphone access to record your voice for promotion descriptions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "RSMS needs speech recognition to transcribe your voice for promotion descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1195,11 +850,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-<<<<<<< HEAD
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS000";
-=======
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS8";
->>>>>>> inventory
+				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -1218,17 +869,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = Q95UXSW82J;
+				DEVELOPMENT_TEAM = VACG5C2JP3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "for scanning the products";
-=======
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
->>>>>>> inventory
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RSMS needs microphone access to record your voice for promotion descriptions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "RSMS needs speech recognition to transcribe your voice for promotion descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1242,11 +885,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-<<<<<<< HEAD
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS000";
-=======
-				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS8";
->>>>>>> inventory
+				PRODUCT_BUNDLE_IDENTIFIER = "saloni.Admin-RSMS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -1258,13 +897,12 @@
 			};
 			name = Release;
 		};
-		7DEBA09C8F9258C4E0B985FB /* Release */ = {
+		74132CCD41A7748415CA4BB4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q95UXSW82J;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1290,13 +928,12 @@
 			};
 			name = Release;
 		};
-		86595AA8743496B07EDA8A7C /* Debug */ = {
+		A69ECB0AAA2D3BD3811F979B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q95UXSW82J;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1310,101 +947,7 @@
 				);
 				MACH_O_TYPE = mh_dylib;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.InventoryModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		898FA0BC7410F119141A1B1B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.StoreManagerModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		9BDD8D0F54E6E47BF56D5680 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.SalesAssociateModule;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		AEDD2B9335C452517174A123 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GENERATE_INFOPLIST_FILE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = mh_dylib;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.InventoryModule;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.AdminModule;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1416,16 +959,12 @@
 			};
 			name = Release;
 		};
-		B457F2EBA618FBFE5070F063 /* Debug */ = {
+		AAD717FEC163CBFB15AC953F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q95UXSW82J;
-=======
-				DEVELOPMENT_TEAM = 5Q57GY4Q4F;
->>>>>>> inventory
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1450,14 +989,115 @@
 			};
 			name = Debug;
 		};
+		D8CB8BB4A9613B727190D593 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.InventoryModule;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		E8EE71E621623221026BE8BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.StoreManagerModule;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		EABA8380BE9601B7254295F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rsms.StoreManagerModule;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		103F858B242B7E6F4B0D571C /* Build configuration list for PBXNativeTarget "StoreManagerModule" */ = {
+		276D188B35B59C09EA55F4CA /* Build configuration list for PBXNativeTarget "InventoryModule" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				044E9504DA388EB2C919AF35 /* Release */,
-				898FA0BC7410F119141A1B1B /* Debug */,
+				D8CB8BB4A9613B727190D593 /* Release */,
+				004D88F61BCC9C91BE52D875 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F99B8F5E13770DA6420F8FD /* Build configuration list for PBXNativeTarget "SalesAssociateModule" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				74132CCD41A7748415CA4BB4 /* Release */,
+				419A6DB9C4D4ADD8F01210DA /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1480,29 +1120,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5F3BA93604FF447F6EFFDEF6 /* Build configuration list for PBXNativeTarget "InventoryModule" */ = {
+		7F8FB508014B756B2DA65F21 /* Build configuration list for PBXNativeTarget "AdminModule" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AEDD2B9335C452517174A123 /* Release */,
-				86595AA8743496B07EDA8A7C /* Debug */,
+				A69ECB0AAA2D3BD3811F979B /* Release */,
+				AAD717FEC163CBFB15AC953F /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B00F0243AE642BEC68537589 /* Build configuration list for PBXNativeTarget "AdminModule" */ = {
+		E38C7F5A249A21EC433CA382 /* Build configuration list for PBXNativeTarget "StoreManagerModule" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3D7473F0DA3454192E59852A /* Release */,
-				B457F2EBA618FBFE5070F063 /* Debug */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D97F11AF2182CB3BE0460E47 /* Build configuration list for PBXNativeTarget "SalesAssociateModule" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7DEBA09C8F9258C4E0B985FB /* Release */,
-				9BDD8D0F54E6E47BF56D5680 /* Debug */,
+				EABA8380BE9601B7254295F5 /* Release */,
+				E8EE71E621623221026BE8BE /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1510,7 +1141,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase/supabase-swift.git";
 			requirement = {
@@ -1518,7 +1149,7 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		4FABAC9D9EEC59EC6F512DAD /* XCRemoteSwiftPackageReference "razorpay-pod" */ = {
+		823B3A15DB28FD629C43476D /* XCRemoteSwiftPackageReference "razorpay-pod" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/razorpay/razorpay-pod";
 			requirement = {
@@ -1537,70 +1168,75 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		08387E1A760E34145B8A003B /* Supabase */ = {
+		032EE05EC878E2196C92097D /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		04D5FC83B69C03E255E5340F /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		05E54592D6ABA7A3535AAC46 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		0EA55DD5B6D6017E96CE079F /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		0D71A5B976D526FED964B5FF /* Realtime */ = {
+		15A9CDBB557999C623764201 /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		0F13A1C2BF83C17741D65526 /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		2417F80FB36D720886DB95F2 /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Functions;
-		};
-		27BE1D9885B71518B62E1EF0 /* Auth */ = {
+		1A87EC1BF8A6C62F18D911B8 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Auth;
 		};
-		2DA3FA9DBC2D091AF055D0CC /* Storage */ = {
+		2422B3549608E0B19FEAA23A /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		323F4898AE416E4C7937561D /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		3627CAD2FC13A10F321C3A7D /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		5853855F290322F066B41F4A /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		588F9233D62B4D9BD79C7521 /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		2FBA351F3A6CED2CCC8D9F04 /* RazorpayCheckout */ = {
+		58AA9E6250EE5C007F43CECB /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 4FABAC9D9EEC59EC6F512DAD /* XCRemoteSwiftPackageReference "razorpay-pod" */;
-			productName = RazorpayCheckout;
-		};
-		359801B555A172F6C9E3F780 /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
-		};
-		42802BE9AFE63E569CA41D2C /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-		45DA124249AF7211B6A05A52 /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		722A9CBDC94EFA9F715A7A61 /* PostgREST */ = {
+		6B36ED4C852F570317DEE05E /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = PostgREST;
+			productName = Realtime;
 		};
-		773DFA0D6F0DA2FD2AFAC78B /* Supabase */ = {
+		7A37BFDB342AE8C99491CECB /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-		8499803AAB95A44A50364AD3 /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
 		};
 		8E2951532FF4F6C200BC2782 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1632,79 +1268,60 @@
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		99E4A566B43DA54C66733A03 /* Storage */ = {
+		A0F940E743AC6428C5CDB4E3 /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		9D70F35F1C1BB5A003815A4C /* Auth */ = {
+		A4A754D75C9638260645F229 /* RazorpayCheckout */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
+			package = 823B3A15DB28FD629C43476D /* XCRemoteSwiftPackageReference "razorpay-pod" */;
+			productName = RazorpayCheckout;
 		};
-		A053F76B6F13D0947553A47E /* Functions */ = {
+		C232492CC80D3156D18515E5 /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-		AC0FC10E6920F1EC740F3231 /* Supabase */ = {
+		C566E1E76BA9BEBF148B4ED0 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		C96E0401165D3D71C4CD8BD0 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		B53787DDC34302D1152544CF /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
-		};
-		D14BB10C79D3442F7E137530 /* Functions */ = {
+		D89341B830C04767DE56BAF8 /* Functions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Functions;
 		};
-<<<<<<< HEAD
-		D4CA5B97AE43988403F6B38A /* Realtime */ = {
-=======
-		A1D18DD02FFE58F500EFC8A4 /* RazorpayCheckout */ = {
+		E1F0840A9309CA3CE5080F27 /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0500A8412F5DDB9D23D86125 /* XCRemoteSwiftPackageReference "razorpay-pod" */;
-			productName = RazorpayCheckout;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
 		};
-		BB50939E46963CAB435243F8 /* Realtime */ = {
->>>>>>> inventory
+		E6CE66F2BEDF949CFFB8D65B /* Realtime */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Realtime;
 		};
-		D6B4750CBF1C586DAEE560F8 /* PostgREST */ = {
+		EF6B62C98A6D63C93EAEE65C /* PostgREST */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = PostgREST;
 		};
-		D7B146B0A352E23F08B9DEF9 /* Storage */ = {
+		F2CC569503868A1C3282216C /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
 		};
-		D8B1634B38C373217F0C47A3 /* Auth */ = {
+		FDA208A94672E3207E5A1A48 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Auth;
-		};
-		E8B07C602FFE535800A1CA81 /* RazorpayCheckout */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4FABAC9D9EEC59EC6F512DAD /* XCRemoteSwiftPackageReference "razorpay-pod" */;
-			productName = RazorpayCheckout;
-		};
-		EA46A0CBC5DD008F4D386286 /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B8C0B71AEE84E10A8633DBB /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Storage;
-		};
-		F9D0CB2910F0CD7D2CBE9FE0 /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E2951512FF4F6B600BC2782 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Realtime;
+			package = 5460DBD7C7F754249455A476 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

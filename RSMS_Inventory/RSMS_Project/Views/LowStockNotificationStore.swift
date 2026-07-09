@@ -74,6 +74,7 @@ final class LowStockNotificationStore: ObservableObject {
 
     @Published var notifications: [LowStockNotification] = []
     @Published var pendingRequests: [StockRequest] = []
+    @Published var pendingCycleCounts: [CycleCount] = []
     @Published var products: [Product] = []
     @Published var stores: [Store] = []
 
@@ -88,7 +89,7 @@ final class LowStockNotificationStore: ObservableObject {
     }
 
     var activeCount: Int {
-        activeNotifications.count + pendingRequests.count
+        activeNotifications.count + pendingRequests.count + pendingCycleCounts.count
     }
 
     // MARK: - Populate
@@ -135,6 +136,13 @@ final class LowStockNotificationStore: ObservableObject {
             self.stores = try await DatabaseService.shared.fetch(from: "stores", as: Store.self)
             let allRequests = try await warehouseService.fetchStockRequests()
             self.pendingRequests = allRequests.filter { $0.status.lowercased() == "pending" }
+            
+            // Fetch pending cycle counts scheduled for today
+            let allCycleCounts = try await warehouseService.fetchCycleCounts()
+            self.pendingCycleCounts = allCycleCounts.filter {
+                $0.status.lowercased() == "scheduled" &&
+                Calendar.current.isDateInToday($0.scheduledDate)
+            }
         } catch {
             print("LowStockNotificationStore: populate failed — \(error)")
         }

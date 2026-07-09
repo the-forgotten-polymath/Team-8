@@ -18,8 +18,6 @@ struct ShipmentDetailView: View {
     @State private var showConfirmDialog = false
     @State private var batchCreatedCertificatesCount = 0
     
-    @Environment(\.dismiss) private var dismiss
-    
     private func displayStatus(for shipment: Shipment) -> String {
         let lower = shipment.status.lowercased()
         if lower == "verified" || lower == "arrived" {

@@ -20,7 +20,7 @@ struct NotificationsView: View {
     }
 
     private var isEmpty: Bool {
-        activeAlerts.isEmpty && notificationStore.pendingRequests.isEmpty
+        activeAlerts.isEmpty && notificationStore.pendingRequests.isEmpty && notificationStore.pendingCycleCounts.isEmpty
     }
 
     var body: some View {
@@ -42,6 +42,11 @@ struct NotificationsView: View {
             }
             .task {
                 await notificationStore.populate(warehouseId: warehouseId)
+            }
+            .onAppear {
+                Swift.Task {
+                    await notificationStore.populate(warehouseId: warehouseId)
+                }
             }
         }
     }
@@ -111,6 +116,29 @@ struct NotificationsView: View {
                                 productName: product?.productName ?? "Product",
                                 relativeTime: relativeTime(request.createdAt)
                             )
+                        }
+                    }
+                }
+            }
+
+            if !notificationStore.pendingCycleCounts.isEmpty {
+                Section(header: Text("Pending Audits")) {
+                    ForEach(notificationStore.pendingCycleCounts) { count in
+                        NavigationLink(destination: CycleCountDetailView(count: count, warehouseId: warehouseId, userId: userId)) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(count.zone ?? "Unknown Zone")
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    StatusChip(status: "pending")
+                                }
+                                
+                                Text("Scheduled for Today (\(count.scheduledDate, style: .date))")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
                         }
                     }
                 }

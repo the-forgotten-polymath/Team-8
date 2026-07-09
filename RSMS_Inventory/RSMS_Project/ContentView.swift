@@ -148,17 +148,10 @@ struct ContentView: View {
             .tag(1)
             
             NavigationStack {
-<<<<<<< HEAD
-                OperationsView(warehouseId: wId, userId: uId)
-            }
-            .tabItem {
-                Label("Operations", systemImage: "arrow.left.arrow.right.circle.fill")
-=======
                 LogisticsView(warehouseId: wId, userId: uId)
             }
             .tabItem {
                 Label("Logistics", systemImage: "truck.box.fill")
->>>>>>> inventory
             }
             .tag(2)
             

@@ -114,6 +114,12 @@ puts "Configured main app target: #{main_target.name}"
 # 8. Clear folder synchronized groups of the main target
 main_target.file_system_synchronized_groups.clear
 
+# Remove obsolete relative references carried over from Admin_RSMS.xcodeproj
+project.main_group.children.select { |c| c.respond_to?(:path) && (c.path == 'Admin_RSMS' || c.path == 'schema.json') }.each do |child|
+  child.remove_from_project
+  puts "  Removed obsolete reference: #{child.path}"
+end
+
 # 9. Clean main target source files and reference root gateway files
 main_target.source_build_phase.files.clear
 main_target.resources_build_phase.files.clear
